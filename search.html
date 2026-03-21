@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search — NovaHub</title>
+  <link rel="icon" href="assets/novahub_favicon.svg" type="image/svg+xml">
+  <meta name="description" content="Search and discover movies, books, AI tools, games, and more on NovaHub.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <nav class="glass-nav">
+    <div class="container nav-content">
+      <a href="index.html" class="logo"><img src="assets/novahub_logo.svg" alt="NovaHub" class="logo-img"></a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="category.html" class="nav-link">Categories</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <button id="theme-toggle" class="icon-btn"><span id="theme-icon"></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-header" style="padding-bottom:32px;">
+    <h1 class="title-xl" id="search-title">Search</h1>
+    <div class="search-autocomplete-wrap" style="max-width:640px;margin:0 auto 16px;position:relative;">
+      <div class="search-box-large">
+        <span style="font-size:20px;padding-left:4px;">🔍</span>
+        <input type="text" id="main-search-input" placeholder="Search movies, books, AI tools, games..." autocomplete="off">
+        <button onclick="SearchEngine.runSearch(document.getElementById('main-search-input').value)" class="btn-primary" style="padding:10px 20px;border-radius:50px;">Search</button>
+      </div>
+    </div>
+    <div id="search-trending"></div>
+    <p id="search-count" style="color:var(--text-secondary);font-size:15px;margin-top:8px;"></p>
+  </div>
+
+  <div class="container">
+    <div id="search-tabs" style="margin-bottom:28px;"></div>
+    <div id="search-results" style="padding-bottom:80px;min-height:300px;"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-logo"><img src="assets/novahub_favicon.svg" alt="NH" class="logo-icon"><div><div>NovaHub &copy; 2026</div><div class="footer-tagline">Discover Everything You Need</div></div></div>
+      <div class="footer-links"><a href="index.html">Home</a><a href="blog.html">Blog</a><a href="category.html">Categories</a></div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    // Scroll reveal
+    const obs = new IntersectionObserver(entries => entries.forEach(e => {if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.07});
+    function initReveal(){document.querySelectorAll('.reveal,.reveal-scale').forEach(el=>obs.observe(el));}
+    document.addEventListener('DOMContentLoaded', () => {
+      SearchEngine.initPage();
+      initReveal();
+    });
+    // Re-observe after results render
+    const resultsEl = document.getElementById('search-results');
+    if (resultsEl) {
+      new MutationObserver(() => initReveal()).observe(resultsEl, { childList: true, subtree: true });
+    }
+  </script>
+</body>
+</html>

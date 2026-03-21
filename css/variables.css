@@ -1,0 +1,73 @@
+/* css/variables.css — NovaHub Design Tokens */
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif;
+  --max-width: 1280px;
+  --navbar-height: 64px;
+
+  /* Backgrounds */
+  --bg-color: #F8F8FA;
+  --surface-color: #FFFFFF;
+  --surface-hover: #F2F2F7;
+  --border-color: #E5E5EA;
+
+  /* Text */
+  --text-primary: #1C1C1E;
+  --text-secondary: #6E6E73;
+  --text-tertiary: #AEAEB2;
+
+  /* Accents */
+  --accent-blue:   #0066CC;
+  --accent-purple: #AF52DE;
+  --accent-green:  #28CD41;
+  --accent-red:    #FF3B30;
+  --accent-amber:  #FF9F0A;
+  --accent-teal:   #5AC8FA;
+  --accent-gold:   #FFD60A;
+
+  /* Gradients */
+  --gradient-blue:   linear-gradient(135deg, #0066CC 0%, #0A84FF 100%);
+  --gradient-purple: linear-gradient(135deg, #AF52DE 0%, #5E5CE6 100%);
+  --gradient-fire:   linear-gradient(135deg, #FF3B30 0%, #FF9F0A 100%);
+  --gradient-hero:   linear-gradient(135deg, #6A22D4 0%, #0055CC 60%, #0284C7 100%);
+
+  /* Buttons */
+  --btn-primary-bg: #0066CC;
+  --btn-primary-color: white;
+  --btn-secondary-bg: rgba(0,0,0,0.05);
+  --btn-secondary-color: #1C1C1E;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.07);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.08);
+
+  /* Borders */
+  --border-radius-sm:   8px;
+  --border-radius-md:   12px;
+  --border-radius-lg:   20px;
+  --border-radius-xl:   28px;
+  --border-radius-full: 100px;
+
+  /* Transitions */
+  --transition-fast:   0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-spring: 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+[data-theme='dark'] {
+  --bg-color: #0A0A0C;
+  --surface-color: #1C1C1E;
+  --surface-hover: #2C2C2E;
+  --border-color: #38383A;
+  --text-primary: #F5F5F7;
+  --text-secondary: #8E8E93;
+  --text-tertiary: #636366;
+  --btn-secondary-bg: rgba(255,255,255,0.08);
+  --btn-secondary-color: #F5F5F7;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.5);
+}

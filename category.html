@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category — NovaHub</title>
+  <link rel="icon" href="assets/novahub_favicon.svg" type="image/svg+xml">
+  <meta name="description" content="Browse curated content by category on NovaHub.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <nav class="glass-nav">
+    <div class="container nav-content">
+      <a href="index.html" class="logo"><img src="assets/novahub_logo.svg" alt="NovaHub" class="logo-img"></a>
+      <div class="nav-links">
+        <div class="search-wrap">
+          <form class="search-box" onsubmit="event.preventDefault(); window.location.href='search.html?q='+document.getElementById('nav-search').value;">
+            <input type="text" id="nav-search" placeholder="Search NovaHub...">
+            <button type="submit" aria-label="Search">🔍</button>
+          </form>
+        </div>
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="category.html" class="nav-link active">Categories</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode"><span id="theme-icon"></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Category Header (populated by JS) -->
+  <div id="cat-header"></div>
+
+  <!-- Filter & Sort Bar -->
+  <div class="container" id="filter-bar-wrap" style="padding-top:0;"></div>
+
+  <!-- Items Grid -->
+  <main class="container" id="cat-grid" style="padding-bottom:80px;min-height:400px;"></main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-logo"><img src="assets/novahub_favicon.svg" alt="NH" class="logo-icon"><div><div>NovaHub &copy; 2026</div><div class="footer-tagline">Discover Everything You Need</div></div></div>
+      <div class="footer-links"><a href="index.html">Home</a><a href="blog.html">Blog</a><a href="search.html">Search</a></div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/theme.js"></script>
+  <script>
+    // Scroll reveal
+    function initReveal() {
+      const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.07});
+      document.querySelectorAll('.reveal,.reveal-scale').forEach(el=>obs.observe(el));
+    }
+    // Ripple
+    function initRipple() {
+      document.querySelectorAll('.btn-primary,.btn-secondary').forEach(btn => {
+        btn.addEventListener('click',function(e){const r=document.createElement('span');r.className='ripple';const rect=this.getBoundingClientRect();const s=Math.max(rect.width,rect.height);r.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(e.clientX-rect.left-s/2)+'px;top:'+(e.clientY-rect.top-s/2)+'px;';this.appendChild(r);setTimeout(()=>r.remove(),600);});
+      });
+    }
+
+    const TYPE_ICON = { movie:'🍿', book:'📚', tool:'✨', game:'🎮', video:'🎬' };
+
+    function sortItems(items, by) {
+      if (by === 'rating') return [...items].sort((a,b) => (b.rating||0) - (a.rating||0));
+      if (by === 'free')   return [...items].filter(i => i.pricing && i.pricing.toLowerCase().includes('free'));
+      if (by === 'name')   return [...items].sort((a,b) => (a.name||'').localeCompare(b.name||''));
+      return items;
+    }
+
+    function renderCard(item) {
+      const href = 'item.html?id=' + encodeURIComponent(item.id);
+      const isPoster = ['movie','book','game'].includes(item.type);
+      if (isPoster) {
+        const badge = item.trending ? "<span class='badge badge-trending'>🔥 Hot</span>" : (item.dailyPick ? "<span class='badge badge-pick'>⭐ Pick</span>" : '');
+        const sub = item.director || item.author || item.developer || item.genre || '';
+        const rating = item.rating ? "<div class='card-poster-rating'>★ " + item.rating + "</div>" : '';
+        return '<a href="'+href+'" class="card-poster reveal-scale" style="background-image:url(\''+item.image+'\');display:block;">'+
+          '<div class="bg-zoom" style="background-image:url(\''+item.image+'\');"></div>'+badge+
+          '<div class="card-poster-content"><div class="card-poster-title">'+item.name+'</div>'+(sub?'<div class="card-poster-sub">'+sub+'</div>':'')+rating+'</div></a>';
+      }
+      if (item.type === 'video') {
+        return '<a href="'+href+'" class="card-video reveal-scale" style="display:block;text-decoration:none;">'+
+          '<div class="card-video-thumb" style="background-image:url(\''+item.image+'\');"></div>'+
+          '<div class="card-video-body"><div class="card-video-title">'+item.name+'</div><div class="card-video-meta">'+(item.platform||'')+' · '+(item.category||'')+'</div></div></a>';
+      }
+      const pc = item.pricing && item.pricing.toLowerCase().includes('free') ? 'tag-free' : 'tag-paid';
+      return '<div class="card reveal-scale" onclick="window.location.href=\''+href+'\'"><div class="card-header"><div class="card-icon">'+(item.name||'?').charAt(0)+'</div><div><div class="card-title">'+item.name+'</div><span class="tag '+pc+'">'+item.pricing+'</span></div></div><p class="card-desc">'+(item.shortDesc||'')+'</p><div class="card-actions"><a href="'+href+'" class="btn-secondary" style="font-size:13px;padding:8px 16px;" onclick="event.stopPropagation()">Details</a><a href="'+(item.affiliateLink||href)+'" target="_blank" class="btn-primary" style="font-size:13px;padding:8px 16px;" onclick="event.stopPropagation()">Get ➔</a></div></div>';
+    }
+
+    let currentSort = 'default';
+    let catItems = [];
+
+    function renderGrid() {
+      const grid = document.getElementById('cat-grid');
+      const sorted = sortItems(catItems, currentSort);
+      const isPoster = sorted.length && ['movie','book','game'].includes(sorted[0].type);
+      const gridClass = isPoster ? 'grid-4' : 'grid-3';
+      grid.innerHTML = '<div class="'+gridClass+'">' + (sorted.length ? sorted.map(renderCard).join('') : '<p style="color:var(--text-secondary);grid-column:1/-1;padding:60px 0;text-align:center;">No items found.</p>') + '</div>';
+      initReveal(); initRipple();
+    }
+
+    function setSort(by) {
+      currentSort = by;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === by));
+      renderGrid();
+    }
+    window.setSort = setSort;
+
+    function init() {
+      const params = new URLSearchParams(window.location.search);
+      const catId = params.get('cat') || 'movies';
+      const cat = NOVAHUB_DATA.categories.find(c => c.id === catId) || { name: catId, icon: '📦', desc: '' };
+      catItems = NOVAHUB_DATA.items.filter(i => i.categoryId === catId);
+
+      // Header
+      document.getElementById('cat-header').innerHTML =
+        '<div class="page-header">' +
+          '<div style="font-size:64px;margin-bottom:16px;animation:floatY 3s ease-in-out infinite;">'+cat.icon+'</div>' +
+          '<h1 class="title-xl">'+cat.name+'</h1>' +
+          '<p class="subtitle">'+catItems.length+' items — globally curated, updated daily.</p>' +
+        '</div>';
+      document.title = cat.name + ' — NovaHub';
+
+      // Filter bar
+      document.getElementById('filter-bar-wrap').innerHTML =
+        '<div class="filter-bar" style="margin-bottom:32px;">' +
+          '<span style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-right:12px;">Sort:</span>' +
+          ['default','rating','free','name'].map(s =>
+            '<button class="sort-btn'+(s==='default'?' active':'')+'" data-sort="'+s+'" onclick="setSort(\''+s+'\')">'+(
+              s==='default'?'Popular':s==='rating'?'Top Rated':s==='free'?'Free Only':'A – Z'
+            )+'</button>'
+          ).join('') +
+          '<span style="margin-left:auto;color:var(--text-secondary);font-size:14px;">'+catItems.length+' items</span>' +
+        '</div>';
+
+      // All other categories nav
+      if (catId === '' || !catId) {
+        catItems = NOVAHUB_DATA.items;
+      }
+
+      renderGrid();
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
