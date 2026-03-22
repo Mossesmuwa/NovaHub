@@ -1,300 +1,227 @@
-// js/comments.js — NovaHub Comments System
-// Real comments stored in Supabase
-// Anonymous users limited to 5 comments per day
+// js/comments.js — NovaHub Comments
+// Real comments in Supabase. Anon users limited to 5/day.
 
-const NovaComments = (() => {
+const NovaComments = (function () {
 
-  const BLOCKED_WORDS = [
-    'spam', 'buy now', 'click here', 'free money',
-    'porn', 'xxx', 'hack', 'scam', 'phishing', 'casino'
-  ]
+  function _db() { return window.NovaDB && window.NovaDB.client }
 
-  // ── MODERATION ─────────────────────────────────────────
-  function moderate(text) {
-    if (!text || text.trim().length < 3)
-      return { ok: false, reason: 'Comment is too short.' }
+  var BLOCKED = ['spam','casino','porn','xxx','scam','phishing','free money','click here']
 
-    if (text.trim().length > 1200)
-      return { ok: false, reason: 'Comment is too long (max 1200 characters).' }
-
-    const lower = text.toLowerCase()
-    for (const word of BLOCKED_WORDS) {
-      if (lower.includes(word))
+  // ── Moderate text ─────────────────────────────────────
+  function _moderate(text) {
+    if (!text || text.trim().length < 3) return { ok: false, reason: 'Comment is too short.' }
+    if (text.trim().length > 1200)       return { ok: false, reason: 'Comment is too long (max 1200 chars).' }
+    var lower = text.toLowerCase()
+    for (var i = 0; i < BLOCKED.length; i++) {
+      if (lower.indexOf(BLOCKED[i]) !== -1)
         return { ok: false, reason: 'Comment contains inappropriate content.' }
     }
-
-    const urlCount = (text.match(/https?:\/\//g) || []).length
-    if (urlCount > 2)
-      return { ok: false, reason: 'Too many links in comment.' }
-
     return { ok: true }
   }
 
-  // ── ESCAPE HTML ────────────────────────────────────────
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/\n/g, '<br>')
+  // ── Random anon name ──────────────────────────────────
+  function _randomName() {
+    var adj  = ['Quick','Bold','Bright','Sharp','Clever','Calm','Brave','Witty','Swift','Keen']
+    var noun = ['Fox','Owl','Panda','Eagle','Wolf','Bear','Lynx','Hawk','Deer','Raven']
+    return adj[Math.floor(Math.random() * adj.length)] +
+           noun[Math.floor(Math.random() * noun.length)] +
+           (Math.floor(Math.random() * 99) + 1)
   }
 
-  // ── FORMAT TIME ────────────────────────────────────────
-  function timeAgo(timestamp) {
-    const diff = Date.now() - new Date(timestamp).getTime()
-    const m = Math.floor(diff / 60000)
-    const h = Math.floor(diff / 3600000)
-    const d = Math.floor(diff / 86400000)
+  // ── Time ago ──────────────────────────────────────────
+  function _timeAgo(ts) {
+    var diff = Date.now() - new Date(ts).getTime()
+    var m = Math.floor(diff / 60000)
+    var h = Math.floor(diff / 3600000)
+    var d = Math.floor(diff / 86400000)
     if (m < 1)  return 'just now'
     if (m < 60) return m + 'm ago'
     if (h < 24) return h + 'h ago'
     if (d < 30) return d + 'd ago'
-    return new Date(timestamp).toLocaleDateString()
+    return new Date(ts).toLocaleDateString()
   }
 
-  // ── RANDOM ANON NAME ───────────────────────────────────
-  function randomName() {
-    const adj  = ['Quick','Bold','Curious','Bright','Sharp','Clever','Wild','Calm','Brave','Witty']
-    const noun = ['Fox','Owl','Panda','Lion','Eagle','Parrot','Wolf','Bear','Lynx','Hawk']
-    const num  = Math.floor(Math.random() * 99) + 1
-    return adj[Math.floor(Math.random() * adj.length)] +
-           noun[Math.floor(Math.random() * noun.length)] + num
+  // ── Escape HTML ───────────────────────────────────────
+  function _esc(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/\n/g, '<br>')
   }
 
-  // ── POST COMMENT ───────────────────────────────────────
+  // ── Post comment ──────────────────────────────────────
   async function post(itemId, text) {
-    const check = moderate(text)
+    if (!_db()) return { success: false, error: 'Not ready.' }
+
+    var check = _moderate(text)
     if (!check.ok) return { success: false, error: check.reason }
 
-    const user = await NovaDB.getCurrentUser()
+    var user = await NovaDB.getCurrentUser()
 
     if (!user) {
-      // Check anonymous comment limit
-      const limitCheck = await NovaAuth.checkAnonLimit('comments')
+      var limitCheck = await NovaAuth.checkAnonLimit('comments')
       if (!limitCheck.allowed) return { success: false, error: limitCheck.reason, showUpgrade: true }
 
-      const anonSession = await NovaAuth.getOrCreateAnonSession()
-      if (!anonSession) return { success: false, error: 'Could not create session.' }
+      var session = await NovaAuth.getOrCreateAnonSession()
+      if (!session) return { success: false, error: 'Could not create session.' }
 
-      const authorName = randomName()
+      try {
+        var { data, error } = await _db().from('comments').insert({
+          item_id: itemId, anon_id: session.id,
+          author_name: _randomName(), content: text.trim()
+        }).select().single()
 
-      const { data, error } = await NovaDB.client
-        .from('comments')
-        .insert({
-          item_id:     itemId,
-          anon_id:     anonSession.id,
-          author_name: authorName,
-          content:     text.trim()
-        })
-        .select()
-        .single()
+        if (error) return { success: false, error: error.message }
 
-      if (error) return { success: false, error: error.message }
-
-      // Update anon comment count
-      const today = new Date().toISOString().split('T')[0]
-      const isToday = anonSession.last_comment_date === today
-      await NovaDB.client
-        .from('anon_sessions')
-        .update({
-          comments_today: isToday ? anonSession.comments_today + 1 : 1,
+        // Update daily count
+        var today  = new Date().toISOString().split('T')[0]
+        var isToday = session.last_comment_date === today
+        _db().from('anon_sessions').update({
+          comments_today: isToday ? (session.comments_today || 0) + 1 : 1,
           last_comment_date: today
-        })
-        .eq('id', anonSession.id)
+        }).eq('id', session.id).then(function(){}).catch(function(){})
 
-      return { success: true, comment: data }
+        return { success: true, comment: data }
+      } catch (e) { return { success: false, error: e.message } }
     }
 
     // Registered user
-    const profile = await NovaDB.getUserProfile(user.id)
-    const authorName = profile?.display_name || user.email.split('@')[0]
-
-    const { data, error } = await NovaDB.client
-      .from('comments')
-      .insert({
-        item_id:     itemId,
-        user_id:     user.id,
-        author_name: authorName,
-        content:     text.trim()
-      })
-      .select()
-      .single()
-
-    if (error) return { success: false, error: error.message }
-    return { success: true, comment: data }
+    try {
+      var profile    = await NovaDB.getUserProfile(user.id)
+      var authorName = (profile && profile.display_name) || user.email.split('@')[0]
+      var { data: cdata, error: cerr } = await _db().from('comments').insert({
+        item_id: itemId, user_id: user.id,
+        author_name: authorName, content: text.trim()
+      }).select().single()
+      if (cerr) return { success: false, error: cerr.message }
+      return { success: true, comment: cdata }
+    } catch (e) { return { success: false, error: e.message } }
   }
 
-  // ── GET COMMENTS ───────────────────────────────────────
+  // ── Get comments ──────────────────────────────────────
   async function get(itemId) {
-    const { data, error } = await NovaDB.client
-      .from('comments')
-      .select('*')
-      .eq('item_id', itemId)
-      .eq('is_flagged', false)
-      .order('created_at', { ascending: false })
-
-    if (error) return []
-    return data
+    if (!_db() || !itemId) return []
+    try {
+      var { data } = await _db().from('comments').select('*')
+        .eq('item_id', itemId).eq('is_flagged', false)
+        .order('created_at', { ascending: false })
+      return data || []
+    } catch { return [] }
   }
 
-  // ── LIKE COMMENT ───────────────────────────────────────
-  async function like(commentId) {
-    const user = await NovaDB.getCurrentUser()
-    const anonId = localStorage.getItem('nova_anon_id')
+  // ── Render single comment ─────────────────────────────
+  function _renderComment(c) {
+    var initial = (c.author_name || 'A').charAt(0).toUpperCase()
+    return '<div class="comment-item" id="c-' + c.id + '">' +
+      '<div class="comment-author-row">' +
+        '<div class="comment-avatar">' + initial + '</div>' +
+        '<div>' +
+          '<div class="comment-name">' + _esc(c.author_name) + '</div>' +
+          '<div class="comment-date">' + _timeAgo(c.created_at) + '</div>' +
+        '</div>' +
+        '<button class="comment-like-btn" onclick="NovaComments.handleLike(\'' + c.id + '\',this)">' +
+          '♡ ' + (c.likes || 0) +
+        '</button>' +
+      '</div>' +
+      '<div class="comment-text">' + _esc(c.content) + '</div>' +
+    '</div>'
+  }
+
+  // ── Handle like click ─────────────────────────────────
+  async function handleLike(commentId, btn) {
+    if (!_db()) return
+    var user   = await NovaDB.getCurrentUser()
+    var anonId = null
+    try { anonId = localStorage.getItem('nova_anon_id') } catch {}
 
     if (!user && !anonId) {
-      const session = await NovaAuth.getOrCreateAnonSession()
-      if (!session) return false
+      var s = await NovaAuth.getOrCreateAnonSession()
+      if (s) { try { anonId = s.id; localStorage.setItem('nova_anon_id', s.id) } catch {} }
     }
 
-    const record = user
+    var record = user
       ? { comment_id: commentId, user_id: user.id }
       : { comment_id: commentId, anon_id: anonId }
 
-    const { error } = await NovaDB.client
-      .from('comment_likes')
-      .insert(record)
+    try {
+      var { error } = await _db().from('comment_likes').insert(record)
+      var n = parseInt((btn.textContent || '0').replace(/\D/g, '')) || 0
 
-    if (error && error.code === '23505') {
-      // Already liked — unlike it
-      const query = user
-        ? NovaDB.client.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id)
-        : NovaDB.client.from('comment_likes').delete().eq('comment_id', commentId).eq('anon_id', anonId)
-
-      await query
-      return 'unliked'
-    }
-
-    return 'liked'
+      if (error && error.code === '23505') {
+        // Already liked — unlike
+        if (user) await _db().from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id)
+        else if (anonId) await _db().from('comment_likes').delete().eq('comment_id', commentId).eq('anon_id', anonId)
+        btn.textContent = '♡ ' + Math.max(0, n - 1)
+        btn.style.color = ''
+      } else {
+        btn.textContent = '♥ ' + (n + 1)
+        btn.style.color = 'var(--gold)'
+      }
+    } catch {}
   }
 
-  // ── FLAG COMMENT ───────────────────────────────────────
-  async function flag(commentId) {
-    await NovaDB.client
-      .from('comments')
-      .update({ is_flagged: true })
-      .eq('id', commentId)
-  }
-
-  // ── RENDER SINGLE COMMENT ──────────────────────────────
-  function renderComment(c) {
-    const initial = (c.author_name || 'A').charAt(0).toUpperCase()
-    return `
-      <div class="comment-item" id="comment-${c.id}">
-        <div class="comment-author-row">
-          <div class="comment-avatar">${initial}</div>
-          <div>
-            <div class="comment-name">${escapeHtml(c.author_name)}</div>
-            <div class="comment-date">${timeAgo(c.created_at)}</div>
-          </div>
-          <button class="comment-like" onclick="NovaComments.handleLike('${c.id}', this)">
-            ♡ ${c.likes || 0}
-          </button>
-        </div>
-        <div class="comment-text">${escapeHtml(c.content)}</div>
-      </div>`
-  }
-
-  // ── HANDLE LIKE CLICK ──────────────────────────────────
-  async function handleLike(commentId, buttonEl) {
-    const result = await like(commentId)
-    if (!result) return
-
-    const currentText = buttonEl.textContent.trim()
-    const currentCount = parseInt(currentText.replace(/[^0-9]/g, '')) || 0
-
-    if (result === 'liked') {
-      buttonEl.textContent = '♥ ' + (currentCount + 1)
-      buttonEl.style.color = 'var(--gold)'
-    } else {
-      buttonEl.textContent = '♡ ' + Math.max(0, currentCount - 1)
-      buttonEl.style.color = ''
-    }
-  }
-
-  // ── RENDER FULL COMMENTS SECTION ──────────────────────
+  // ── Render full section ───────────────────────────────
   async function render(itemId, containerId) {
-    const container = document.getElementById(containerId)
+    var container = document.getElementById(containerId)
     if (!container) return
 
-    container.innerHTML = `
-      <div class="comments-section">
-        <div class="comments-header">💬 Discussion</div>
+    container.innerHTML =
+      '<div class="comments-wrap">' +
+        '<div class="comments-title" id="ctitle-' + itemId + '">💬 Comments</div>' +
+        '<div class="comment-form">' +
+          '<textarea class="comment-textarea" id="cinput-' + itemId + '" ' +
+            'placeholder="Share your thoughts (anonymous — no account needed)…" maxlength="1200" rows="3"></textarea>' +
+          '<div class="comment-form-foot">' +
+            '<span class="comment-anon-note">🔒 Anonymous · No account needed</span>' +
+            '<button class="btn-gold" style="font-size:13px;padding:10px 22px" ' +
+              'onclick="NovaComments.handleSubmit(\'' + itemId + '\')">Post</button>' +
+          '</div>' +
+          '<div class="comment-error hidden" id="cerr-' + itemId + '"></div>' +
+        '</div>' +
+        '<div class="comments-list" id="clist-' + itemId + '">' +
+          '<div style="text-align:center;padding:32px;color:var(--t3);font-size:14px">Loading…</div>' +
+        '</div>' +
+      '</div>'
 
-        <div class="comment-form">
-          <textarea
-            id="nova-comment-input-${itemId}"
-            class="comment-textarea"
-            placeholder="Share your thoughts anonymously…"
-            maxlength="1200"
-            rows="3"></textarea>
-          <div class="comment-form-actions">
-            <span class="comment-anon-note">🔒 Anonymous · No account needed</span>
-            <button class="btn-gold"
-              style="font-size:13px;padding:10px 22px"
-              onclick="NovaComments.handleSubmit('${itemId}')">
-              Post Comment
-            </button>
-          </div>
-          <div class="comment-error hidden" id="nova-comment-error-${itemId}"></div>
-        </div>
-
-        <div class="comments-list" id="nova-comments-list-${itemId}">
-          <div style="text-align:center;padding:32px;color:var(--t3)">
-            Loading comments…
-          </div>
-        </div>
-      </div>`
-
-    // Load comments
-    const comments = await get(itemId)
-    const listEl = document.getElementById(`nova-comments-list-${itemId}`)
-
+    var comments = await get(itemId)
+    var listEl   = document.getElementById('clist-' + itemId)
+    var titleEl  = document.getElementById('ctitle-' + itemId)
     if (!listEl) return
 
     if (comments.length === 0) {
-      listEl.innerHTML = `
-        <div class="comments-empty">
-          Be the first to comment!
-        </div>`
+      listEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--t3);font-size:14px">Be the first to comment!</div>'
     } else {
-      // Update header count
-      const header = container.querySelector('.comments-header')
-      if (header) header.innerHTML = `💬 Discussion (${comments.length})`
-
-      listEl.innerHTML = comments.map(renderComment).join('')
+      if (titleEl) titleEl.textContent = '💬 Comments (' + comments.length + ')'
+      listEl.innerHTML = comments.map(_renderComment).join('')
     }
   }
 
-  // ── HANDLE SUBMIT ──────────────────────────────────────
+  // ── Handle submit ─────────────────────────────────────
   async function handleSubmit(itemId) {
-    const input  = document.getElementById(`nova-comment-input-${itemId}`)
-    const errEl  = document.getElementById(`nova-comment-error-${itemId}`)
-    const listEl = document.getElementById(`nova-comments-list-${itemId}`)
+    var input   = document.getElementById('cinput-' + itemId)
+    var errEl   = document.getElementById('cerr-' + itemId)
+    var listEl  = document.getElementById('clist-' + itemId)
+    var titleEl = document.getElementById('ctitle-' + itemId)
 
     if (!input) return
-
-    const text = input.value.trim()
+    var text = input.value.trim()
     if (!text) return
 
-    // Show loading
-    const btn = input.closest('.comment-form')?.querySelector('button')
-    if (btn) { btn.disabled = true; btn.textContent = 'Posting…' }
+    var form = input.closest('.comment-form')
+    var btn  = form && form.querySelector('.btn-gold')
+    if (btn) { btn.disabled = true; btn.textContent = '…' }
 
-    const result = await post(itemId, text)
+    var result = await post(itemId, text)
 
-    if (btn) { btn.disabled = false; btn.textContent = 'Post Comment' }
+    if (btn) { btn.disabled = false; btn.textContent = 'Post' }
 
     if (!result.success) {
       if (errEl) {
         errEl.textContent = result.error
         errEl.classList.remove('hidden')
       }
-      if (result.showUpgrade) {
-        NovaFavorites.showUpgradePrompt
-          ? NovaFavorites.showUpgradePrompt(result.error)
-          : NovaUI.toast(result.error, 'warning')
+      if (result.showUpgrade && window.NovaFavorites) {
+        NovaFavorites.showUpgradePrompt(result.error)
       }
       return
     }
@@ -302,33 +229,20 @@ const NovaComments = (() => {
     if (errEl) errEl.classList.add('hidden')
     input.value = ''
 
-    // Add comment to top of list
     if (listEl) {
-      const emptyEl = listEl.querySelector('.comments-empty')
-      if (emptyEl) emptyEl.remove()
-
-      const div = document.createElement('div')
-      div.innerHTML = renderComment(result.comment)
+      var empty = listEl.querySelector('[style*="Be the first"]')
+      if (empty) empty.remove()
+      var div = document.createElement('div')
+      div.innerHTML = _renderComment(result.comment)
       listEl.prepend(div.firstChild)
-
-      // Update count
-      const header = listEl.closest('.comments-section')?.querySelector('.comments-header')
-      if (header) {
-        const current = parseInt(header.textContent.match(/\d+/)?.[0] || '0')
-        header.innerHTML = `💬 Discussion (${current + 1})`
+      if (titleEl) {
+        var n = parseInt((titleEl.textContent || '0').match(/\d+/) || ['0']) || 0
+        titleEl.textContent = '💬 Comments (' + (n + 1) + ')'
       }
     }
   }
 
-  return {
-    post,
-    get,
-    like,
-    flag,
-    render,
-    handleSubmit,
-    handleLike,
-  }
+  return { post, get, render, handleSubmit, handleLike }
 
 })()
 

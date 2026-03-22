@@ -1,271 +1,204 @@
-// js/favorites.js — NovaHub Favorites System
+// js/favorites.js — NovaHub Favorites
 // Works for both anonymous and registered users
-// Anonymous users limited to 10 favorites
 
-const NovaFavorites = (() => {
+const NovaFavorites = (function () {
 
-  // ── ADD FAVORITE ───────────────────────────────────────
+  function _db() { return window.NovaDB && window.NovaDB.client }
+
+  // ── Add ───────────────────────────────────────────────
   async function add(itemId) {
+    if (!_db()) return { success: false, error: 'Not ready.' }
     const user = await NovaDB.getCurrentUser()
 
     if (user) {
-      // Registered user
-      const { error } = await NovaDB.client
-        .from('favorites')
-        .insert({ item_id: itemId, user_id: user.id })
+      try {
+        const { error } = await _db().from('favorites')
+          .insert({ item_id: itemId, user_id: user.id })
+        if (error) {
+          if (error.code === '23505') return { success: false, error: 'Already saved.' }
+          return { success: false, error: error.message }
+        }
+        return { success: true }
+      } catch (e) { return { success: false, error: e.message } }
+    }
 
+    // Anonymous
+    const limitCheck = await NovaAuth.checkAnonLimit('favorites')
+    if (!limitCheck.allowed) return limitCheck
+
+    const session = await NovaAuth.getOrCreateAnonSession()
+    if (!session) return { success: false, error: 'Could not create session.' }
+
+    try {
+      const { error } = await _db().from('favorites')
+        .insert({ item_id: itemId, anon_id: session.id })
       if (error) {
         if (error.code === '23505') return { success: false, error: 'Already saved.' }
         return { success: false, error: error.message }
       }
+      // Update count
+      _db().from('anon_sessions')
+        .update({ favorites_count: (session.favorites_count || 0) + 1 })
+        .eq('id', session.id)
+        .then(() => {}).catch(() => {})
       return { success: true }
-    }
-
-    // Anonymous user — check limits first
-    const limitCheck = await NovaAuth.checkAnonLimit('favorites')
-    if (!limitCheck.allowed) return limitCheck
-
-    const anonSession = await NovaAuth.getOrCreateAnonSession()
-    if (!anonSession) return { success: false, error: 'Could not create session.' }
-
-    const { error } = await NovaDB.client
-      .from('favorites')
-      .insert({ item_id: itemId, anon_id: anonSession.id })
-
-    if (error) {
-      if (error.code === '23505') return { success: false, error: 'Already saved.' }
-      return { success: false, error: error.message }
-    }
-
-    // Update anon favorites count
-    await NovaDB.client
-      .from('anon_sessions')
-      .update({ favorites_count: anonSession.favorites_count + 1 })
-      .eq('id', anonSession.id)
-
-    return { success: true }
+    } catch (e) { return { success: false, error: e.message } }
   }
 
-  // ── REMOVE FAVORITE ────────────────────────────────────
+  // ── Remove ────────────────────────────────────────────
   async function remove(itemId) {
+    if (!_db()) return { success: false, error: 'Not ready.' }
     const user = await NovaDB.getCurrentUser()
 
-    if (user) {
-      const { error } = await NovaDB.client
-        .from('favorites')
-        .delete()
-        .eq('item_id', itemId)
-        .eq('user_id', user.id)
-
-      if (error) return { success: false, error: error.message }
+    try {
+      if (user) {
+        await _db().from('favorites').delete()
+          .eq('item_id', itemId).eq('user_id', user.id)
+        return { success: true }
+      }
+      const anonId = _anonId()
+      if (!anonId) return { success: false, error: 'No session.' }
+      await _db().from('favorites').delete()
+        .eq('item_id', itemId).eq('anon_id', anonId)
       return { success: true }
-    }
-
-    const anonId = localStorage.getItem('nova_anon_id')
-    if (!anonId) return { success: false, error: 'No session found.' }
-
-    const { error } = await NovaDB.client
-      .from('favorites')
-      .delete()
-      .eq('item_id', itemId)
-      .eq('anon_id', anonId)
-
-    if (error) return { success: false, error: error.message }
-    return { success: true }
+    } catch (e) { return { success: false, error: e.message } }
   }
 
-  // ── TOGGLE FAVORITE ────────────────────────────────────
-  async function toggle(itemId, buttonEl) {
-    const isSaved = await isFavorited(itemId)
+  // ── Toggle ────────────────────────────────────────────
+  async function toggle(itemId, btn) {
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5' }
 
-    if (buttonEl) {
-      buttonEl.disabled = true
-      buttonEl.style.opacity = '0.6'
-    }
+    const saved = await isFavorited(itemId)
+    const result = saved ? await remove(itemId) : await add(itemId)
 
-    let result
-    if (isSaved) {
-      result = await remove(itemId)
-    } else {
-      result = await add(itemId)
-    }
-
-    if (buttonEl) {
-      buttonEl.disabled = false
-      buttonEl.style.opacity = '1'
-    }
+    if (btn) { btn.disabled = false; btn.style.opacity = '1' }
 
     if (!result.success) {
-      if (result.showUpgrade) {
-        showUpgradePrompt(result.reason)
-      } else {
-        NovaUI.toast(result.error || 'Something went wrong.', 'error')
-      }
-      return false
+      if (result.showUpgrade) showUpgradePrompt(result.reason)
+      else _toast(result.error || 'Something went wrong.', 'error')
+      return saved // unchanged
     }
 
-    const newState = !isSaved
-    updateButton(buttonEl, newState)
-    NovaUI.toast(newState ? '✦ Saved to favorites' : 'Removed from favorites', newState ? 'success' : 'info')
+    const newState = !saved
+    _updateBtn(btn, newState)
+    _toast(newState ? '♥ Saved to favorites' : 'Removed from favorites', newState ? 'success' : 'info')
     return newState
   }
 
-  // ── IS ITEM FAVORITED ──────────────────────────────────
+  // ── Is favorited ──────────────────────────────────────
   async function isFavorited(itemId) {
+    if (!_db() || !itemId) return false
     const user = await NovaDB.getCurrentUser()
-
-    if (user) {
-      const { data } = await NovaDB.client
-        .from('favorites')
-        .select('id')
-        .eq('item_id', itemId)
-        .eq('user_id', user.id)
-        .single()
-
+    try {
+      if (user) {
+        const { data } = await _db().from('favorites').select('id')
+          .eq('item_id', itemId).eq('user_id', user.id).single()
+        return !!data
+      }
+      const id = _anonId()
+      if (!id) return false
+      const { data } = await _db().from('favorites').select('id')
+        .eq('item_id', itemId).eq('anon_id', id).single()
       return !!data
-    }
-
-    const anonId = localStorage.getItem('nova_anon_id')
-    if (!anonId) return false
-
-    const { data } = await NovaDB.client
-      .from('favorites')
-      .select('id')
-      .eq('item_id', itemId)
-      .eq('anon_id', anonId)
-      .single()
-
-    return !!data
+    } catch { return false }
   }
 
-  // ── GET ALL FAVORITES ──────────────────────────────────
+  // ── Get all ───────────────────────────────────────────
   async function getAll() {
+    if (!_db()) return []
     const user = await NovaDB.getCurrentUser()
-
-    if (user) {
-      const { data, error } = await NovaDB.client
-        .from('favorites')
+    try {
+      if (user) {
+        const { data } = await _db().from('favorites')
+          .select('*, items(*)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+        return (data || []).map(function (f) { return f.items }).filter(Boolean)
+      }
+      const id = _anonId()
+      if (!id) return []
+      const { data } = await _db().from('favorites')
         .select('*, items(*)')
-        .eq('user_id', user.id)
+        .eq('anon_id', id)
         .order('created_at', { ascending: false })
-
-      if (error) return []
-      return data.map(f => f.items).filter(Boolean)
-    }
-
-    const anonId = localStorage.getItem('nova_anon_id')
-    if (!anonId) return []
-
-    const { data, error } = await NovaDB.client
-      .from('favorites')
-      .select('*, items(*)')
-      .eq('anon_id', anonId)
-      .order('created_at', { ascending: false })
-
-    if (error) return []
-    return data.map(f => f.items).filter(Boolean)
+      return (data || []).map(function (f) { return f.items }).filter(Boolean)
+    } catch { return [] }
   }
 
-  // ── GET FAVORITES COUNT ────────────────────────────────
-  async function getCount() {
-    const user = await NovaDB.getCurrentUser()
-
-    if (user) {
-      const { count } = await NovaDB.client
-        .from('favorites')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-
-      return count || 0
-    }
-
-    const anonId = localStorage.getItem('nova_anon_id')
-    if (!anonId) return 0
-
-    const { data } = await NovaDB.client
-      .from('anon_sessions')
-      .select('favorites_count')
-      .eq('id', anonId)
-      .single()
-
-    return data?.favorites_count || 0
-  }
-
-  // ── INIT FAVORITE BUTTON ───────────────────────────────
-  // Call on any button with data-item-id attribute
-  async function initButton(buttonEl) {
-    if (!buttonEl) return
-
-    const itemId = buttonEl.dataset.itemId
-    if (!itemId) return
-
-    const saved = await isFavorited(itemId)
-    updateButton(buttonEl, saved)
-
-    buttonEl.addEventListener('click', async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      await toggle(itemId, buttonEl)
-    })
-  }
-
-  // ── INIT ALL FAVORITE BUTTONS ON PAGE ─────────────────
+  // ── Init all buttons on page ──────────────────────────
   async function initAll() {
-    const buttons = document.querySelectorAll('[data-favorite-btn]')
-    for (const btn of buttons) {
-      await initButton(btn)
+    var buttons = document.querySelectorAll('[data-fav-btn]')
+    for (var i = 0; i < buttons.length; i++) {
+      var btn   = buttons[i]
+      var id    = btn.getAttribute('data-item-id')
+      if (!id) continue
+      var saved = await isFavorited(id)
+      _updateBtn(btn, saved)
+      ;(function (btn, id) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault()
+          e.stopPropagation()
+          toggle(id, btn)
+        })
+      })(btn, id)
     }
   }
 
-  // ── UPDATE BUTTON VISUAL STATE ─────────────────────────
-  function updateButton(buttonEl, isSaved) {
-    if (!buttonEl) return
+  // ── Upgrade modal ─────────────────────────────────────
+  function showUpgradePrompt(msg) {
+    var old = document.getElementById('nova-upgrade-modal')
+    if (old) old.remove()
 
-    if (isSaved) {
-      buttonEl.innerHTML = '♥ Saved'
-      buttonEl.classList.add('favorited')
-      buttonEl.style.background = 'var(--gold-grad)'
-      buttonEl.style.color = '#09090C'
+    var overlay = document.createElement('div')
+    overlay.id  = 'nova-upgrade-modal'
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px'
+    overlay.innerHTML =
+      '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:40px;max-width:420px;width:100%;text-align:center;animation:novaFadeUp .3s ease">' +
+        '<div style="font-size:48px;margin-bottom:16px">⭐</div>' +
+        '<h3 style="font-size:22px;font-weight:900;margin-bottom:12px;letter-spacing:-.025em">Save more items</h3>' +
+        '<p style="font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:28px">' + _esc(msg || 'Create a free account to save unlimited items.') + '</p>' +
+        '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+          '<a href="/account/register.html" class="btn-primary" style="font-size:14px">Create Free Account</a>' +
+          '<button onclick="document.getElementById(\'nova-upgrade-modal\').remove()" style="background:var(--surf);border:1px solid var(--border2);border-radius:99px;padding:12px 22px;font-size:14px;font-weight:600;color:var(--t2);cursor:pointer">Maybe Later</button>' +
+        '</div>' +
+      '</div>'
+
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove() })
+    document.body.appendChild(overlay)
+  }
+
+  // ── Private helpers ───────────────────────────────────
+  function _anonId() {
+    try { return localStorage.getItem('nova_anon_id') } catch { return null }
+  }
+
+  function _updateBtn(btn, saved) {
+    if (!btn) return
+    if (saved) {
+      btn.textContent = '♥ Saved'
+      btn.setAttribute('data-saved', 'true')
+      btn.style.background = 'var(--gold-grad)'
+      btn.style.color = '#09090C'
     } else {
-      buttonEl.innerHTML = '♡ Save'
-      buttonEl.classList.remove('favorited')
-      buttonEl.style.background = ''
-      buttonEl.style.color = ''
+      btn.textContent = '♡ Save'
+      btn.removeAttribute('data-saved')
+      btn.style.background = ''
+      btn.style.color = ''
     }
   }
 
-  // ── SHOW UPGRADE PROMPT ────────────────────────────────
-  function showUpgradePrompt(message) {
-    const modal = document.createElement('div')
-    modal.className = 'nova-modal-overlay'
-    modal.innerHTML = `
-      <div class="nova-modal">
-        <div class="nova-modal-icon">⭐</div>
-        <h3>Upgrade to save more</h3>
-        <p>${message}</p>
-        <div class="nova-modal-actions">
-          <a href="/account/register.html" class="btn-primary">Create Free Account</a>
-          <button class="btn-secondary" onclick="this.closest('.nova-modal-overlay').remove()">Maybe Later</button>
-        </div>
-      </div>`
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.remove()
-    })
-
-    document.body.appendChild(modal)
+  function _toast(msg, type) {
+    if (window.NovaUI && window.NovaUI.toast) {
+      window.NovaUI.toast(msg, type)
+    }
   }
 
-  return {
-    add,
-    remove,
-    toggle,
-    isFavorited,
-    getAll,
-    getCount,
-    initButton,
-    initAll,
+  function _esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   }
+
+  return { add, remove, toggle, isFavorited, getAll, initAll, showUpgradePrompt }
 
 })()
 

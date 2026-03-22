@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Dashboard — NovaHub</title>
 <link rel="icon" href="../assets/novahub_favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,214 +10,198 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --gold:#C9A84C;--gold-l:#E8C97A;--gold-glow:rgba(201,168,76,.15);--gold-glow2:rgba(201,168,76,.28);
+  --gold:#C9A84C;--gold-l:#E8C97A;
+  --gold-glow:rgba(201,168,76,.15);--gold-glow2:rgba(201,168,76,.28);
   --gold-grad:linear-gradient(140deg,#E8C97A 0%,#C9A84C 55%,#9B7520 100%);
   --bg:#09090C;--bg2:#111116;--bg3:#18181F;--bg4:#1e1e28;
-  --surf:rgba(255,255,255,.04);--surf2:rgba(255,255,255,.07);
-  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --surf:rgba(255,255,255,.04);--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
   --t1:#F2F2F7;--t2:#AEAEB2;--t3:#636366;
-  --r:16px;--rsm:10px;--rlg:24px;--rxl:32px;--nav:64px;
+  --r:16px;--rsm:10px;--rlg:24px;--nav:60px;
   --ease:.28s cubic-bezier(.25,.46,.45,.94);--spring:.55s cubic-bezier(.22,1,.36,1);
   --font:"Inter","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
 }
-[data-theme=light]{--bg:#F5F5F7;--bg2:#fff;--bg3:#EBEBF0;--bg4:#E5E5EA;--surf:rgba(0,0,0,.03);--surf2:rgba(0,0,0,.06);--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);--t1:#1D1D1F;--t2:#424245;--t3:#6E6E73;}
+[data-theme=light]{--bg:#F5F5F7;--bg2:#fff;--bg3:#EBEBF0;--bg4:#E5E5EA;--surf:rgba(0,0,0,.03);--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);--t1:#1D1D1F;--t2:#424245;--t3:#6E6E73;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 /* NAV */
-.glass-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav);display:flex;align-items:center;backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);background:rgba(9,9,12,.76);border-bottom:1px solid var(--border);transition:background var(--ease),height .3s ease}
-[data-theme=light] .glass-nav{background:rgba(245,245,247,.85)}
-.glass-nav.scrolled{background:rgba(9,9,12,.97);box-shadow:0 1px 40px rgba(0,0,0,.6);height:56px}
-.container{max-width:1280px;margin:0 auto;padding:0 28px}
-.nav-content{display:flex;align-items:center;gap:14px;width:100%;height:100%}
-.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.logo-img{height:26px;width:auto}
-.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
-.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surf);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease)}
+.glass-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav);display:flex;align-items:center;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);background:rgba(9,9,12,.82);border-bottom:1px solid var(--border);transition:background var(--ease)}
+[data-theme=light] .glass-nav{background:rgba(245,245,247,.88)}
+.glass-nav.scrolled{background:rgba(9,9,12,.97);box-shadow:0 1px 40px rgba(0,0,0,.6)}
+.container{max-width:1280px;margin:0 auto;padding:0 20px}
+@media(min-width:600px){.container{padding:0 28px}}
+.nav-content{display:flex;align-items:center;height:100%;gap:10px}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-img{height:24px;width:auto}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surf);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
 .icon-btn:hover{background:var(--gold-glow);border-color:var(--gold-glow2);color:var(--gold)}
-.btn-secondary{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--surf);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--spring)}
-.btn-secondary:hover{border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow)}
-.btn-danger{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:99px;border:1px solid rgba(255,59,48,.25);background:rgba(255,59,48,.08);color:#FF453A;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--ease)}
+.btn-sm{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:99px;border:1px solid var(--border2);background:var(--surf);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--ease)}
+.btn-sm:hover{border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow)}
+.btn-danger{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:99px;border:1px solid rgba(255,59,48,.25);background:rgba(255,59,48,.08);color:#FF453A;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--ease)}
 .btn-danger:hover{background:rgba(255,59,48,.15)}
 
-/* LAYOUT */
+/* PAGE */
 .page-content{padding-top:var(--nav)}
-.dashboard{padding:48px 0 80px}
-.dash-header{padding:56px 0 40px;position:relative;overflow:hidden}
-.dash-header-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(201,168,76,.07) 0%,transparent 60%);pointer-events:none}
-.avatar-large{width:80px;height:80px;border-radius:50%;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#09090C;flex-shrink:0;margin-bottom:20px;box-shadow:0 8px 32px rgba(201,168,76,.3)}
-.dash-name{font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
-.dash-email{font-size:14px;color:var(--t3);margin-bottom:20px}
-.dash-stats{display:flex;gap:24px;flex-wrap:wrap}
-.dash-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 24px;text-align:center;min-width:100px}
-.dash-stat-num{font-size:24px;font-weight:900;color:var(--gold);letter-spacing:-.04em;display:block}
-.dash-stat-label{font-size:12px;color:var(--t3);font-weight:500;margin-top:3px}
+.dash-header{padding:36px 0 28px;position:relative;overflow:hidden}
+@media(min-width:600px){.dash-header{padding:48px 0 36px}}
+.dash-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(201,168,76,.07) 0%,transparent 60%);pointer-events:none}
+.avatar-lg{width:68px;height:68px;border-radius:50%;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#09090C;flex-shrink:0;margin-bottom:16px;box-shadow:0 8px 24px rgba(201,168,76,.3)}
+@media(min-width:600px){.avatar-lg{width:80px;height:80px;font-size:32px}}
+.dash-name{font-size:clamp(24px,5vw,36px);font-weight:900;letter-spacing:-.04em;margin-bottom:5px}
+.dash-email{font-size:13px;color:var(--t3);margin-bottom:18px}
+.dash-stats{display:flex;gap:10px;flex-wrap:wrap}
+.dash-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;text-align:center;min-width:88px}
+.dash-stat-num{font-size:22px;font-weight:900;color:var(--gold);letter-spacing:-.04em;display:block}
+.dash-stat-label{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
 
 /* TABS */
-.dash-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;scrollbar-width:none}
+.dash-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:28px;overflow-x:auto;scrollbar-width:none}
 .dash-tabs::-webkit-scrollbar{display:none}
-.dash-tab{padding:12px 20px;font-size:14px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color var(--ease),border-color var(--ease);white-space:nowrap;margin-bottom:-1px}
+.dash-tab{padding:11px 16px;font-size:14px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color var(--ease),border-color var(--ease);white-space:nowrap;margin-bottom:-1px;-webkit-tap-highlight-color:transparent}
 .dash-tab:hover{color:var(--t1)}
 .dash-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 
 /* CARDS */
-.card-poster{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:2/3;background-size:cover;background-position:center;display:block;transition:transform var(--spring),box-shadow var(--spring)}
-.card-poster:hover{transform:scale(1.04) translateY(-6px);box-shadow:0 28px 64px rgba(0,0,0,.6)}
-.card-poster::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.15) 55%,transparent 100%)}
+.card-poster{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:2/3;background-size:cover;background-position:center;display:block;transition:transform var(--spring)}
+.card-poster:hover{transform:scale(1.04) translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.6)}
+.card-poster::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.2) 50%,transparent 100%)}
 .bg-zoom{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .6s ease}
-.card-poster:hover .bg-zoom{transform:scale(1.07)}
-.card-poster-content{position:absolute;bottom:0;left:0;right:0;padding:14px;z-index:2;color:#fff}
-.card-poster-title{font-size:12.5px;font-weight:700;line-height:1.3;margin-bottom:3px}
-.card-poster-rating{display:inline-flex;align-items:center;gap:3px;margin-top:6px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.35);color:var(--gold-l);font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px;cursor:pointer;transition:transform var(--spring),box-shadow var(--ease),border-color var(--ease)}
-.card:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(0,0,0,.28);border-color:var(--gold-glow2)}
-.card-icon{width:46px;height:46px;border-radius:12px;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#09090C;margin-bottom:14px}
-.card-title{font-size:16px;font-weight:800;margin-bottom:5px}
-.card-desc{font-size:13px;color:var(--t2);line-height:1.55}
-.tag-free{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(48,209,88,.1);color:#30D158;border:1px solid rgba(48,209,88,.2)}
-.tag-paid{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--gold-glow);color:var(--gold-l);border:1px solid var(--gold-glow2)}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media(max-width:1100px){.grid-4{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:860px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.grid-3,.grid-4{grid-template-columns:1fr}}
-.empty-state{text-align:center;padding:64px 24px;color:var(--t2)}
-.empty-state-icon{font-size:56px;display:block;margin-bottom:16px;opacity:.35}
-.empty-state h3{font-size:20px;font-weight:800;margin-bottom:8px}
-.empty-state p{font-size:14px;margin-bottom:24px}
-.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:12px 26px;border-radius:99px;background:var(--gold-grad);color:#09090C;font-size:14px;font-weight:800;border:none;cursor:pointer;font-family:var(--font);box-shadow:0 4px 20px rgba(201,168,76,.38);transition:transform var(--spring),box-shadow var(--ease)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(201,168,76,.5)}
-.remove-btn{position:absolute;top:10px;right:10px;z-index:20;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s ease}
+.card-poster:hover .bg-zoom{transform:scale(1.06)}
+.card-poster-content{position:absolute;bottom:0;left:0;right:0;padding:12px;z-index:2;color:#fff}
+.card-poster-title{font-size:12px;font-weight:700;line-height:1.3}
+.card-poster-rating{display:inline-flex;align-items:center;gap:3px;margin-top:5px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.35);color:var(--gold-l);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px}
+.remove-btn{position:absolute;top:8px;right:8px;z-index:20;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s ease;-webkit-tap-highlight-color:transparent}
 .card-poster:hover .remove-btn{opacity:1}
+@media(hover:none){.remove-btn{opacity:1}}
 .remove-btn:hover{background:rgba(255,59,48,.8)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:transform var(--spring),border-color var(--ease)}
+.card:hover{transform:translateY(-4px);border-color:var(--gold-glow2)}
+.card-icon{width:44px;height:44px;border-radius:12px;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#09090C;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:800;margin-bottom:5px}
+.card-desc{font-size:13px;color:var(--t2);line-height:1.5}
+.tag-free{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:rgba(48,209,88,.1);color:#30D158;border:1px solid rgba(48,209,88,.2)}
+.tag-paid{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--gold-glow);color:var(--gold-l);border:1px solid var(--gold-glow2)}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:540px){.grid-3{grid-template-columns:repeat(2,1fr)}.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.grid-3{grid-template-columns:repeat(3,1fr)}.grid-4{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1100px){.grid-4{grid-template-columns:repeat(4,1fr)}}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:56px 24px;color:var(--t2)}
+.empty-icon{font-size:48px;display:block;margin-bottom:14px;opacity:.35}
+.empty-state h3{font-size:20px;font-weight:800;margin-bottom:8px}
+.empty-state p{font-size:14px;margin-bottom:20px}
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border-radius:99px;background:var(--gold-grad);color:#09090C;font-size:14px;font-weight:800;border:none;cursor:pointer;font-family:var(--font);box-shadow:0 4px 20px rgba(201,168,76,.38);transition:transform var(--spring);-webkit-tap-highlight-color:transparent}
+.btn-primary:hover{transform:translateY(-2px)}
 
 /* SETTINGS */
-.settings-form{display:flex;flex-direction:column;gap:20px;max-width:480px}
-.form-group{display:flex;flex-direction:column;gap:7px}
+.settings-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;margin-bottom:16px}
+@media(min-width:600px){.settings-card{padding:28px}}
+.settings-card h3{font-size:16px;font-weight:800;margin-bottom:18px}
+.form-group{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 .form-label{font-size:13px;font-weight:600;color:var(--t2)}
-.form-input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rsm);padding:13px 16px;font-family:var(--font);font-size:15px;color:var(--t1);outline:none;transition:border-color var(--ease),box-shadow var(--ease)}
+.form-input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rsm);padding:12px 14px;font-family:var(--font);font-size:16px;color:var(--t1);outline:none;transition:border-color var(--ease);-webkit-appearance:none;width:100%}
 .form-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
-.form-input::placeholder{color:var(--t3)}
-.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;margin-bottom:20px}
-.settings-section h3{font-size:17px;font-weight:800;margin-bottom:20px;letter-spacing:-.02em}
-.danger-zone{background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);border-radius:var(--rlg);padding:28px;margin-top:32px}
-.danger-zone h3{font-size:17px;font-weight:800;color:#FF453A;margin-bottom:8px}
-.danger-zone p{font-size:13px;color:var(--t2);margin-bottom:20px}
+.form-msg{font-size:13px;margin-top:10px;display:none}
+.danger-zone{background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);border-radius:var(--rlg);padding:20px;margin-top:16px}
+.danger-zone h3{font-size:16px;font-weight:800;color:#FF453A;margin-bottom:8px}
+.danger-zone p{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.5}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="glass-nav" id="main-nav">
   <div class="container nav-content">
     <a href="../index.html" class="logo">
       <img src="../assets/novahub_logo.svg" alt="NovaHub" class="logo-img">
     </a>
     <div class="nav-right">
-      <a href="../index.html" class="btn-secondary" style="font-size:13px">← Home</a>
+      <a href="../index.html" class="btn-sm">← Home</a>
       <button class="icon-btn" id="theme-btn"><span id="theme-icon"></span></button>
-      <button class="btn-danger" onclick="NovaAuth.logout()" style="font-size:13px;padding:9px 18px">Sign Out</button>
+      <button class="btn-danger" id="logout-btn" style="font-size:13px">Sign Out</button>
     </div>
   </div>
 </nav>
 
-<!-- DASHBOARD -->
 <div class="page-content">
   <div class="dash-header">
-    <div class="dash-header-bg"></div>
+    <div class="dash-bg"></div>
     <div class="container" style="position:relative;z-index:1">
-      <div id="user-loading" style="padding:48px 0;color:var(--t3)">Loading your dashboard…</div>
+      <div id="user-loading" style="padding:40px 0;color:var(--t3);font-size:14px">Loading your dashboard…</div>
       <div id="user-header" style="display:none">
-        <div class="avatar-large" id="user-avatar"></div>
+        <div class="avatar-lg" id="user-avatar"></div>
         <div class="dash-name" id="user-name"></div>
         <div class="dash-email" id="user-email"></div>
         <div class="dash-stats">
-          <div class="dash-stat">
-            <span class="dash-stat-num" id="stat-favs">0</span>
-            <div class="dash-stat-label">Saved Items</div>
-          </div>
-          <div class="dash-stat">
-            <span class="dash-stat-num" id="stat-lists">0</span>
-            <div class="dash-stat-label">Lists</div>
-          </div>
-          <div class="dash-stat">
-            <span class="dash-stat-num" id="stat-member">—</span>
-            <div class="dash-stat-label">Member Since</div>
-          </div>
+          <div class="dash-stat"><span class="dash-stat-num" id="stat-favs">0</span><div class="dash-stat-label">Saved</div></div>
+          <div class="dash-stat"><span class="dash-stat-num" id="stat-lists">0</span><div class="dash-stat-label">Lists</div></div>
+          <div class="dash-stat"><span class="dash-stat-num" id="stat-since">—</span><div class="dash-stat-label">Joined</div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="dashboard">
+  <div style="padding:0 0 80px">
     <div class="container">
-
-      <!-- TABS -->
       <div class="dash-tabs">
-        <button class="dash-tab active" onclick="showTab('favorites')">♥ Saved Items</button>
-        <button class="dash-tab" onclick="showTab('lists')">📋 My Lists</button>
+        <button class="dash-tab active" onclick="showTab('favorites')">♥ Saved</button>
+        <button class="dash-tab" onclick="showTab('lists')">📋 Lists</button>
         <button class="dash-tab" onclick="showTab('settings')">⚙ Settings</button>
       </div>
 
-      <!-- FAVORITES TAB -->
-      <div id="tab-favorites">
-        <div id="favorites-grid">
-          <div style="text-align:center;padding:48px;color:var(--t3)">Loading saved items…</div>
-        </div>
-      </div>
+      <div id="tab-favorites"><div id="favs-grid" style="min-height:200px"></div></div>
 
-      <!-- LISTS TAB -->
       <div id="tab-lists" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-          <h3 style="font-size:20px;font-weight:800">My Lists</h3>
-          <button class="btn-primary" style="font-size:13px;padding:10px 20px" onclick="createList()">+ New List</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <h3 style="font-size:18px;font-weight:800">My Lists</h3>
+          <button class="btn-primary" style="font-size:13px;padding:9px 18px" onclick="createList()">+ New List</button>
         </div>
         <div id="lists-grid"></div>
       </div>
 
-      <!-- SETTINGS TAB -->
       <div id="tab-settings" style="display:none">
-        <div class="settings-section">
-          <h3>Profile Settings</h3>
-          <div class="settings-form">
-            <div class="form-group">
-              <label class="form-label">Display Name</label>
-              <input class="form-input" type="text" id="settings-name" placeholder="Your name">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Bio</label>
-              <input class="form-input" type="text" id="settings-bio" placeholder="Tell people about yourself">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Website</label>
-              <input class="form-input" type="url" id="settings-website" placeholder="https://yoursite.com">
-            </div>
-            <button class="btn-primary" style="align-self:flex-start;font-size:13px;padding:10px 22px" onclick="saveSettings()">Save Changes</button>
-            <div id="settings-msg" style="font-size:13px;display:none"></div>
+        <div class="settings-card">
+          <h3>Profile</h3>
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input class="form-input" type="text" id="s-name" placeholder="Your name" autocomplete="name">
           </div>
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <input class="form-input" type="text" id="s-bio" placeholder="Tell people about yourself">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input class="form-input" type="url" id="s-web" placeholder="https://yoursite.com" inputmode="url">
+          </div>
+          <button class="btn-primary" style="font-size:13px;padding:10px 20px;width:auto;display:inline-flex" onclick="saveProfile()">Save Changes</button>
+          <div class="form-msg" id="profile-msg"></div>
         </div>
 
-        <div class="settings-section">
+        <div class="settings-card">
           <h3>Change Password</h3>
-          <div class="settings-form">
-            <div class="form-group">
-              <label class="form-label">New Password</label>
-              <input class="form-input" type="password" id="new-password" placeholder="At least 8 characters">
-            </div>
-            <button class="btn-primary" style="align-self:flex-start;font-size:13px;padding:10px 22px" onclick="changePassword()">Update Password</button>
-            <div id="password-msg" style="font-size:13px;display:none"></div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input class="form-input" type="password" id="s-pw" placeholder="At least 8 characters" autocomplete="new-password">
           </div>
+          <button class="btn-primary" style="font-size:13px;padding:10px 20px;width:auto;display:inline-flex" onclick="changePassword()">Update Password</button>
+          <div class="form-msg" id="pw-msg"></div>
         </div>
 
         <div class="danger-zone">
           <h3>Danger Zone</h3>
-          <p>Signing out will end your session on this device. Your data is safely stored.</p>
-          <button class="btn-danger" onclick="NovaAuth.logout()">Sign Out</button>
+          <p>Signing out will end your session on this device. Your saved data stays safe.</p>
+          <button class="btn-danger" onclick="NovaAuth.logout()">Sign Out of NovaHub</button>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -229,202 +213,157 @@ a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer}
 <script src="../js/favorites.js"></script>
 
 <script>
-window.addEventListener('scroll', () => {
-  document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 48)
-}, { passive: true })
+'use strict';
 
-// TAB SWITCHING
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('main-nav');
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 48);
+}, { passive: true });
+
+document.getElementById('logout-btn').addEventListener('click', function() { NovaAuth.logout(); });
+
 function showTab(tab) {
-  document.querySelectorAll('.dash-tab').forEach((t, i) => {
-    const tabs = ['favorites','lists','settings']
-    t.classList.toggle('active', tabs[i] === tab)
-  })
-  document.getElementById('tab-favorites').style.display = tab === 'favorites' ? 'block' : 'none'
-  document.getElementById('tab-lists').style.display     = tab === 'lists'     ? 'block' : 'none'
-  document.getElementById('tab-settings').style.display  = tab === 'settings'  ? 'block' : 'none'
+  var tabs = ['favorites', 'lists', 'settings'];
+  var btns = document.querySelectorAll('.dash-tab');
+  tabs.forEach(function(t, i) {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+    btns[i] && btns[i].classList.toggle('active', t === tab);
+  });
 }
 
-// RENDER SAVED ITEM
-function renderSavedItem(item) {
-  const href = '../item.html?slug=' + encodeURIComponent(item.slug)
-  if (['movie', 'book', 'game'].includes(item.type)) {
-    return `<div style="position:relative">
-      <a href="${href}" class="card-poster">
-        <div class="bg-zoom" style="background-image:url('${item.image || ''}')"></div>
-        <div class="card-poster-content">
-          <div class="card-poster-title">${item.name}</div>
-          ${item.rating ? `<div class="card-poster-rating">★ ${item.rating}</div>` : ''}
-        </div>
-      </a>
-      <button class="remove-btn" onclick="removeFav('${item.id}',this)" title="Remove">✕</button>
-    </div>`
+function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderSaved(item) {
+  var href = '../item.html?slug=' + encodeURIComponent(item.slug);
+  if (item.type === 'movie' || item.type === 'book' || item.type === 'game') {
+    return '<div style="position:relative">' +
+      '<a href="' + href + '" class="card-poster">' +
+        '<div class="bg-zoom" style="background-image:url(\'' + _esc(item.image||'') + '\')"></div>' +
+        '<div class="card-poster-content">' +
+          '<div class="card-poster-title">' + _esc(item.name) + '</div>' +
+          (item.rating ? '<div class="card-poster-rating">★ ' + item.rating + '</div>' : '') +
+        '</div>' +
+      '</a>' +
+      '<button class="remove-btn" onclick="removeSaved(\'' + item.id + '\',this)" title="Remove">✕</button>' +
+    '</div>';
   }
-  const isFree = (item.pricing || '').toLowerCase().includes('free')
-  return `<div class="card" onclick="location.href='${href}'">
-    <div class="card-icon">${(item.name || '?').charAt(0)}</div>
-    <div class="card-title">${item.name}</div>
-    ${item.pricing ? `<span class="${isFree ? 'tag-free' : 'tag-paid'}" style="margin-bottom:10px;display:inline-block">${item.pricing}</span>` : ''}
-    <p class="card-desc">${item.short_desc || ''}</p>
-  </div>`
+  var isFree = (item.pricing||'').toLowerCase().indexOf('free') !== -1;
+  return '<div class="card" onclick="location.href=\'' + href + '\'">' +
+    '<div class="card-icon">' + _esc((item.name||'?').charAt(0)) + '</div>' +
+    '<div class="card-title">' + _esc(item.name) + '</div>' +
+    (item.pricing ? '<span class="' + (isFree?'tag-free':'tag-paid') + '" style="display:inline-block;margin-bottom:8px">' + _esc(item.pricing) + '</span>' : '') +
+    '<p class="card-desc">' + _esc(item.short_desc||'') + '</p>' +
+  '</div>';
 }
 
-async function removeFav(itemId, btn) {
-  btn.textContent = '…'
-  await NovaFavorites.remove(itemId)
-  const card = btn.closest('[style*="relative"]') || btn.closest('.card')
-  if (card) card.style.opacity = '0', setTimeout(() => card.remove(), 300)
-  const stat = document.getElementById('stat-favs')
-  if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent) - 1)
+async function removeSaved(itemId, btn) {
+  btn.textContent = '…';
+  await NovaFavorites.remove(itemId);
+  var card = btn.closest('[style*="relative"]') || btn.closest('.card');
+  if (card) { card.style.transition = 'opacity .3s ease'; card.style.opacity = '0'; setTimeout(function() { card.remove(); }, 300); }
+  var stat = document.getElementById('stat-favs');
+  if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent) - 1);
 }
 
-// LOAD FAVORITES
 async function loadFavorites() {
-  const grid = document.getElementById('favorites-grid')
-  const items = await NovaFavorites.getAll()
+  var grid  = document.getElementById('favs-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="color:var(--t3);padding:32px 0;font-size:14px">Loading saved items…</div>';
+  var items = await NovaFavorites.getAll();
+  document.getElementById('stat-favs').textContent = items.length;
 
   if (!items.length) {
-    grid.innerHTML = `<div class="empty-state">
-      <span class="empty-state-icon">♡</span>
-      <h3>No saved items yet</h3>
-      <p>Browse NovaHub and save things you love.</p>
-      <a href="../index.html" class="btn-primary">Discover Now</a>
-    </div>`
-    return
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">♡</span><h3>No saved items yet</h3><p>Browse NovaHub and save things you love.</p><a href="../index.html" class="btn-primary">Discover Now</a></div>';
+    return;
   }
-
-  const isPoster = items.some(i => ['movie','book','game'].includes(i.type))
-  grid.innerHTML = `<div class="${isPoster ? 'grid-4' : 'grid-3'}">${items.map(renderSavedItem).join('')}</div>`
-  document.getElementById('stat-favs').textContent = items.length
+  var hasPoster = items.some(function(i) { return ['movie','book','game'].indexOf(i.type) !== -1; });
+  grid.innerHTML = '<div class="' + (hasPoster ? 'grid-4' : 'grid-3') + '">' + items.map(renderSaved).join('') + '</div>';
 }
 
-// LOAD LISTS
 async function loadLists() {
-  const grid = document.getElementById('lists-grid')
-  const user = await NovaDB.getCurrentUser()
-  if (!user) return
+  var grid = document.getElementById('lists-grid');
+  if (!grid) return;
+  var user = await NovaDB.getCurrentUser();
+  if (!user) return;
 
-  const { data: lists } = await NovaDB.client
-    .from('lists')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+  var res = await NovaDB.client.from('lists').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+  var lists = res.data || [];
+  document.getElementById('stat-lists').textContent = lists.length;
 
-  document.getElementById('stat-lists').textContent = lists?.length || 0
-
-  if (!lists || !lists.length) {
-    grid.innerHTML = `<div class="empty-state">
-      <span class="empty-state-icon">📋</span>
-      <h3>No lists yet</h3>
-      <p>Create curated lists to organise and share your favourite discoveries.</p>
-      <button class="btn-primary" onclick="createList()">Create First List</button>
-    </div>`
-    return
+  if (!lists.length) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><h3>No lists yet</h3><p>Create curated lists to share with others.</p><button class="btn-primary" onclick="createList()">Create First List</button></div>';
+    return;
   }
-
-  grid.innerHTML = `<div class="grid-3">${lists.map(l => `
-    <div class="card">
-      <div class="card-icon">📋</div>
-      <div class="card-title">${l.name}</div>
-      <p class="card-desc">${l.description || 'No description'} · ${l.item_count || 0} items</p>
-      <div style="display:flex;gap:8px;margin-top:16px">
-        <span style="font-size:11px;padding:3px 10px;border-radius:99px;background:var(--surf);border:1px solid var(--border);color:var(--t3)">${l.is_public ? '🌍 Public' : '🔒 Private'}</span>
-      </div>
-    </div>`).join('')}</div>`
+  grid.innerHTML = '<div class="grid-3">' + lists.map(function(l) {
+    return '<div class="card">' +
+      '<div class="card-icon">📋</div>' +
+      '<div class="card-title">' + _esc(l.name) + '</div>' +
+      '<p class="card-desc">' + _esc(l.description || 'No description') + ' · ' + (l.item_count || 0) + ' items</p>' +
+      '<div style="margin-top:10px"><span style="font-size:11px;padding:3px 10px;border-radius:99px;background:var(--surf);border:1px solid var(--border);color:var(--t3)">' + (l.is_public ? '🌍 Public' : '🔒 Private') + '</span></div>' +
+    '</div>';
+  }).join('') + '</div>';
 }
 
-// CREATE LIST
 async function createList() {
-  const name = prompt('Name your new list:')
-  if (!name || !name.trim()) return
-
-  const user = await NovaDB.getCurrentUser()
-  const { error } = await NovaDB.client
-    .from('lists')
-    .insert({ user_id: user.id, name: name.trim() })
-
-  if (!error) loadLists()
+  var name = prompt('Name your new list:');
+  if (!name || !name.trim()) return;
+  var user = await NovaDB.getCurrentUser();
+  if (!user) return;
+  var res = await NovaDB.client.from('lists').insert({ user_id: user.id, name: name.trim() });
+  if (!res.error) loadLists();
 }
 
-// SAVE SETTINGS
-async function saveSettings() {
-  const user = await NovaDB.getCurrentUser()
-  if (!user) return
-
-  const name    = document.getElementById('settings-name').value.trim()
-  const bio     = document.getElementById('settings-bio').value.trim()
-  const website = document.getElementById('settings-website').value.trim()
-  const msgEl   = document.getElementById('settings-msg')
-
-  const { error } = await NovaDB.client
-    .from('profiles')
-    .update({ display_name: name, bio, website, updated_at: new Date().toISOString() })
-    .eq('id', user.id)
-
-  msgEl.style.display = 'block'
-  if (error) {
-    msgEl.style.color = '#FF453A'
-    msgEl.textContent = 'Error saving. Please try again.'
-  } else {
-    msgEl.style.color = '#30D158'
-    msgEl.textContent = '✦ Settings saved!'
-    setTimeout(() => msgEl.style.display = 'none', 3000)
-  }
+async function saveProfile() {
+  var user = await NovaDB.getCurrentUser();
+  if (!user) return;
+  var msg = document.getElementById('profile-msg');
+  var res = await NovaDB.client.from('profiles').update({
+    display_name: document.getElementById('s-name').value.trim(),
+    bio:          document.getElementById('s-bio').value.trim(),
+    website:      document.getElementById('s-web').value.trim(),
+    updated_at:   new Date().toISOString()
+  }).eq('id', user.id);
+  msg.style.display = 'block';
+  if (res.error) { msg.style.color = '#FF453A'; msg.textContent = 'Error saving. Try again.'; }
+  else { msg.style.color = '#30D158'; msg.textContent = '✦ Saved!'; setTimeout(function() { msg.style.display = 'none'; }, 3000); }
 }
 
-// CHANGE PASSWORD
 async function changePassword() {
-  const password = document.getElementById('new-password').value
-  const msgEl    = document.getElementById('password-msg')
-
-  if (password.length < 8) {
-    msgEl.style.display = 'block'
-    msgEl.style.color = '#FF453A'
-    msgEl.textContent = 'Password must be at least 8 characters.'
-    return
-  }
-
-  const { error } = await NovaDB.client.auth.updateUser({ password })
-  msgEl.style.display = 'block'
-  if (error) {
-    msgEl.style.color = '#FF453A'
-    msgEl.textContent = error.message
-  } else {
-    msgEl.style.color = '#30D158'
-    msgEl.textContent = '✦ Password updated!'
-    document.getElementById('new-password').value = ''
-    setTimeout(() => msgEl.style.display = 'none', 3000)
-  }
+  var pw  = document.getElementById('s-pw').value;
+  var msg = document.getElementById('pw-msg');
+  if (pw.length < 8) { msg.style.display = 'block'; msg.style.color = '#FF453A'; msg.textContent = 'Password must be at least 8 characters.'; return; }
+  var res = await NovaDB.client.auth.updateUser({ password: pw });
+  msg.style.display = 'block';
+  if (res.error) { msg.style.color = '#FF453A'; msg.textContent = res.error.message; }
+  else { msg.style.color = '#30D158'; msg.textContent = '✦ Password updated!'; document.getElementById('s-pw').value = ''; setTimeout(function() { msg.style.display = 'none'; }, 3000); }
 }
 
-// INIT
 async function init() {
-  const user = await NovaAuth.requireAuth()
-  if (!user) return
+  var user = await NovaAuth.requireAuth();
+  if (!user) return;
 
-  document.getElementById('user-loading').style.display = 'none'
-  document.getElementById('user-header').style.display = 'block'
+  document.getElementById('user-loading').style.display = 'none';
+  document.getElementById('user-header').style.display  = 'block';
 
-  const profile  = await NovaDB.getUserProfile(user.id)
-  const name     = profile?.display_name || user.email.split('@')[0]
-  const initial  = name.charAt(0).toUpperCase()
-  const joined   = new Date(user.created_at).getFullYear()
+  var profile = await NovaDB.getUserProfile(user.id);
+  var name    = (profile && profile.display_name) || user.email.split('@')[0];
 
-  document.getElementById('user-avatar').textContent = initial
-  document.getElementById('user-name').textContent   = name
-  document.getElementById('user-email').textContent  = user.email
-  document.getElementById('stat-member').textContent = joined
+  document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent   = name;
+  document.getElementById('user-email').textContent  = user.email;
+  document.getElementById('stat-since').textContent  = new Date(user.created_at).getFullYear();
 
-  // Pre-fill settings
-  document.getElementById('settings-name').value    = profile?.display_name || ''
-  document.getElementById('settings-bio').value     = profile?.bio || ''
-  document.getElementById('settings-website').value = profile?.website || ''
+  if (profile) {
+    document.getElementById('s-name').value = profile.display_name || '';
+    document.getElementById('s-bio').value  = profile.bio || '';
+    document.getElementById('s-web').value  = profile.website || '';
+  }
 
-  // Load data
-  await loadFavorites()
-  await loadLists()
+  await loadFavorites();
+  await loadLists();
 }
 
-document.addEventListener('DOMContentLoaded', init)
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
