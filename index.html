@@ -1,61 +1,807 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NovaHub — Discover Everything You Need</title>
-  <link rel="icon" href="assets/novahub_favicon.svg" type="image/svg+xml">
-  <meta name="description" content="Discover movies, books, AI tools, games, videos and more on NovaHub — your global discovery platform.">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NovaHub — Discover Everything You Need</title>
+<link rel="icon" href="assets/novahub_favicon.svg" type="image/svg+xml">
+<meta name="description" content="NovaHub is an AI-powered discovery platform for movies, books, AI tools, games, cyber security resources, and more.">
+<meta property="og:title" content="NovaHub — Discover Everything">
+<meta property="og:description" content="AI-powered discovery for movies, books, tools, games and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --gold:#C9A84C;--gold-l:#E8C97A;--gold-d:#9B7520;
+  --gold-glow:rgba(201,168,76,.15);--gold-glow2:rgba(201,168,76,.28);
+  --gold-grad:linear-gradient(140deg,#E8C97A 0%,#C9A84C 55%,#9B7520 100%);
+  --bg:#09090C;--bg2:#111116;--bg3:#18181F;--bg4:#1e1e28;
+  --surf:rgba(255,255,255,.04);--surf2:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --t1:#F2F2F7;--t2:#AEAEB2;--t3:#636366;--t4:#3A3A3C;
+  --r:16px;--rsm:10px;--rlg:24px;--rxl:32px;
+  --nav:64px;--ease:.28s cubic-bezier(.25,.46,.45,.94);
+  --spring:.55s cubic-bezier(.22,1,.36,1);
+  --font:"Inter","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
+}
+[data-theme=light]{
+  --bg:#F5F5F7;--bg2:#fff;--bg3:#EBEBF0;--bg4:#E5E5EA;
+  --surf:rgba(0,0,0,.03);--surf2:rgba(0,0,0,.06);
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);
+  --t1:#1D1D1F;--t2:#424245;--t3:#6E6E73;--t4:#AEAEB2;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* NAV */
+.glass-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav);display:flex;align-items:center;backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);background:rgba(9,9,12,.76);border-bottom:1px solid var(--border);transition:background var(--ease),box-shadow var(--ease),height .3s ease}
+[data-theme=light] .glass-nav{background:rgba(245,245,247,.85)}
+.glass-nav.scrolled{background:rgba(9,9,12,.97);box-shadow:0 1px 40px rgba(0,0,0,.6);height:56px}
+[data-theme=light] .glass-nav.scrolled{background:rgba(245,245,247,.98);box-shadow:0 1px 32px rgba(0,0,0,.09)}
+.container{max-width:1280px;margin:0 auto;padding:0 28px}
+.nav-content{display:flex;align-items:center;gap:14px;width:100%;height:100%}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-img{height:26px;width:auto;transition:transform var(--spring)}
+.logo:hover .logo-img{transform:scale(1.07)}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;padding-left:8px}
+.nav-link{font-size:13.5px;font-weight:500;color:var(--t3);padding:7px 13px;border-radius:99px;transition:color var(--ease),background var(--ease);white-space:nowrap}
+.nav-link:hover{color:var(--t1);background:var(--surf2)}
+.nav-link.active{color:var(--gold);background:var(--gold-glow);font-weight:700}
+.search-wrap{position:relative;flex:0 1 260px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--border);border-radius:99px;padding:7px 14px;transition:var(--ease)}
+.search-box:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);background:var(--bg2)}
+.search-box input{background:none;border:none;outline:none;color:var(--t1);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--t3)}
+.search-box svg{flex-shrink:0;opacity:.4;color:var(--t3)}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surf);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease)}
+.icon-btn:hover{background:var(--gold-glow);border-color:var(--gold-glow2);color:var(--gold)}
+.nav-cta{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:99px;border:1px solid var(--gold-glow2);background:var(--gold-glow);color:var(--gold);font-size:13px;font-weight:800;transition:var(--ease)}
+.nav-cta:hover{background:var(--gold);color:#09090C}
+.nav-auth-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#09090C}
+.nav-user-btn{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:99px;background:var(--surf);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--t2);transition:var(--ease)}
+.nav-user-btn:hover{border-color:var(--gold-glow2);color:var(--gold)}
+.mobile-btn{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.mobile-btn span{display:block;width:20px;height:2px;background:var(--t2);border-radius:2px}
+@media(max-width:900px){.nav-links{display:none}.search-wrap{flex:1}.mobile-btn{display:flex}.nav-links.open{display:flex;flex-direction:column;align-items:stretch;position:absolute;top:var(--nav);left:0;right:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:12px;z-index:998;gap:4px;box-shadow:0 8px 32px rgba(0,0,0,.3)}.nav-links.open .nav-link{border-radius:var(--rsm)}}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:12px 26px;border-radius:99px;background:var(--gold-grad);color:#09090C;font-size:14px;font-weight:800;border:none;cursor:pointer;position:relative;overflow:hidden;letter-spacing:-.01em;font-family:var(--font);box-shadow:0 4px 20px rgba(201,168,76,.38);transition:transform var(--spring),box-shadow var(--ease),filter var(--ease)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(201,168,76,.5);filter:brightness(1.06)}
+.btn-secondary{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:99px;border:1px solid var(--border2);background:var(--surf);color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:var(--spring)}
+.btn-secondary:hover{border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow)}
+.btn-ghost{display:inline-flex;align-items:center;gap:5px;padding:10px 20px;border-radius:99px;border:1px solid var(--gold-glow2);color:var(--gold-l);font-size:13px;font-weight:700;background:none;cursor:pointer;font-family:var(--font);transition:var(--ease)}
+.btn-ghost:hover{background:var(--gold-glow)}
+.btn-gold{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:99px;background:var(--gold-grad);color:#09090C;font-size:14px;font-weight:800;border:none;cursor:pointer;font-family:var(--font);transition:transform var(--spring),box-shadow var(--ease)}
+.btn-gold:hover{transform:scale(1.04);box-shadow:0 8px 28px rgba(201,168,76,.4)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.22);transform:scale(0);pointer-events:none;animation:rippleAnim .6s linear forwards}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+
+/* LAYOUT */
+.page-content{padding-top:var(--nav)}
+.section{padding:80px 0}
+.divider{height:1px;background:var(--border)}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;gap:16px}
+.section-label{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.section-label::before{content:"";width:14px;height:2px;background:var(--gold);border-radius:1px}
+.section-title{font-size:clamp(20px,2.2vw,26px);font-weight:900;letter-spacing:-.03em}
+.section-more{font-size:13px;font-weight:700;color:var(--gold);display:inline-flex;align-items:center;gap:4px;transition:opacity var(--ease)}
+.section-more:hover{opacity:.7}
+
+/* CARDS */
+.card-poster{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:2/3;background-size:cover;background-position:center;display:block;transition:transform var(--spring),box-shadow var(--spring)}
+.card-poster:hover{transform:scale(1.04) translateY(-6px);box-shadow:0 28px 64px rgba(0,0,0,.6)}
+.bg-zoom{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .6s ease}
+.card-poster:hover .bg-zoom{transform:scale(1.07)}
+.card-poster::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.15) 55%,transparent 100%)}
+.card-poster-content{position:absolute;bottom:0;left:0;right:0;padding:14px;z-index:2;color:#fff}
+.card-poster-title{font-size:12.5px;font-weight:700;line-height:1.3;margin-bottom:3px}
+.card-poster-sub{font-size:11px;color:rgba(255,255,255,.5)}
+.card-poster-rating{display:inline-flex;align-items:center;gap:3px;margin-top:6px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.35);color:var(--gold-l);font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px}
+.badge{position:absolute;top:10px;left:10px;z-index:10;font-size:10px;font-weight:800;padding:4px 10px;border-radius:99px;backdrop-filter:blur(8px)}
+.badge-trending{background:rgba(255,59,48,.85);color:#fff;animation:badgePulse 2.4s ease infinite}
+.badge-pick{background:rgba(201,168,76,.88);color:#fff}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;cursor:pointer;transition:transform var(--spring),box-shadow var(--ease),border-color var(--ease)}
+.card::before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);left:var(--mx,50%);top:var(--my,50%);transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(0,0,0,.28);border-color:var(--gold-glow2)}
+.card:hover::before{opacity:1}
+.card-icon{width:46px;height:46px;border-radius:12px;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#09090C;flex-shrink:0;margin-bottom:14px;transition:transform var(--spring)}
+.card:hover .card-icon{transform:scale(1.12) rotate(-4deg)}
+.card-title{font-size:16px;font-weight:800;margin-bottom:5px;letter-spacing:-.02em}
+.card-desc{font-size:13px;color:var(--t2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.tag-free{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(48,209,88,.1);color:#30D158;border:1px solid rgba(48,209,88,.2)}
+.tag-paid{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--gold-glow);color:var(--gold-l);border:1px solid var(--gold-glow2)}
+.card-video{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:block;color:inherit;transition:transform var(--spring),box-shadow var(--ease)}
+.card-video:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.4)}
+.card-video-thumb{aspect-ratio:16/9;background-size:cover;background-position:center;position:relative}
+.card-video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity var(--ease)}
+.card-video:hover .card-video-overlay{opacity:1}
+.play-btn{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:18px;color:#000;transform:scale(.88);transition:transform var(--spring)}
+.card-video:hover .play-btn{transform:scale(1)}
+.card-video-body{padding:14px 16px}
+.card-video-title{font-weight:700;font-size:13.5px;margin-bottom:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-video-meta{font-size:11px;color:var(--t3)}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+@media(max-width:1100px){.grid-4{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:860px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* CAROUSEL */
+.carousel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:8px}
+.carousel::-webkit-scrollbar{display:none}
+.carousel-item{scroll-snap-align:start;flex-shrink:0}
+.carousel-nav{display:flex;gap:8px;margin-top:18px}
+.carousel-btn{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--t1);transition:var(--ease)}
+.carousel-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes orbFloat{0%,100%{transform:translateX(-50%) scale(1);opacity:.8}50%{transform:translateX(-50%) scale(1.15);opacity:1}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.7)}}
+@keyframes scrollLine{0%{opacity:0;transform:scaleY(0);transform-origin:top}55%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1);transform-origin:top}}
+@keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-scale{opacity:0;transform:scale(.94);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+.reveal-scale.visible{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)}
+.stagger.visible>*{opacity:1;transform:none}
+.stagger.visible>*:nth-child(1){transition-delay:.04s}
+.stagger.visible>*:nth-child(2){transition-delay:.09s}
+.stagger.visible>*:nth-child(3){transition-delay:.14s}
+.stagger.visible>*:nth-child(4){transition-delay:.19s}
+.stagger.visible>*:nth-child(5){transition-delay:.24s}
+.stagger.visible>*:nth-child(6){transition-delay:.29s}
+.stagger.visible>*:nth-child(7){transition-delay:.34s}
+.stagger.visible>*:nth-child(8){transition-delay:.39s}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:calc(var(--nav) + 60px) 28px 80px;position:relative;overflow:hidden;text-align:center}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 65%,rgba(201,168,76,.05) 0%,transparent 55%)}
+.hero-grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(201,168,76,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.022) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 80%)}
+.hero-orb{position:absolute;width:640px;height:640px;border-radius:50%;top:-180px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(201,168,76,.09) 0%,transparent 65%);filter:blur(48px);pointer-events:none;animation:orbFloat 9s ease-in-out infinite}
+.hero-content{position:relative;z-index:1;max-width:760px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:9px;background:var(--gold-glow);border:1px solid var(--gold-glow2);border-radius:99px;padding:7px 18px;font-size:11.5px;font-weight:800;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px;animation:fadeUp .8s .05s both cubic-bezier(.22,1,.36,1)}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulseDot 2.4s ease-in-out infinite}
+.hero-title{font-size:clamp(44px,8vw,100px);font-weight:900;line-height:.97;letter-spacing:-.055em;margin-bottom:22px;background:linear-gradient(170deg,#fff 0%,var(--gold-l) 36%,rgba(242,242,247,.6) 72%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .9s .12s both cubic-bezier(.22,1,.36,1)}
+[data-theme=light] .hero-title{background:linear-gradient(170deg,#1D1D1F 0%,var(--gold) 50%,#1D1D1F 100%);-webkit-background-clip:text;background-clip:text}
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--t2);max-width:520px;margin:0 auto 44px;font-weight:400;line-height:1.65;animation:fadeUp .9s .2s both cubic-bezier(.22,1,.36,1)}
+.hero-search{display:flex;gap:0;max-width:560px;margin:0 auto 40px;animation:fadeUp .9s .26s both cubic-bezier(.22,1,.36,1)}
+.hero-search input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-right:none;border-radius:99px 0 0 99px;padding:15px 24px;font-family:var(--font);font-size:15px;color:var(--t1);outline:none;transition:border-color var(--ease)}
+.hero-search input:focus{border-color:var(--gold)}
+.hero-search input::placeholder{color:var(--t3)}
+.hero-search .btn-gold{border-radius:0 99px 99px 0;padding:15px 28px}
+.hero-stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;animation:fadeUp .9s .32s both cubic-bezier(.22,1,.36,1)}
+.hero-stat-num{font-size:26px;font-weight:900;color:var(--gold);letter-spacing:-.04em;display:block}
+.hero-stat-label{font-size:12px;color:var(--t3);font-weight:500}
+.hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--t4);font-size:10px;letter-spacing:.15em;text-transform:uppercase;z-index:1;animation:fadeUp 1s .6s both cubic-bezier(.22,1,.36,1)}
+.scroll-line{width:1px;height:44px;background:linear-gradient(to bottom,var(--gold) 0%,transparent 100%);animation:scrollLine 2.2s ease-in-out infinite}
+
+/* CAT CHIPS */
+.cat-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+.cat-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--surf);color:var(--t2);font-size:13px;font-weight:500;transition:var(--spring)}
+.cat-chip:hover{border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow);transform:translateY(-2px)}
+
+/* FEATURED GRID */
+.featured-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;height:540px}
+.featured-hero-card{grid-column:1;grid-row:1/3;border-radius:var(--rlg);overflow:hidden;position:relative;cursor:pointer;display:block}
+.featured-card{border-radius:var(--r);overflow:hidden;position:relative;cursor:pointer;display:block}
+.featured-hero-card img,.featured-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+.featured-hero-card:hover img,.featured-card:hover img{transform:scale(1.05)}
+.feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%)}
+.feat-info{position:absolute;bottom:0;left:0;right:0;padding:20px}
+.feat-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.8px;color:var(--gold-l);margin-bottom:7px}
+.feat-title{font-size:clamp(15px,2vw,22px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:5px}
+.feat-rating{display:inline-flex;align-items:center;gap:4px;background:rgba(201,168,76,.2);border:1px solid var(--gold-glow2);border-radius:99px;padding:3px 10px;font-size:10px;font-weight:800;color:var(--gold-l)}
+@media(max-width:900px){.featured-grid{grid-template-columns:1fr 1fr;height:auto;grid-template-rows:280px 180px 180px}.featured-hero-card{grid-column:1/3;grid-row:1}}
+@media(max-width:540px){.featured-grid{grid-template-columns:1fr;height:auto;grid-template-rows:none}.featured-hero-card{grid-column:1;grid-row:auto;min-height:240px}.featured-card{min-height:180px}}
+
+/* AI SECTION */
+.ai-section{background:linear-gradient(135deg,var(--gold-glow) 0%,rgba(201,168,76,.04) 50%,rgba(100,60,200,.04) 100%);border:1px solid var(--gold-glow2);border-radius:var(--rxl);padding:48px;position:relative;overflow:hidden}
+.ai-section-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(201,168,76,.08) 0%,transparent 60%)}
+.ai-section::before{content:"✦";position:absolute;right:36px;top:24px;font-size:80px;color:rgba(201,168,76,.07);line-height:1;pointer-events:none;animation:floatY 5s ease-in-out infinite}
+.ai-badge{display:inline-flex;align-items:center;gap:7px;background:var(--gold-glow);border:1px solid var(--gold-glow2);border-radius:99px;padding:5px 15px;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.ai-recs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:28px}
+.ai-rec-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:var(--spring);text-decoration:none;color:inherit;display:block}
+.ai-rec-card:hover{border-color:var(--gold-glow2);background:var(--bg4);transform:translateY(-3px)}
+.ai-rec-img{width:100%;height:80px;object-fit:cover;border-radius:var(--rsm);margin-bottom:11px;display:block;background:var(--bg4)}
+.ai-rec-name{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.ai-rec-why{font-size:11.5px;color:var(--t2);line-height:1.5}
+.ai-input-row{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.ai-input-row input{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rsm);padding:13px 18px;color:var(--t1);font-size:15px;font-family:var(--font);outline:none;transition:border-color var(--ease)}
+.ai-input-row input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+.ai-input-row input::placeholder{color:var(--t3)}
+.ai-result{margin-top:16px;padding:16px 18px;border-radius:var(--rsm);background:var(--bg3);border:1px solid var(--border);font-size:14px;color:var(--t2);min-height:52px;line-height:1.65}
+
+/* FOOTER */
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:64px 0 32px;margin-top:96px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:52px;margin-bottom:52px}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:36px}}
+@media(max-width:540px){.footer-grid{grid-template-columns:1fr}}
+.footer-brand{font-size:18px;font-weight:900;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.logo-icon{height:24px;width:auto}
+.footer-tagline{font-size:13.5px;color:var(--t2);line-height:1.65;max-width:260px}
+.footer-social{display:flex;gap:8px;margin-top:20px}
+.footer-social a{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surf);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t2);transition:var(--ease)}
+.footer-social a:hover{border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow)}
+.footer-col h4{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:16px}
+.footer-links a{display:block;font-size:13.5px;color:var(--t2);margin-bottom:11px;transition:color var(--ease)}
+.footer-links a:hover{color:var(--gold)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:26px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--t3);flex-wrap:wrap;gap:12px}
+.empty-state{text-align:center;padding:80px 24px;color:var(--t2)}
+.empty-state-icon{font-size:56px;display:block;margin-bottom:16px;opacity:.35}
+.hidden{display:none!important}
+</style>
 </head>
 <body>
-  <nav class="glass-nav">
-    <div class="container nav-content">
-      <a href="index.html" class="logo">
-        <img src="assets/novahub_logo.svg" alt="NovaHub" class="logo-img">
-      </a>
-      <div class="nav-links">
-        <div class="search-wrap">
-          <form class="search-box" onsubmit="event.preventDefault(); window.location.href='search.html?q='+document.getElementById('global-search').value;">
-            <input type="text" id="global-search" placeholder="Search movies, books, AI tools..." autocomplete="off">
-            <button type="submit" aria-label="Search">🔍</button>
-          </form>
+
+<!-- NAV -->
+<nav class="glass-nav" id="main-nav">
+  <div class="container nav-content">
+    <a href="index.html" class="logo">
+      <img src="assets/novahub_logo.svg" alt="NovaHub" class="logo-img">
+    </a>
+    <div class="nav-links" id="nav-links">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="global-search" placeholder="Search everything…" autocomplete="off">
         </div>
-        <a href="index.html" class="nav-link active">Home</a>
-        <a href="category.html" class="nav-link">Categories</a>
-        <a href="blog.html" class="nav-link">Blog</a>
-        <a href="search.html" class="nav-link">Explore</a>
-        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode" title="Toggle Dark/Light Mode">
-          <span id="theme-icon"></span>
-        </button>
+      </div>
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="category.html" class="nav-link">Browse</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="search.html" class="nav-link">Explore</a>
+    </div>
+    <div class="nav-auth-actions" id="nav-auth-actions">
+      <!-- Filled by auth.js -->
+      <a href="account/login.html" class="btn-ghost" style="font-size:13px;padding:8px 18px">Sign in</a>
+      <a href="account/register.html" class="btn-primary" style="font-size:13px;padding:8px 18px">Sign up</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:8px">
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme">
+        <span id="theme-icon"></span>
+      </button>
+      <button class="mobile-btn" id="mobile-btn">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="page-content">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        AI Discovery · Now Live
+      </div>
+      <h1 class="hero-title">Discover Everything<br>You Need</h1>
+      <p class="hero-sub">Movies, books, AI tools, games, cyber security resources — curated by humans, powered by intelligence.</p>
+      <div class="hero-search">
+        <input type="text" id="hero-input" placeholder='Try "best AI tools" or "sci-fi movies"…'>
+        <button class="btn-gold" onclick="handleHeroSearch()">Search →</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-num" id="stat-items">…</span><span class="hero-stat-label">Curated Items</span></div>
+        <div class="hero-stat"><span class="hero-stat-num">7</span><span class="hero-stat-label">Categories</span></div>
+        <div class="hero-stat"><span class="hero-stat-num">Daily</span><span class="hero-stat-label">Updates</span></div>
+        <div class="hero-stat"><span class="hero-stat-num">Free</span><span class="hero-stat-label">Always</span></div>
       </div>
     </div>
-  </nav>
+    <div class="hero-scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
 
-  <main id="app-root"></main>
-
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-logo">
-        <img src="assets/novahub_favicon.svg" alt="NH" class="logo-icon">
+  <!-- CATEGORIES -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-header reveal">
         <div>
-          <div>NovaHub &copy; 2026</div>
-          <div class="footer-tagline">Discover Everything You Need</div>
+          <div class="section-label">Browse</div>
+          <h2 class="section-title">Featured Categories</h2>
         </div>
+        <a href="category.html" class="section-more">All Categories →</a>
       </div>
-      <div class="footer-links">
-        <a href="blog.html">Blog</a>
-        <a href="category.html">Categories</a>
-        <a href="search.html">Search</a>
+      <div class="cat-chips stagger" id="cat-chips">
+        <!-- Filled by JS -->
+      </div>
+      <div class="featured-grid" id="featured-grid">
+        <!-- Filled by JS -->
       </div>
     </div>
-  </footer>
+  </section>
 
-  <script src="js/data.js"></script>
-  <script src="js/theme.js"></script>
-  <script src="js/embeds.js"></script>
-  <script src="js/news.js"></script>
-  <script src="js/app.js"></script>
+  <div class="divider"></div>
+
+  <!-- TRENDING -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Hot Right Now</div>
+          <h2 class="section-title">🔥 Trending This Week</h2>
+        </div>
+        <a href="search.html?q=trending" class="section-more">See All →</a>
+      </div>
+      <div class="carousel" id="trending-carousel">
+        <!-- Filled by JS -->
+      </div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="document.getElementById('trending-carousel').scrollBy({left:-300,behavior:'smooth'})">←</button>
+        <button class="carousel-btn" onclick="document.getElementById('trending-carousel').scrollBy({left:300,behavior:'smooth'})">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AI RECOMMENDATIONS -->
+  <section class="section">
+    <div class="container">
+      <div class="ai-section reveal">
+        <div class="ai-section-bg"></div>
+        <div style="position:relative;z-index:1">
+          <div class="ai-badge">✦ AI-Powered</div>
+          <div class="section-header" style="margin-bottom:8px">
+            <div>
+              <div class="section-label">Personalized</div>
+              <h2 class="section-title">AI Recommendations</h2>
+            </div>
+            <a href="search.html" class="section-more">Explore All →</a>
+          </div>
+          <p style="color:var(--t2);font-size:15px;max-width:520px;margin-bottom:0">
+            Tell us what you are in the mood for and our AI will find it instantly.
+          </p>
+          <div class="ai-input-row">
+            <input type="text" id="ai-rec-input"
+              placeholder='e.g. "mind-bending sci-fi" or "free productivity tool"…'
+              onkeypress="if(event.key==='Enter')handleAIRec()">
+            <button class="btn-gold" onclick="handleAIRec()">Ask ✦</button>
+          </div>
+          <div class="ai-result" id="ai-result" style="display:none"></div>
+          <div class="ai-recs-grid stagger" id="ai-recs-grid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AI TOOLS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Productivity</div>
+          <h2 class="section-title">✨ AI Tools Spotlight</h2>
+        </div>
+        <a href="category.html?cat=ai-tools" class="section-more">All Tools →</a>
+      </div>
+      <div class="carousel" id="tools-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="document.getElementById('tools-carousel').scrollBy({left:-300,behavior:'smooth'})">←</button>
+        <button class="carousel-btn" onclick="document.getElementById('tools-carousel').scrollBy({left:300,behavior:'smooth'})">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECURITY -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Featured</div>
+          <h2 class="section-title">🔐 Cyber Security</h2>
+        </div>
+        <a href="category.html?cat=security" class="section-more">All Security →</a>
+      </div>
+      <div class="grid-3 stagger" id="security-grid"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MOVIES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Watch</div>
+          <h2 class="section-title">🍿 Movies &amp; TV</h2>
+        </div>
+        <a href="category.html?cat=movies" class="section-more">See all →</a>
+      </div>
+      <div class="carousel" id="movies-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="document.getElementById('movies-carousel').scrollBy({left:-300,behavior:'smooth'})">←</button>
+        <button class="carousel-btn" onclick="document.getElementById('movies-carousel').scrollBy({left:300,behavior:'smooth'})">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GAMES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Play</div>
+          <h2 class="section-title">🎮 Games</h2>
+        </div>
+        <a href="category.html?cat=games" class="section-more">See all →</a>
+      </div>
+      <div class="carousel" id="games-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="document.getElementById('games-carousel').scrollBy({left:-300,behavior:'smooth'})">←</button>
+        <button class="carousel-btn" onclick="document.getElementById('games-carousel').scrollBy({left:300,behavior:'smooth'})">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BOOKS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">Read</div>
+          <h2 class="section-title">📚 Books</h2>
+        </div>
+        <a href="category.html?cat=books" class="section-more">See all →</a>
+      </div>
+      <div class="carousel" id="books-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="document.getElementById('books-carousel').scrollBy({left:-300,behavior:'smooth'})">←</button>
+        <button class="carousel-btn" onclick="document.getElementById('books-carousel').scrollBy({left:300,behavior:'smooth'})">→</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/novahub_favicon.svg" alt="NH" class="logo-icon">
+          NovaHub
+        </div>
+        <p class="footer-tagline">Your AI-powered discovery platform for everything worth your time. Updated daily.</p>
+        <div class="footer-social">
+          <a href="https://github.com/Mossesmuwa" target="_blank" title="GitHub">⌥</a>
+          <a href="https://www.instagram.com/mosses.muwa/" target="_blank" title="Instagram">◈</a>
+          <a href="#" title="Twitter">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Discover</h4>
+        <div class="footer-links">
+          <a href="category.html?cat=movies">Movies &amp; TV</a>
+          <a href="category.html?cat=books">Books</a>
+          <a href="category.html?cat=ai-tools">AI Tools</a>
+          <a href="category.html?cat=games">Games</a>
+          <a href="category.html?cat=security">Cyber Security</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <div class="footer-links">
+          <a href="blog.html">Blog</a>
+          <a href="search.html">Search</a>
+          <a href="category.html">All Categories</a>
+          <a href="account/register.html">Create Account</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <div class="footer-links">
+          <a href="https://github.com/Mossesmuwa" target="_blank">GitHub</a>
+          <a href="https://www.instagram.com/mosses.muwa/" target="_blank">Instagram</a>
+          <a href="contact.html">Contact</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>NovaHub © 2026 — Built by Mosses Muwa</span>
+      <span style="color:var(--gold);font-weight:700">Discover Everything You Need ✦</span>
+    </div>
+  </div>
+</footer>
+
+<!-- SCRIPTS — ORDER MATTERS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/items.js"></script>
+<script src="js/favorites.js"></script>
+<script src="js/ui.js"></script>
+
+<script>
+// ── NAV BEHAVIOUR ────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 48)
+}, { passive: true })
+
+document.getElementById('mobile-btn').addEventListener('click', () => {
+  document.getElementById('nav-links').classList.toggle('open')
+})
+
+document.getElementById('global-search').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    window.location.href = 'search.html?q=' + encodeURIComponent(e.target.value.trim())
+  }
+})
+
+// ── HERO SEARCH ──────────────────────────────────────────
+function handleHeroSearch() {
+  const q = document.getElementById('hero-input').value.trim()
+  if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q)
+}
+document.getElementById('hero-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') handleHeroSearch()
+})
+
+// ── AI RECOMMENDATIONS ───────────────────────────────────
+async function handleAIRec() {
+  const input     = document.getElementById('ai-rec-input')
+  const resultEl  = document.getElementById('ai-result')
+  const query     = input?.value.trim()
+  if (!query) return
+
+  resultEl.style.display = 'block'
+  resultEl.innerHTML = '<span style="color:var(--t3)">✦ Searching for the best match…</span>'
+
+  setTimeout(async () => {
+    const results = await NovaItems.search(query, { limit: 5 })
+    if (!results.length) {
+      resultEl.innerHTML = 'No exact match found. Try a different keyword.'
+      return
+    }
+    resultEl.innerHTML = `Found <strong>${results.length} match${results.length > 1 ? 'es' : ''}</strong> for "<em>${query}</em>":<br><br>`
+      + results.map(i =>
+          `<a href="item.html?slug=${encodeURIComponent(i.slug)}"
+            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+            margin:4px;background:var(--bg4);border:1px solid var(--border);
+            border-radius:99px;font-weight:700;font-size:13px;color:var(--gold);
+            transition:.2s ease" onmouseover="this.style.background='var(--gold-glow)'"
+            onmouseout="this.style.background='var(--bg4)'">
+            → ${i.name}
+          </a>`
+      ).join('')
+  }, 600)
+}
+
+// ── RENDER CARD ──────────────────────────────────────────
+function renderCard(item) {
+  if (!item) return ''
+  const href = 'item.html?slug=' + encodeURIComponent(item.slug)
+
+  if (['movie', 'book', 'game'].includes(item.type)) {
+    const sub = item.director || item.author || item.developer || item.genre || ''
+    const badge = item.trending
+      ? "<span class='badge badge-trending'>🔥 Hot</span>"
+      : item.daily_pick
+        ? "<span class='badge badge-pick'>⭐ Pick</span>" : ''
+    return `<a href="${href}" class="card-poster">
+      <div class="bg-zoom" style="background-image:url('${item.image || ''}')"></div>
+      ${badge}
+      <div class="card-poster-content">
+        <div class="card-poster-title">${item.name}</div>
+        ${sub ? `<div class="card-poster-sub">${sub}</div>` : ''}
+        ${item.rating ? `<div class="card-poster-rating">★ ${item.rating}</div>` : ''}
+      </div>
+    </a>`
+  }
+
+  if (item.type === 'video') {
+    return `<a href="${href}" class="card-video">
+      <div class="card-video-thumb" style="background-image:url('${item.image || ''}')">
+        <div class="card-video-overlay"><div class="play-btn">▶</div></div>
+      </div>
+      <div class="card-video-body">
+        <div class="card-video-title">${item.name}</div>
+        <div class="card-video-meta">${item.platforms || ''}</div>
+      </div>
+    </a>`
+  }
+
+  const isFree = (item.pricing || '').toLowerCase().includes('free')
+  return `<div class="card" onclick="location.href='${href}'">
+    <div class="card-icon">${(item.name || '?').charAt(0)}</div>
+    <div class="card-title">${item.name}</div>
+    ${item.pricing ? `<span class="${isFree ? 'tag-free' : 'tag-paid'}" style="margin-bottom:10px;display:inline-block">${item.pricing}</span>` : ''}
+    <p class="card-desc">${item.short_desc || ''}</p>
+    <div class="card-actions">
+      <a href="${href}" class="btn-secondary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Details</a>
+      <a href="${item.affiliate_link || href}" target="_blank" rel="noopener" class="btn-primary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Get →</a>
+    </div>
+  </div>`
+}
+
+function renderCarousel(items, id, width = '160px') {
+  const el = document.getElementById(id)
+  if (!el || !items.length) return
+  el.innerHTML = items.map(i =>
+    `<div class="carousel-item" style="width:${width}">${renderCard(i)}</div>`
+  ).join('')
+}
+
+function renderGrid(items, id, gridClass = 'grid-4') {
+  const el = document.getElementById(id)
+  if (!el) return
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📭</span><p>Nothing here yet</p></div>'
+    return
+  }
+  el.innerHTML = `<div class="${gridClass} stagger">${items.map(i => `<div class="reveal-scale">${renderCard(i)}</div>`).join('')}</div>`
+}
+
+// ── MAIN INIT ────────────────────────────────────────────
+async function init() {
+  // Auth UI
+  await NovaAuth.updateNavUI()
+
+  // Load all data in parallel
+  const [
+    categories,
+    featured,
+    trending,
+    aiTools,
+    security,
+    movies,
+    games,
+    books,
+    recommendations,
+    itemCount
+  ] = await Promise.all([
+    NovaItems.getCategories(),
+    NovaItems.getFeatured(5),
+    NovaItems.getTrending(14),
+    NovaItems.getByCategory('ai-tools', { limit: 8 }),
+    NovaItems.getByCategory('security', { limit: 6 }),
+    NovaItems.getByCategory('movies', { limit: 8 }),
+    NovaItems.getByCategory('games', { limit: 8 }),
+    NovaItems.getByCategory('books', { limit: 8 }),
+    NovaItems.getRecommendations(6),
+    NovaDB.client.from('items').select('id', { count: 'exact', head: true }).eq('approved', true)
+  ])
+
+  // Item count stat
+  const statEl = document.getElementById('stat-items')
+  if (statEl && itemCount.count) statEl.textContent = itemCount.count + '+'
+
+  // Category chips
+  const chipsEl = document.getElementById('cat-chips')
+  if (chipsEl && categories.length) {
+    chipsEl.innerHTML = categories.map(c =>
+      `<a href="category.html?cat=${c.id}" class="cat-chip">${c.icon} ${c.name}</a>`
+    ).join('')
+  }
+
+  // Featured grid
+  const featEl = document.getElementById('featured-grid')
+  if (featEl && featured.length >= 2) {
+    const hero = featured[0]
+    const rest = featured.slice(1, 5)
+    featEl.innerHTML =
+      `<a href="item.html?slug=${encodeURIComponent(hero.slug)}" class="featured-hero-card">
+        <img src="${hero.image}" alt="${hero.name}" loading="lazy">
+        <div class="feat-overlay"></div>
+        <div class="feat-info">
+          <div class="feat-type">${(hero.type || '').toUpperCase()}</div>
+          <div class="feat-title">${hero.name}</div>
+          ${hero.rating ? `<div class="feat-rating">★ ${hero.rating}</div>` : ''}
+        </div>
+      </a>` +
+      rest.map(i =>
+        `<a href="item.html?slug=${encodeURIComponent(i.slug)}" class="featured-card">
+          <img src="${i.image}" alt="${i.name}" loading="lazy">
+          <div class="feat-overlay"></div>
+          <div class="feat-info">
+            <div class="feat-type">${(i.type || '').toUpperCase()}</div>
+            <div class="feat-title" style="font-size:14px">${i.name}</div>
+          </div>
+        </a>`
+      ).join('')
+  }
+
+  // Trending carousel
+  renderCarousel(trending, 'trending-carousel', '160px')
+
+  // AI Recommendations
+  const aiRecsEl = document.getElementById('ai-recs-grid')
+  if (aiRecsEl && recommendations.length) {
+    const reasons = ['Trending now','Top community pick','Editor's choice','Highly rated','New & noteworthy','Perfect for today']
+    aiRecsEl.innerHTML = recommendations.map((item, i) =>
+      `<a href="item.html?slug=${encodeURIComponent(item.slug)}" class="ai-rec-card">
+        ${item.image ? `<img src="${item.image}" class="ai-rec-img" alt="${item.name}" loading="lazy">` : `<div style="font-size:32px;margin-bottom:11px">${(item.name || '?').charAt(0)}</div>`}
+        <div class="ai-rec-name">${item.name}</div>
+        <div class="ai-rec-why">${reasons[i % reasons.length]}</div>
+      </a>`
+    ).join('')
+  }
+
+  // Other carousels
+  renderCarousel(aiTools, 'tools-carousel', '280px')
+  renderCarousel(movies, 'movies-carousel', '160px')
+  renderCarousel(games, 'games-carousel', '160px')
+  renderCarousel(books, 'books-carousel', '160px')
+
+  // Security grid
+  renderGrid(security, 'security-grid', 'grid-3')
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return
+      e.target.classList.add('visible')
+      if (e.target.classList.contains('stagger'))
+        [...e.target.children].forEach((c, i) => {
+          c.style.transitionDelay = (i * .065) + 's'
+          c.classList.add('visible')
+        })
+      io.unobserve(e.target)
+    })
+  }, { threshold: .06, rootMargin: '0px 0px -36px 0px' })
+
+  document.querySelectorAll('.reveal,.reveal-scale,.stagger').forEach(el => io.observe(el))
+
+  // Card glow
+  document.addEventListener('mousemove', e => {
+    const card = e.target.closest('.card')
+    if (!card) return
+    const r = card.getBoundingClientRect()
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px')
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px')
+  })
+
+  // Ripple
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.btn-primary,.btn-gold')
+    if (!b) return
+    const r = document.createElement('span'), br = b.getBoundingClientRect(), s = Math.max(br.width, br.height) * 2
+    r.className = 'ripple'
+    r.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - br.left - s / 2}px;top:${e.clientY - br.top - s / 2}px`
+    b.appendChild(r)
+    setTimeout(() => r.remove(), 700)
+  })
+}
+
+document.addEventListener('DOMContentLoaded', init)
+</script>
+
 </body>
 </html>
