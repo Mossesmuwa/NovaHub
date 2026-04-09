@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>NovaHub — The Weekly Digest</title>
+<link rel="icon" href="../assets/novahub_favicon.svg" type="image/svg+xml">
+<meta name="description" content="AI-curated weekly digest of the best tools, movies, books, and games.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Inline base styles to mirror index.html for consistency -->
+<link rel="stylesheet" href="../css/variables.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/ai-interface.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="glass-nav">
+  <div class="container nav-content">
+    <a href="index.html" class="logo">
+      <img src="../assets/novahub_logo.svg" alt="NovaHub" style="height:28px; width:auto; display:block;">
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="category.html" class="nav-link">Browse</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="weekly.html" class="nav-link active">The Weekly</a>
+    </div>
+    <div id="nav-auth-actions" style="display:flex; gap:8px;">
+        <a href="account/login.html" style="font-size:13px; font-weight:600; padding:8px">Login</a>
+    </div>
+  </div>
+</nav>
+
+<main class="page-content container">
+  <div class="hero-weekly">
+    <div class="weekly-badge">✦ AI Curated</div>
+    <h1 class="weekly-title">The Weekly Digest</h1>
+    <p class="weekly-sub">The absolute best tools, reads, and entertainment from the past 7 days, summarized by our AI.</p>
+  </div>
+
+  <div class="weekly-grid">
+    <!-- Main Digest Section -->
+    <div class="weekly-main-card">
+      <div class="digest-date">Issue #42 — This Week in Review</div>
+      <h2 class="digest-header">Top Breakthroughs & Finds</h2>
+      
+      <div class="digest-item">
+        <div class="digest-icon">🤖</div>
+        <div class="digest-body">
+          <h3>ChatGPT 5 Sneak Peek</h3>
+          <p>A leak dropped highlighting insane multimodality improvements. We broke down the 3 ways it will change dev workflows.</p>
+          <a href="#" class="digest-meta">Read AI Breakdown →</a>
+        </div>
+      </div>
+
+      <div class="digest-item">
+        <div class="digest-icon">🍿</div>
+        <div class="digest-body">
+          <h3>Dune: Part Two — The Visual Masterpiece</h3>
+          <p>It's finally here and it does not disappoint. The cinematography alone makes it a must-watch in IMAX. Currently trending at #1.</p>
+          <a href="#" class="digest-meta">View Item →</a>
+        </div>
+      </div>
+
+      <div class="digest-item">
+        <div class="digest-icon">⚡</div>
+        <div class="digest-body">
+          <h3>Supabase Vector reaches GA</h3>
+          <p>Store your AI embeddings natively in Postgres with high performance. We tested it against Pinecone and the results are surprising.</p>
+          <a href="#" class="digest-meta">View Tool →</a>
+        </div>
+      </div>
+
+      <div class="digest-item">
+        <div class="digest-icon">📚</div>
+        <div class="digest-body">
+          <h3>"Read Write Own" by Chris Dixon</h3>
+          <p>A compelling new philosophical take on the future of the internet. A highly recommended weekend read for founders.</p>
+          <a href="#" class="digest-meta">View Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="subscribe-card">
+        <h3>Never Miss a Beat</h3>
+        <p>Get this AI-curated digest delivered to your inbox every Sunday morning. No spam.</p>
+        <form onsubmit="event.preventDefault(); alert('Subscribed!');">
+          <input type="email" placeholder="Enter your email" class="sub-input" required>
+          <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Subscribe ✦</button>
+        </form>
+      </div>
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:24px;">
+        <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Previous Issues</h3>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="#" style="font-size:14px; color:var(--t2); display:flex; justify-content:space-between;">Issue #41 <span>Mar 24</span></a>
+          <a href="#" style="font-size:14px; color:var(--t2); display:flex; justify-content:space-between;">Issue #40 <span>Mar 17</span></a>
+          <a href="#" style="font-size:14px; color:var(--t2); display:flex; justify-content:space-between;">Issue #39 <span>Mar 10</span></a>
+          <a href="#" style="font-size:14px; color:var(--gold); font-weight:600; margin-top:8px;">Archive →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container" style="text-align:center; font-size:13px; color:var(--t3)">
+    NovaHub © 2026 — Built by Mosses Muwa
+  </div>
+</footer>
+
+<script src="../js/theme.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Browse — NovaHub</title>
+<link rel="icon" href="../assets/novahub_favicon.svg" type="image/svg+xml">
+<meta name="description" content="Browse all categories on NovaHub — movies, books, AI tools, games, cyber security and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/variables.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/ai-interface.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="glass-nav" id="main-nav">
+  <div class="container nav-content">
+    <a href="index.html" class="logo">
+      <img src="../assets/novahub_logo.svg" alt="NovaHub" style="height:28px; width:auto; display:block;">
+    </a>
+    <div class="nav-links">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="global-search" placeholder="Search everything…" autocomplete="off">
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="category.html" class="nav-link active">Browse</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="search.html" class="nav-link">Explore</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-auth-actions" id="nav-auth-actions">
+        <a href="account/login.html" class="btn-ghost" style="font-size:13px;padding:7px 14px">Sign in</a>
+        <a href="account/register.html" class="btn-primary" style="font-size:13px;padding:7px 16px">Sign up</a>
+      </div>
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme" style="margin-left:4px"><span id="theme-icon"></span></button>
+      <button class="mobile-btn" id="mobile-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="mobile-search-input" placeholder="Search NovaHub…" autocomplete="off">
+    </div>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="category.html" class="nav-link active">Browse</a>
+    <a href="blog.html" class="nav-link">Blog</a>
+    <a href="search.html" class="nav-link">Explore</a>
+    <a href="account/login.html" class="nav-link">Sign In</a>
+    <a href="account/register.html" class="nav-link" style="color:var(--gold)">Create Account</a>
+  </div>
+</nav>
+
+<main class="page-content">
+
+  <!-- CATEGORY HERO -->
+  <div class="cat-hero" id="cat-hero">
+    <div class="cat-hero-bg"></div>
+    <div class="cat-hero-grid"></div>
+    <div style="position:relative;z-index:1">
+      <span class="cat-hero-icon" id="cat-icon">📦</span>
+      <h1 class="cat-hero-title" id="cat-title">Browse</h1>
+      <p class="cat-hero-desc" id="cat-desc">Curated content updated daily.</p>
+      <p class="cat-hero-count" id="cat-count"></p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom:80px">
+
+    <!-- Category pills -->
+    <div class="cat-pills-wrap">
+      <div class="cat-pills" id="cat-pills"></div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <span class="filter-label">Sort</span>
+      <button class="sort-pill active" id="sort-popular"  onclick="setSort('popular',this)">Popular</button>
+      <button class="sort-pill"        id="sort-rating"   onclick="setSort('rating',this)">Top Rated</button>
+      <button class="sort-pill"        id="sort-newest"   onclick="setSort('newest',this)">Newest</button>
+      <button class="sort-pill"        id="sort-name"     onclick="setSort('name',this)">A–Z</button>
+      <div class="filter-right">
+        <label class="free-toggle">
+          <input type="checkbox" id="free-only" onchange="applyFilters()"> Free only
+        </label>
+        <span class="item-count" id="item-count"></span>
+      </div>
+    </div>
+
+    <!-- Items grid -->
+    <div id="items-grid"></div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <svg viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+            <defs><linearGradient id="flg-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E8C97A"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9B7520"/></linearGradient></defs>
+            <rect width="32" height="32" rx="7" fill="#1E1812"/><circle cx="16" cy="7" r="2.5" fill="url(#flg-c)"/><circle cx="6" cy="22" r="2.2" fill="url(#flg-c)"/><circle cx="26" cy="22" r="2.2" fill="url(#flg-c)"/>
+            <line x1="16" y1="7" x2="6" y2="22" stroke="url(#flg-c)" stroke-width="1.2" opacity="0.65"/><line x1="16" y1="7" x2="26" y2="22" stroke="url(#flg-c)" stroke-width="1.2" opacity="0.65"/><line x1="6" y1="22" x2="26" y2="22" stroke="url(#flg-c)" stroke-width="1" opacity="0.35"/>
+          </svg>
+          NovaHub
+        </div>
+        <p class="footer-tagline">Your AI-powered discovery platform for everything worth your time.</p>
+        <div class="footer-social">
+          <a href="https://github.com/Mossesmuwa" target="_blank" rel="noopener">⌥</a>
+          <a href="https://www.instagram.com/mosses.muwa/" target="_blank" rel="noopener">◈</a>
+          <a href="#">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Discover</h4><div class="footer-links"><a href="category.html?cat=movies">Movies &amp; TV</a><a href="category.html?cat=books">Books</a><a href="category.html?cat=ai-tools">AI Tools</a><a href="category.html?cat=games">Games</a><a href="category.html?cat=security">Cyber Security</a></div></div>
+      <div class="footer-col"><h4>Platform</h4><div class="footer-links"><a href="blog.html">Blog</a><a href="search.html">Search</a><a href="account/register.html">Create Account</a></div></div>
+      <div class="footer-col"><h4>Connect</h4><div class="footer-links"><a href="https://github.com/Mossesmuwa" target="_blank" rel="noopener">GitHub</a><a href="https://mossesmuwa.github.io" target="_blank" rel="noopener">Portfolio</a><a href="privacy.html">Privacy</a></div></div>
+    </div>
+    <div class="footer-bottom"><span>NovaHub © 2026 — Built by Mosses Muwa</span><span style="color:var(--gold);font-weight:700">Discover Everything ✦</span></div>
+  </div>
+</footer>
+
+<div id="nova-toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/items.js"></script>
+<script src="../js/favorites.js"></script>
+<script>
+'use strict';
+
+// ── NAV ──────────────────────────────────────────────
+window.addEventListener('scroll', function(){ document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 48); }, { passive:true });
+document.getElementById('mobile-btn').addEventListener('click', function(){ document.getElementById('mobile-menu').classList.toggle('open'); });
+document.querySelectorAll('.mobile-menu .nav-link').forEach(function(a){ a.addEventListener('click', function(){ document.getElementById('mobile-menu').classList.remove('open'); }); });
+document.getElementById('global-search').addEventListener('keydown', function(e){ if(e.key==='Enter'&&this.value.trim()) window.location.href='search.html?q='+encodeURIComponent(this.value.trim()); });
+document.getElementById('mobile-search-input').addEventListener('keydown', function(e){ if(e.key==='Enter'&&this.value.trim()) window.location.href='search.html?q='+encodeURIComponent(this.value.trim()); });
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg, type) {
+  var c = document.getElementById('nova-toasts');
+  var colors = {success:'var(--gold)',error:'#FF453A',info:'var(--t2)'};
+  var icons  = {success:'✦',error:'✕',info:'◆'};
+  var t = type||'info';
+  var el = document.createElement('div'); el.className='nova-toast';
+  el.innerHTML='<span style="color:'+colors[t]+';font-size:15px;flex-shrink:0">'+icons[t]+'</span><span>'+msg+'</span>';
+  c.appendChild(el);
+  setTimeout(function(){ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(function(){ el.remove(); },300); }, 2800);
+}
+
+// ── STATE ─────────────────────────────────────────────
+var allItems = [], currentSort = 'popular', freeOnly = false;
+var CATEGORIES = [
+  { id:'movies',   name:'Movies & TV',   icon:'🍿', desc:'Blockbusters, indie films, and must-watch series.' },
+  { id:'books',    name:'Books',          icon:'📚', desc:'Bestsellers, classics, and essential reads.' },
+  { id:'ai-tools', name:'AI Tools',       icon:'✨', desc:'The best AI tools for writing, coding, design, and more.' },
+  { id:'games',    name:'Games',          icon:'🎮', desc:'Console hits, indie gems, and free-to-play picks.' },
+  { id:'security', name:'Cyber Security', icon:'🔐', desc:'Tools, courses, and resources for security professionals.' },
+  { id:'videos',   name:'Videos',         icon:'🎬', desc:'Top channels, tutorials, and documentaries.' },
+  { id:'productivity', name:'Productivity', icon:'⚡', desc:'Apps and tools to get more done every day.' }
+];
+
+function getCat(id) { return CATEGORIES.find(function(c){ return c.id===id; }) || {id:id,name:id,icon:'📦',desc:''}; }
+
+// ── SORT & FILTER ─────────────────────────────────────
+function setSort(mode, btn) {
+  currentSort = mode;
+  document.querySelectorAll('.sort-pill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderGrid();
+}
+window.setSort = setSort;
+
+function applyFilters() {
+  freeOnly = document.getElementById('free-only').checked;
+  renderGrid();
+}
+
+function sorted() {
+  var items = freeOnly ? allItems.filter(function(i){ return (i.pricing||'').toLowerCase().includes('free'); }) : allItems.slice();
+  if (currentSort === 'rating')   return items.sort(function(a,b){ return (b.rating||0)-(a.rating||0); });
+  if (currentSort === 'newest')   return items.sort(function(a,b){ return (b.year||0)-(a.year||0); });
+  if (currentSort === 'name')     return items.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  return items.sort(function(a,b){ return (b.trending?1:0)-(a.trending?1:0)||(b.save_count||0)-(a.save_count||0); });
+}
+
+// ── RENDER ────────────────────────────────────────────
+function renderGrid() {
+  var grid  = document.getElementById('items-grid');
+  var count = document.getElementById('item-count');
+  var items = sorted();
+
+  if (count) count.innerHTML = '<strong>'+items.length+'</strong> item'+(items.length!==1?'s':'');
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📭</span><h3 style="font-size:20px;font-weight:800;margin-bottom:8px">Nothing here yet</h3><p style="font-size:14px">Check back soon — we add content daily.</p></div>';
+    return;
+  }
+
+  var isPoster = items.some(function(i){ return ['movie','book','game'].includes(i.type); });
+  var cls = isPoster ? 'grid-4 stagger' : 'grid-3 stagger';
+
+  grid.innerHTML = '<div class="'+cls+'">'+items.map(function(item){ return '<div class="reveal-scale">'+renderCard(item)+'</div>'; }).join('')+'</div>';
+  setTimeout(initReveal, 50);
+  setTimeout(function(){ if(window.NovaFavorites) NovaFavorites.initAll(); }, 80);
+}
+
+function renderCard(item) {
+  var href = 'item.html?slug='+encodeURIComponent(item.slug||item.id);
+  if (['movie','book','game'].includes(item.type)) {
+    var sub = item.director||item.author||item.developer||item.genre||'';
+    var badge = item.trending ? "<span class='badge badge-trending'>🔥 Hot</span>" : (item.daily_pick ? "<span class='badge badge-pick'>⭐ Pick</span>" : '');
+    return '<a href="'+href+'" class="card-poster">'
+      +'<div class="bg-zoom" style="background-image:url(\''+esc(item.image||'')+'\')"></div>'
+      +badge
+      +'<button class="fav-btn-overlay" data-fav-btn data-item-id="'+item.id+'" aria-label="Save">♡ Save</button>'
+      +'<div class="card-poster-content">'
+      +'<div class="card-poster-title">'+esc(item.name)+'</div>'
+      +(sub?'<div class="card-poster-sub">'+esc(sub)+'</div>':'')
+      +(item.rating?'<div class="card-poster-rating">★ '+item.rating+'</div>':'')
+      +'</div></a>';
+  }
+  var isFree = (item.pricing||'').toLowerCase().includes('free');
+  return '<div class="card" onclick="location.href=\''+href+'\'">'
+    +'<div class="card-icon">'+esc((item.name||'?').charAt(0))+'</div>'
+    +'<div class="card-title">'+esc(item.name)+'</div>'
+    +(item.pricing?'<span class="'+(isFree?'tag-free':'tag-paid')+'" style="margin-bottom:10px;display:inline-block">'+esc(item.pricing)+'</span>':'')
+    +'<p class="card-desc">'+esc(item.short_desc||'')+'</p>'
+    +'<div class="card-actions">'
+    +'<a href="'+href+'" class="btn-secondary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Details</a>'
+    +'<a href="'+esc(item.affiliate_link||href)+'" target="_blank" rel="noopener" class="btn-primary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Get →</a>'
+    +'</div></div>';
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── SCROLL REVEAL ─────────────────────────────────────
+var _io;
+function initReveal() {
+  if (!_io) _io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      if (e.target.classList.contains('stagger'))
+        Array.from(e.target.children).forEach(function(c,i){ c.style.transitionDelay=(i*.065)+'s'; c.classList.add('visible'); });
+      _io.unobserve(e.target);
+    });
+  }, { threshold:.05, rootMargin:'0px 0px -32px 0px' });
+  document.querySelectorAll('.reveal,.reveal-scale,.stagger').forEach(function(el){ _io.observe(el); });
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async function() {
+  // Parse category from URL
+  var params = new URLSearchParams(location.search);
+  var catId  = params.get('cat') || 'movies';
+  var cat    = getCat(catId);
+
+  // Update hero
+  document.title = cat.name + ' — NovaHub';
+  document.getElementById('cat-icon').textContent  = cat.icon;
+  document.getElementById('cat-title').textContent = cat.name;
+  document.getElementById('cat-desc').textContent  = cat.desc;
+
+  // Category pills
+  var pillsEl = document.getElementById('cat-pills');
+  pillsEl.innerHTML = CATEGORIES.map(function(c){
+    return '<a href="category.html?cat='+c.id+'" class="cat-pill'+(c.id===catId?' active':'')+'">'
+      +c.icon+' '+esc(c.name)+'</a>';
+  }).join('');
+
+  // Load items from Supabase
+  try {
+    allItems = await NovaItems.getByCategory(catId, { limit:48 });
+  } catch(e) {
+    allItems = [];
+  }
+
+  // Update count in hero
+  var countEl = document.getElementById('cat-count');
+  if (countEl && allItems.length) {
+    countEl.innerHTML = '<span>'+allItems.length+'</span> items in this category';
+  }
+
+  renderGrid();
+  initReveal();
+
+  // Auth nav
+  if (window.NovaAuth) NovaAuth.updateNavUI();
+
+  // Card glow (desktop)
+  if (window.matchMedia('(hover:hover)').matches) {
+    document.addEventListener('mousemove', function(e){
+      var card = e.target.closest && e.target.closest('.card');
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+      card.style.setProperty('--my',(e.clientY-r.top)+'px');
+    });
+  }
+});
+</script>
+</body>
+</html>
+

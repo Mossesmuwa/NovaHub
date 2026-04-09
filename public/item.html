@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Item — NovaHub</title>
+<link rel="icon" href="../assets/novahub_favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/variables.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/ai-interface.css">
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div class="progress-bar" id="progress-bar"></div>
+
+<!-- NAV -->
+<nav class="glass-nav" id="main-nav">
+  <div class="container nav-content">
+    <a href="index.html" class="logo">
+      <img src="../assets/novahub_logo.svg" alt="NovaHub" style="height:28px; width:auto; display:block;">
+    </a>
+    <div class="nav-links">
+      <div class="search-wrap"><div class="search-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="global-search" placeholder="Search everything…" autocomplete="off"></div></div>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="category.html" class="nav-link">Browse</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="search.html" class="nav-link">Explore</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-auth-actions" id="nav-auth-actions">
+        <a href="account/login.html" class="btn-ghost" style="font-size:13px;padding:7px 14px">Sign in</a>
+        <a href="account/register.html" class="btn-primary" style="font-size:13px;padding:7px 16px">Sign up</a>
+      </div>
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme" style="margin-left:4px"><span id="theme-icon"></span></button>
+      <button class="mobile-btn" id="mobile-btn"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="mobile-search-input" placeholder="Search NovaHub…" autocomplete="off"></div>
+    <a href="index.html" class="nav-link">Home</a><a href="category.html" class="nav-link">Browse</a><a href="blog.html" class="nav-link">Blog</a><a href="search.html" class="nav-link">Explore</a>
+    <a href="account/login.html" class="nav-link">Sign In</a><a href="account/register.html" class="nav-link" style="color:var(--gold)">Create Account</a>
+  </div>
+</nav>
+
+<main class="page-content" id="item-root">
+  <!-- Filled by JS -->
+  <div style="text-align:center;padding:120px 24px;color:var(--t3)">
+    <div style="width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div>
+    Loading…
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <svg viewBox="0 0 32 32" width="22" height="22" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+            <defs><linearGradient id="flg-i" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E8C97A"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9B7520"/></linearGradient></defs>
+            <rect width="32" height="32" rx="7" fill="#1E1812"/><circle cx="16" cy="7" r="2.5" fill="url(#flg-i)"/><circle cx="6" cy="22" r="2.2" fill="url(#flg-i)"/><circle cx="26" cy="22" r="2.2" fill="url(#flg-i)"/>
+            <line x1="16" y1="7" x2="6" y2="22" stroke="url(#flg-i)" stroke-width="1.2" opacity="0.65"/><line x1="16" y1="7" x2="26" y2="22" stroke="url(#flg-i)" stroke-width="1.2" opacity="0.65"/><line x1="6" y1="22" x2="26" y2="22" stroke="url(#flg-i)" stroke-width="1" opacity="0.35"/>
+          </svg>NovaHub
+        </div>
+        <p class="footer-tagline">Your AI-powered discovery platform for everything worth your time.</p>
+        <div class="footer-social"><a href="https://github.com/Mossesmuwa" target="_blank" rel="noopener">⌥</a><a href="https://www.instagram.com/mosses.muwa/" target="_blank" rel="noopener">◈</a><a href="#">𝕏</a></div>
+      </div>
+      <div class="footer-col"><h4>Discover</h4><div class="footer-links"><a href="category.html?cat=movies">Movies &amp; TV</a><a href="category.html?cat=books">Books</a><a href="category.html?cat=ai-tools">AI Tools</a><a href="category.html?cat=games">Games</a><a href="category.html?cat=security">Cyber Security</a></div></div>
+      <div class="footer-col"><h4>Platform</h4><div class="footer-links"><a href="blog.html">Blog</a><a href="search.html">Search</a><a href="account/register.html">Create Account</a></div></div>
+      <div class="footer-col"><h4>Connect</h4><div class="footer-links"><a href="https://github.com/Mossesmuwa" target="_blank" rel="noopener">GitHub</a><a href="https://mossesmuwa.github.io" target="_blank" rel="noopener">Portfolio</a><a href="privacy.html">Privacy</a></div></div>
+    </div>
+    <div class="footer-bottom"><span>NovaHub © 2026 — Built by Mosses Muwa</span><span style="color:var(--gold);font-weight:700">Discover Everything ✦</span></div>
+  </div>
+</footer>
+
+<div id="nova-toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/items.js"></script>
+<script src="../js/favorites.js"></script>
+<script src="../js/comments.js"></script>
+<script>
+'use strict';
+
+// ── PROGRESS BAR ─────────────────────────────────────
+window.addEventListener('scroll', function() {
+  var pb = document.getElementById('progress-bar');
+  if (!pb) return;
+  var doc = document.documentElement;
+  var pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+  pb.style.width = Math.min(100, pct) + '%';
+  document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 48);
+}, { passive: true });
+
+// ── NAV ───────────────────────────────────────────────
+document.getElementById('mobile-btn').addEventListener('click', function() { document.getElementById('mobile-menu').classList.toggle('open'); });
+document.querySelectorAll('.mobile-menu .nav-link').forEach(function(a) { a.addEventListener('click', function() { document.getElementById('mobile-menu').classList.remove('open'); }); });
+document.getElementById('global-search').addEventListener('keydown', function(e) { if (e.key === 'Enter' && this.value.trim()) window.location.href = 'search.html?q=' + encodeURIComponent(this.value.trim()); });
+document.getElementById('mobile-search-input').addEventListener('keydown', function(e) { if (e.key === 'Enter' && this.value.trim()) window.location.href = 'search.html?q=' + encodeURIComponent(this.value.trim()); });
+
+// ── HELPERS ───────────────────────────────────────────
+function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function timeAgo(ts) { var d = Date.now() - new Date(ts).getTime(), m = Math.floor(d / 60000), h = Math.floor(d / 3600000), dd = Math.floor(d / 86400000); if (m < 1) return 'just now'; if (m < 60) return m + 'm ago'; if (h < 24) return h + 'h ago'; if (dd < 30) return dd + 'd ago'; return new Date(ts).toLocaleDateString(); }
+
+function toast(msg, type) {
+  var c = document.getElementById('nova-toasts');
+  var el = document.createElement('div'); el.className = 'nova-toast';
+  var colors = { success: 'var(--gold)', error: '#FF453A', info: 'var(--t2)' };
+  var icons  = { success: '✦', error: '✕', info: '◆' };
+  var t = type || 'info';
+  el.innerHTML = '<span style="color:' + colors[t] + ';font-size:15px;flex-shrink:0">' + icons[t] + '</span><span>' + msg + '</span>';
+  c.appendChild(el);
+  setTimeout(function() { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 2800);
+}
+
+// ── SCROLL REVEAL ─────────────────────────────────────
+var _io;
+function initReveal() {
+  if (!_io) _io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      if (e.target.classList.contains('stagger')) Array.from(e.target.children).forEach(function(c, i) { c.style.transitionDelay = (i * .065) + 's'; c.classList.add('visible'); });
+      _io.unobserve(e.target);
+    });
+  }, { threshold: .05, rootMargin: '0px 0px -32px 0px' });
+  document.querySelectorAll('.reveal,.reveal-scale,.stagger').forEach(function(el) { _io.observe(el); });
+}
+
+// ── SAVE / FAVOURITE ──────────────────────────────────
+function toggleSave(itemId) {
+  var btn = document.getElementById('save-btn');
+  if (!btn) return;
+  NovaFavorites.toggle(itemId, btn).then(function(saved) {
+    if (saved === true)  { btn.className = 'save-hero-btn saved'; btn.textContent = '♥ Saved'; toast('✦ Saved to favorites', 'success'); }
+    if (saved === false) { btn.className = 'save-hero-btn';       btn.textContent = '♡ Save';  toast('Removed from favorites', 'info'); }
+  });
+}
+window.toggleSave = toggleSave;
+
+// ── RENDER PAGE ───────────────────────────────────────
+async function renderItem(item) {
+  var root = document.getElementById('item-root');
+  var cat  = { id: item.category_id, name: item.category_id, icon: '📦' };
+  var catNames = { movies: { name: 'Movies & TV', icon: '🍿' }, books: { name: 'Books', icon: '📚' }, 'ai-tools': { name: 'AI Tools', icon: '✨' }, games: { name: 'Games', icon: '🎮' }, security: { name: 'Cyber Security', icon: '🔐' }, videos: { name: 'Videos', icon: '🎬' }, productivity: { name: 'Productivity', icon: '⚡' } };
+  if (catNames[item.category_id]) cat = Object.assign({ id: item.category_id }, catNames[item.category_id]);
+
+  var sub     = item.director || item.author || item.developer || item.genre || '';
+  var isFree  = (item.pricing || '').toLowerCase().includes('free');
+  var isSaved = await NovaFavorites.isFavorited(item.id);
+
+  // CTA button
+  var ctaBtn = '';
+  if      (item.type === 'movie' && item.watch_link)   ctaBtn = '<a href="' + esc(item.watch_link)   + '" target="_blank" rel="noopener" class="btn-primary" style="font-size:15px;padding:14px 28px">▶ Watch Now</a>';
+  else if (item.type === 'book'  && item.buy_link)      ctaBtn = '<a href="' + esc(item.buy_link)     + '" target="_blank" rel="noopener" class="btn-primary" style="font-size:15px;padding:14px 28px">🛒 Buy Now</a>';
+  else if (item.type === 'game'  && item.play_link)     ctaBtn = '<a href="' + esc(item.play_link)    + '" target="_blank" rel="noopener" class="btn-primary" style="font-size:15px;padding:14px 28px">🎮 Play Now</a>';
+  else if (item.affiliate_link)                          ctaBtn = '<a href="' + esc(item.affiliate_link) + '" target="_blank" rel="noopener" class="btn-primary" style="font-size:15px;padding:14px 28px">Get →</a>';
+
+  // Cover
+  var coverHtml = item.image
+    ? '<div class="item-cover"><img src="' + esc(item.image) + '" alt="' + esc(item.name) + '" loading="eager"></div>'
+    : '<div class="item-cover-placeholder">' + esc((item.name || '?').charAt(0)) + '</div>';
+
+  // Trailer
+  var trailerHtml = '';
+  if (item.trailer_url) {
+    trailerHtml = '<div class="trailer-wrap reveal"><div class="trailer-label">🎬 Trailer / Preview</div><iframe src="' + esc(item.trailer_url) + '" allowfullscreen allow="autoplay;encrypted-media;picture-in-picture"></iframe></div>';
+  }
+
+  // Pros / Cons
+  var pcHtml = '';
+  if (item.pros && item.pros.length) {
+    pcHtml = '<div class="pc-grid reveal">'
+      + '<div class="pc-card"><div class="pc-title">✅ Pros</div><ul class="pc-list">' + (item.pros || []).map(function(p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="pc-card"><div class="pc-title">❌ Cons</div><ul class="pc-list">' + (item.cons || ['None noted']).map(function(c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="pc-card"><div class="pc-title">🎯 Best For</div><p style="font-size:13.5px;color:var(--t2);line-height:1.65">' + esc(item.best_for || 'Everyone interested in ' + cat.name) + '</p></div>'
+      + '</div>';
+  }
+
+  // Related items
+  var related = [];
+  try { related = await NovaItems.getRelated(item, 4); } catch(e) {}
+  var relatedHtml = '';
+  if (related.length) {
+    relatedHtml = '<div class="section" style="padding-top:0"><div class="section-header"><div><div class="section-label">More Like This</div><h2 class="section-title">You Might Also Like</h2></div><a href="category.html?cat=' + item.category_id + '" class="section-more">See all →</a></div>'
+      + '<div class="grid-4 stagger">' + related.map(function(r) {
+          var href = 'item.html?slug=' + encodeURIComponent(r.slug || r.id);
+          if (['movie','book','game'].includes(r.type)) {
+            return '<div class="reveal-scale"><a href="' + href + '" class="card-poster"><div class="bg-zoom" style="background-image:url(\'' + esc(r.image || '') + '\')"></div><div class="card-poster-content"><div class="card-poster-title">' + esc(r.name) + '</div>' + (r.rating ? '<div class="card-poster-rating">★ ' + r.rating + '</div>' : '') + '</div></a></div>';
+          }
+          return '<div class="reveal-scale"><div class="card" onclick="location.href=\'' + href + '\'">'
+            + '<div class="card-icon">' + esc((r.name || '?').charAt(0)) + '</div>'
+            + '<div class="card-title">' + esc(r.name) + '</div>'
+            + '<p class="card-desc">' + esc(r.short_desc || '') + '</p>'
+            + '</div></div>';
+        }).join('') + '</div></div>';
+  }
+
+  // Build page HTML
+  root.innerHTML =
+    '<div class="item-hero">'
+    + '<div class="item-hero-bg"></div>'
+    + '<div class="container">'
+    + '<div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">›</span><a href="category.html?cat=' + item.category_id + '">' + cat.icon + ' ' + esc(cat.name) + '</a><span class="breadcrumb-sep">›</span><span>' + esc(item.name) + '</span></div>'
+    + '<div class="item-layout">'
+    + coverHtml
+    + '<div>'
+    + '<div class="item-type-label">' + esc((item.type || '').toUpperCase()) + '</div>'
+    + '<h1 class="item-name">' + esc(item.name) + '</h1>'
+    + '<div class="item-meta">'
+    + (item.rating ? '<span class="item-rating">★ ' + item.rating + '</span><span class="item-meta-sep">·</span>' : '')
+    + (item.year   ? '<span>' + item.year + '</span>' : '')
+    + (sub         ? '<span class="item-meta-sep">·</span><span>' + esc(sub) + '</span>' : '')
+    + (item.pricing ? '<span class="item-meta-sep">·</span><span class="' + (isFree ? 'tag-free' : 'tag-paid') + '">' + esc(item.pricing) + '</span>' : '')
+    + '</div>'
+    + '<p class="item-desc">' + esc(item.short_desc || '') + '</p>'
+    + '<div class="item-actions">'
+    + ctaBtn
+    + '<button id="save-btn" class="save-hero-btn' + (isSaved ? ' saved' : '') + '" onclick="toggleSave(\'' + item.id + '\')">' + (isSaved ? '♥ Saved' : '♡ Save') + '</button>'
+    + '<a href="category.html?cat=' + item.category_id + '" class="btn-secondary">Browse ' + esc(cat.name) + '</a>'
+    + '</div>'
+    + '</div></div></div></div>'
+    + '<div class="container">'
+    + trailerHtml
+    + pcHtml
+    + '</div>'
+    + '<div class="container">'
+    + relatedHtml
+    + '</div>'
+    + '<div class="container"><div class="comments-section" id="comments-section"></div></div>';
+
+  // Render comments
+  if (window.NovaComments) {
+    NovaComments.render(item.id, 'comments-section');
+  } else {
+    document.getElementById('comments-section').innerHTML = '<div class="comments-title">💬 Comments</div><p style="color:var(--t3);font-size:14px">Comments not available — check comments.js is loaded.</p>';
+  }
+
+  initReveal();
+  if (window.NovaFavorites) NovaFavorites.initAll();
+  if (window.matchMedia('(hover:hover)').matches) {
+    document.addEventListener('mousemove', function(e) {
+      var card = e.target.closest && e.target.closest('.card');
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  }
+}
+
+// ── MAIN ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async function() {
+  var params = new URLSearchParams(location.search);
+  var slug   = params.get('slug') || params.get('id') || '';
+  var root   = document.getElementById('item-root');
+
+  var item = null;
+  try { item = await NovaItems.getBySlug(slug); } catch(e) {}
+
+  if (!item) {
+    root.innerHTML = '<div style="text-align:center;padding:calc(var(--nav) + 80px) 24px 80px">'
+      + '<div style="font-size:64px;opacity:.3;margin-bottom:20px">🔍</div>'
+      + '<h1 style="font-size:32px;font-weight:900;margin-bottom:12px;letter-spacing:-.04em">Item Not Found</h1>'
+      + '<p style="color:var(--t2);margin-bottom:28px;font-size:16px">We couldn\'t find what you\'re looking for.</p>'
+      + '<a href="index.html" class="btn-gold">← Back to NovaHub</a>'
+      + '</div>';
+    return;
+  }
+
+  document.title = item.name + ' — NovaHub';
+  await renderItem(item);
+  if (window.NovaAuth) NovaAuth.updateNavUI();
+});
+</script>
+</body>
+</html>
+

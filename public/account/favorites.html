@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Saved Items — NovaHub</title>
+<link rel="icon" href="../../assets/novahub_favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="../../css/variables.css">
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../../css/components.css">
+<link rel="stylesheet" href="../../css/ai-interface.css">
+</head>
+<body>
+<nav class="glass-nav" id="main-nav">
+  <div class="container nav-content">
+    <a href="../index.html" class="logo"><img src="../../assets/novahub_logo.svg" alt="NovaHub" style="height:26px"></a>
+    <div class="nav-right">
+      <a href="../index.html"     class="btn-sm">← Home</a>
+      <a href="dashboard.html"    class="btn-sm">Dashboard</a>
+      <button class="icon-btn" id="theme-btn"><span id="theme-icon"></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+  <div class="fav-hero">
+    <div class="fav-hero-bg"></div>
+    <div class="container" style="position:relative;z-index:1">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Your Collection</div>
+      <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;letter-spacing:-.04em;margin-bottom:6px">Saved Items</h1>
+      <p style="font-size:15px;color:var(--t2)">Everything you've saved across all categories.</p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom:80px">
+    <div class="fav-toolbar">
+      <input type="text" class="fav-search" id="fav-search" placeholder="Filter saved items…">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="sort-pill active" onclick="setSort('recent',this)">Recent</button>
+        <button class="sort-pill"        onclick="setSort('name',this)">A–Z</button>
+        <button class="sort-pill"        onclick="setSort('type',this)">By Type</button>
+      </div>
+      <div style="font-size:14px;color:var(--t3);white-space:nowrap;margin-left:auto"><span id="fav-count" style="color:var(--gold);font-weight:700">—</span> saved</div>
+    </div>
+
+    <div id="type-chips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px"></div>
+    <div id="favs-grid"></div>
+  </div>
+</div>
+
+<div id="nova-toasts"></div>
+
+<script src="../../js/supabase.js"></script>
+<script src="../../js/theme.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/items.js"></script>
+<script src="../../js/favorites.js"></script>
+<script>
+'use strict';
+window.addEventListener('scroll',function(){ document.getElementById('main-nav').classList.toggle('scrolled',scrollY>48); },{passive:true});
+
+var allFavs=[], currentSort='recent', currentType='all';
+
+function toast(msg,type){ var c=document.getElementById('nova-toasts'); var el=document.createElement('div'); el.className='nova-toast'; el.innerHTML='<span style="color:var(--gold);font-size:15px">✦</span><span>'+msg+'</span>'; c.appendChild(el); setTimeout(function(){ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(function(){ el.remove(); },300); },2800); }
+if(!window.NovaUI) window.NovaUI={}; window.NovaUI.toast=toast;
+
+function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function setSort(mode,btn){
+  currentSort=mode;
+  document.querySelectorAll('.sort-pill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function setType(type,chip){
+  currentType=type;
+  document.querySelectorAll('.type-chip').forEach(function(c){ c.classList.remove('active'); });
+  chip.classList.add('active');
+  render();
+}
+
+function getSorted(){
+  var q=(document.getElementById('fav-search').value||'').toLowerCase().trim();
+  var items=allFavs.filter(function(i){
+    if(currentType!=='all'&&i.type!==currentType) return false;
+    if(q&&!(i.name||'').toLowerCase().includes(q)&&!(i.short_desc||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(currentSort==='name') return items.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  if(currentSort==='type') return items.sort(function(a,b){ return (a.type||'').localeCompare(b.type||''); });
+  return items;
+}
+
+function renderCard(item){
+  var href='../item.html?slug='+encodeURIComponent(item.slug||item.id);
+  if(item.type==='movie'||item.type==='book'||item.type==='game'){
+    return '<div style="position:relative">'+
+      '<a href="'+href+'" class="card-poster">'+
+        '<div class="bg-zoom" style="background-image:url(\''+_esc(item.image||'')+'\')"></div>'+
+        '<div class="card-poster-content"><div class="card-poster-title">'+_esc(item.name)+'</div>'+
+        (item.rating?'<div class="card-poster-rating">★ '+item.rating+'</div>':'')+
+        '</div></a>'+
+      '<button class="remove-btn" onclick="removeItem(\''+item.id+'\',this)" title="Remove">✕</button>'+
+    '</div>';
+  }
+  var isFree=(item.pricing||'').toLowerCase().indexOf('free')!==-1;
+  return '<div class="card" style="position:relative" onclick="location.href=\''+href+'\'">'+
+    '<button class="remove-btn" onclick="event.stopPropagation();removeItem(\''+item.id+'\',this)" title="Remove">✕</button>'+
+    '<div class="card-icon">'+_esc((item.name||'?').charAt(0))+'</div>'+
+    '<div class="card-title">'+_esc(item.name)+'</div>'+
+    (item.pricing?'<span class="'+(isFree?'tag-free':'tag-paid')+'" style="display:inline-block;margin-bottom:8px">'+_esc(item.pricing)+'</span>':'')+
+    '<p class="card-desc">'+_esc(item.short_desc||'')+'</p>'+
+    '<div class="card-actions"><a href="'+href+'" class="btn-secondary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Details</a></div>'+
+  '</div>';
+}
+
+function render(){
+  var grid=document.getElementById('favs-grid');
+  var items=getSorted();
+  document.getElementById('fav-count').textContent=items.length;
+  if(!items.length){
+    var isFiltered=currentType!=='all'||(document.getElementById('fav-search').value||'').trim();
+    grid.innerHTML='<div class="empty-state"><span class="empty-state-icon">'+(isFiltered?'🔍':'♡')+'</span><h3>'+(isFiltered?'No matches':'Nothing saved yet')+'</h3><p>'+(isFiltered?'Try a different filter.':'Browse NovaHub and save things you love.')+'</p>'+(isFiltered?'':'<a href="../index.html" class="btn-primary" style="margin-top:12px">Discover Now</a>')+'</div>';
+    return;
+  }
+  var hasPoster=items.some(function(i){ return ['movie','book','game'].indexOf(i.type)!==-1; });
+  grid.innerHTML='<div class="'+(hasPoster?'grid-4':'grid-3')+'">'+items.map(renderCard).join('')+'</div>';
+}
+
+async function removeItem(itemId,btn){
+  btn.textContent='…';
+  await NovaFavorites.remove(itemId);
+  allFavs=allFavs.filter(function(i){ return i.id!==itemId; });
+  toast('Removed from saved','info');
+  buildChips(); render();
+}
+window.removeItem=removeItem;
+
+function buildChips(){
+  var types={};
+  allFavs.forEach(function(i){ if(i.type) types[i.type]=(types[i.type]||0)+1; });
+  var chips=document.getElementById('type-chips');
+  chips.innerHTML=
+    '<button class="sort-pill type-chip'+(currentType==='all'?' active':'')+'" onclick="setType(\'all\',this)">All ('+allFavs.length+')</button>'+
+    Object.keys(types).map(function(t){
+      return '<button class="sort-pill type-chip'+(currentType===t?' active':'')+'" onclick="setType(\''+t+'\',this)">'+_esc(t)+' ('+types[t]+')</button>';
+    }).join('');
+}
+
+document.getElementById('fav-search').addEventListener('input',function(){ render(); });
+window.setSort=setSort; window.setType=setType;
+
+document.addEventListener('DOMContentLoaded', async function(){
+  var user=await NovaAuth.requireAuth();
+  if(!user) return;
+
+  document.getElementById('favs-grid').innerHTML=
+    '<div style="text-align:center;padding:80px;color:var(--t3)"><div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px"></div>Loading…</div>';
+
+  allFavs=await NovaFavorites.getAll();
+  buildChips();
+  render();
+});
+</script>
+</body>
+</html>

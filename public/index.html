@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>NovaHub — Discover Everything You Need</title>
+<link rel="icon" href="../assets/novahub_favicon.svg" type="image/svg+xml">
+<meta name="description" content="AI-powered discovery for movies, books, AI tools, games, niche companies and more. Updated daily.">
+<meta property="og:title" content="NovaHub — Discover Everything You Need">
+<meta property="og:description" content="Your AI-powered discovery platform. Find anything — from blockbuster movies to niche specialized companies.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/variables.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/ai-interface.css">
+<style>
+/* ── INDEX-ONLY STYLES ───────────────────────────────── */
+.hero-cat-chips { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px;animation:fadeUp .9s .38s both cubic-bezier(.22,1,.36,1) }
+.vibe-strip { background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0 }
+.vibe-strip-inner { display:flex;align-items:center;gap:16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch }
+.vibe-strip-inner::-webkit-scrollbar { display:none }
+.vibe-strip-label { font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);white-space:nowrap;flex-shrink:0 }
+.vibe-pills-row { display:flex;gap:8px;flex-wrap:nowrap }
+.vibe-pill-btn {
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:99px;
+  border:1px solid var(--border2);background:var(--surf);
+  font-size:12px;font-weight:600;color:var(--t2);
+  white-space:nowrap;cursor:pointer;flex-shrink:0;
+  transition:var(--spring);-webkit-tap-highlight-color:transparent;
+  font-family:var(--font);
+}
+.vibe-pill-btn:hover,.vibe-pill-btn.active { border-color:var(--gold-glow2);color:var(--gold);background:var(--gold-glow) }
+.vibe-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0 }
+.onboard-nudge { display:none;padding:16px 0 }
+.onboard-nudge-inner { background:linear-gradient(135deg,var(--gold-glow) 0%,rgba(201,168,76,.04) 100%);border:1px solid var(--gold-glow2);border-radius:var(--rlg);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap }
+.nl-row { display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto }
+@media(min-width:520px){ .nl-row { flex-direction:row;gap:0 } }
+.nl-input { flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:99px;padding:13px 20px;font-size:15px;font-family:var(--font);color:var(--t1);outline:none;transition:border-color var(--ease) }
+@media(min-width:520px){ .nl-input { border-right:none;border-radius:99px 0 0 99px } }
+.nl-input:focus { border-color:var(--gold) }
+.nl-input::placeholder { color:var(--t3) }
+.nl-btn { }
+@media(min-width:520px){ .nl-btn { border-radius:0 99px 99px 0 } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="glass-nav" id="main-nav">
+  <div class="container nav-content">
+    <a href="index.html" class="logo">
+      <img src="../assets/novahub_logo.svg" alt="NovaHub" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="global-search" placeholder="Search everything…" autocomplete="off">
+        </div>
+      </div>
+      <a href="index.html"    class="nav-link active">Home</a>
+      <a href="category.html" class="nav-link">Browse</a>
+      <a href="discover.html" class="nav-link">Discover</a>
+      <a href="blog.html"     class="nav-link">Blog</a>
+      <a href="weekly.html"   class="nav-link">Weekly</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-auth-actions" id="nav-auth-actions">
+        <a href="account/login.html"    class="btn-ghost"   style="font-size:13px;padding:7px 14px">Sign in</a>
+        <a href="account/register.html" class="btn-primary" style="font-size:13px;padding:7px 16px">Sign up</a>
+      </div>
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme" style="margin-left:4px"><span id="theme-icon"></span></button>
+      <button class="mobile-btn" id="mobile-btn" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="mobile-search-input" placeholder="Search NovaHub…" autocomplete="off">
+    </div>
+    <a href="index.html"            class="nav-link active">Home</a>
+    <a href="category.html"         class="nav-link">Browse</a>
+    <a href="discover.html"         class="nav-link">Discover</a>
+    <a href="blog.html"             class="nav-link">Blog</a>
+    <a href="weekly.html"           class="nav-link">Weekly</a>
+    <a href="account/login.html"    class="nav-link">Sign In</a>
+    <a href="account/register.html" class="nav-link" style="color:var(--gold)">Create Account</a>
+  </div>
+</nav>
+
+<main class="page-content">
+
+  <!-- ══ HERO ══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><div class="hero-badge-dot"></div>AI Discovery · Updated Daily</div>
+      <h1 class="hero-title">Discover Everything<br>Worth Your Time</h1>
+      <p class="hero-sub">Movies, books, AI tools, games, niche companies — curated by humans, powered by intelligence. One place for all of it.</p>
+      <div class="hero-search">
+        <input type="text" id="hero-input" placeholder='Try "best AI coding tools" or "dark sci-fi movies"…' autocomplete="off">
+        <button class="btn-gold" onclick="heroSearch()">Search →</button>
+      </div>
+      <div class="hero-cat-chips">
+        <a href="search.html?q=trending"       class="cat-chip" style="font-size:12px;padding:6px 14px">🔥 Trending</a>
+        <a href="category.html?cat=ai-tools"   class="cat-chip" style="font-size:12px;padding:6px 14px">✨ AI Tools</a>
+        <a href="category.html?cat=games"      class="cat-chip" style="font-size:12px;padding:6px 14px">🎮 Games</a>
+        <a href="category.html?cat=movies"     class="cat-chip" style="font-size:12px;padding:6px 14px">🍿 Movies</a>
+        <a href="category.html?cat=books"      class="cat-chip" style="font-size:12px;padding:6px 14px">📚 Books</a>
+        <a href="category.html?cat=security"   class="cat-chip" style="font-size:12px;padding:6px 14px">🔐 Security</a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint"><div class="scroll-line"></div><span>Scroll</span></div>
+  </section>
+
+  <!-- ══ VIBE STRIP ════════════════════════════════════ -->
+  <div class="vibe-strip">
+    <div class="container">
+      <div class="vibe-strip-inner">
+        <span class="vibe-strip-label">Vibe:</span>
+        <div class="vibe-pills-row">
+          <button class="vibe-pill-btn active" data-vibe="all"><span class="vibe-dot" style="background:var(--gold)"></span>All</button>
+          <button class="vibe-pill-btn" data-vibe="mind-bending"><span class="vibe-dot" style="background:#BF5AF2"></span>Mind-bending</button>
+          <button class="vibe-pill-btn" data-vibe="chill"><span class="vibe-dot" style="background:#5AC8FA"></span>Chill &amp; Easy</button>
+          <button class="vibe-pill-btn" data-vibe="productive"><span class="vibe-dot" style="background:#30D158"></span>Productive</button>
+          <button class="vibe-pill-btn" data-vibe="intense"><span class="vibe-dot" style="background:#FF453A"></span>Intense</button>
+          <button class="vibe-pill-btn" data-vibe="creative"><span class="vibe-dot" style="background:#FF9F0A"></span>Creative</button>
+          <button class="vibe-pill-btn" data-vibe="feel-good"><span class="vibe-dot" style="background:#34C759"></span>Feel-good</button>
+        </div>
+        <a href="discover.html" style="font-size:12px;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0;margin-left:auto;text-decoration:none">Full Dial →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ONBOARDING NUDGE ══════════════════════════════ -->
+  <div class="onboard-nudge" id="onboard-nudge">
+    <div class="container">
+      <div class="onboard-nudge-inner">
+        <div>
+          <div style="font-size:14px;font-weight:800;margin-bottom:4px">✦ Personalise your feed</div>
+          <div style="font-size:13px;color:var(--t2)">30 seconds to set your taste — we'll show you exactly what you'll love.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
+          <a href="onboarding.html" class="btn-gold" style="font-size:13px;padding:10px 20px">Set My Taste →</a>
+          <button onclick="dismissNudge()" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;line-height:1">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FEATURED ══════════════════════════════════════ -->
+  <section class="section" style="padding-top:36px">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Featured</div><h2 class="section-title">Editor's Picks</h2></div>
+        <a href="category.html" class="section-more">All →</a>
+      </div>
+      <div class="featured-grid reveal" id="featured-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--t3)">
+          <div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px"></div>
+          Loading picks…
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ TRENDING ══════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Hot Now</div><h2 class="section-title">🔥 Trending</h2></div>
+        <a href="trending.html" class="section-more">See all →</a>
+      </div>
+      <div class="carousel" id="trending-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="car('trending-carousel',-1)">←</button>
+        <button class="carousel-btn" onclick="car('trending-carousel',1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ AI RECOMMENDATIONS ════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="ai-section reveal">
+        <div class="ai-section-bg"></div>
+        <div style="position:relative;z-index:1">
+          <div class="ai-badge">✦ AI-Powered</div>
+          <div class="section-header" style="margin-bottom:8px">
+            <div>
+              <div class="section-label">Personalised</div>
+              <h2 class="section-title">Tell us what you're in the mood for</h2>
+            </div>
+            <a href="search.html" class="section-more">Full Search →</a>
+          </div>
+          <p style="color:var(--t2);font-size:14px;max-width:520px">Type anything — "dark thriller with twists" or "free tool to speed up my workflow".</p>
+          <div class="ai-input-row">
+            <input type="text" id="ai-input" placeholder='e.g. "mind-bending sci-fi" or "free AI coding tool"…' autocomplete="off">
+            <button class="btn-gold" onclick="aiSearch()">Ask ✦</button>
+          </div>
+          <div class="ai-result hidden" id="ai-result"></div>
+          <div class="ai-recs-grid stagger" id="ai-recs-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ AI TOOLS ══════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Productivity</div><h2 class="section-title">✨ AI Tools</h2></div>
+        <a href="category.html?cat=ai-tools" class="section-more">All →</a>
+      </div>
+      <div class="carousel" id="tools-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="car('tools-carousel',-1)">←</button>
+        <button class="carousel-btn" onclick="car('tools-carousel',1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ CATEGORY GRID ═════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Browse</div><h2 class="section-title">All Categories</h2></div>
+        <a href="category.html" class="section-more">More →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="stagger" id="cat-grid">
+        <a href="category.html?cat=movies"      class="cat-tile reveal-scale"><div class="cat-tile-icon">🍿</div><div class="cat-tile-name">Movies & TV</div><div class="cat-tile-count">120+ items</div></a>
+        <a href="category.html?cat=books"       class="cat-tile reveal-scale"><div class="cat-tile-icon">📚</div><div class="cat-tile-name">Books</div><div class="cat-tile-count">85+ items</div></a>
+        <a href="category.html?cat=ai-tools"    class="cat-tile reveal-scale"><div class="cat-tile-icon">✨</div><div class="cat-tile-name">AI Tools</div><div class="cat-tile-count">90+ items</div></a>
+        <a href="category.html?cat=games"       class="cat-tile reveal-scale"><div class="cat-tile-icon">🎮</div><div class="cat-tile-name">Games</div><div class="cat-tile-count">64+ items</div></a>
+        <a href="category.html?cat=security"    class="cat-tile reveal-scale"><div class="cat-tile-icon">🔐</div><div class="cat-tile-name">Security</div><div class="cat-tile-count">40+ items</div></a>
+        <a href="category.html?cat=music"       class="cat-tile reveal-scale"><div class="cat-tile-icon">🎵</div><div class="cat-tile-name">Music</div><div class="cat-tile-count">55+ items</div></a>
+        <a href="category.html?cat=courses"     class="cat-tile reveal-scale"><div class="cat-tile-icon">🧠</div><div class="cat-tile-name">Courses</div><div class="cat-tile-count">38+ items</div></a>
+        <a href="category.html?cat=news"        class="cat-tile reveal-scale"><div class="cat-tile-icon">📰</div><div class="cat-tile-name">News</div><div class="cat-tile-count">Daily</div></a>
+        <a href="category.html?cat=design"      class="cat-tile reveal-scale"><div class="cat-tile-icon">🎨</div><div class="cat-tile-name">Design</div><div class="cat-tile-count">45+ items</div></a>
+        <a href="category.html?cat=science"     class="cat-tile reveal-scale"><div class="cat-tile-icon">🔬</div><div class="cat-tile-name">Science</div><div class="cat-tile-count">30+ items</div></a>
+        <a href="category.html?cat=finance"     class="cat-tile reveal-scale"><div class="cat-tile-icon">📈</div><div class="cat-tile-name">Finance</div><div class="cat-tile-count">28+ items</div></a>
+        <a href="category.html?cat=productivity" class="cat-tile reveal-scale"><div class="cat-tile-icon">⚡</div><div class="cat-tile-name">Productivity</div><div class="cat-tile-count">60+ items</div></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ MOVIES ════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Watch</div><h2 class="section-title">🍿 Movies &amp; TV</h2></div>
+        <a href="category.html?cat=movies" class="section-more">All →</a>
+      </div>
+      <div class="carousel" id="movies-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="car('movies-carousel',-1)">←</button>
+        <button class="carousel-btn" onclick="car('movies-carousel',1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ GAMES ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Play</div><h2 class="section-title">🎮 Games</h2></div>
+        <a href="category.html?cat=games" class="section-more">All →</a>
+      </div>
+      <div class="carousel" id="games-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="car('games-carousel',-1)">←</button>
+        <button class="carousel-btn" onclick="car('games-carousel',1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ SECURITY ══════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Featured</div><h2 class="section-title">🔐 Cyber Security</h2></div>
+        <a href="category.html?cat=security" class="section-more">All →</a>
+      </div>
+      <div class="grid-3 stagger" id="security-grid"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ BOOKS ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div><div class="section-label">Read</div><h2 class="section-title">📚 Books</h2></div>
+        <a href="category.html?cat=books" class="section-more">All →</a>
+      </div>
+      <div class="carousel" id="books-carousel"></div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="car('books-carousel',-1)">←</button>
+        <button class="carousel-btn" onclick="car('books-carousel',1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ NEWSLETTER CTA ════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);padding:48px 32px;text-align:center;max-width:600px;margin:0 auto" class="reveal">
+        <div class="ai-badge" style="margin-bottom:16px">✦ Weekly Digest</div>
+        <h2 style="font-size:clamp(22px,4vw,34px);font-weight:900;letter-spacing:-.04em;margin-bottom:12px">Never Miss What's Next</h2>
+        <p style="font-size:15px;color:var(--t2);max-width:380px;margin:0 auto 28px;line-height:1.6">AI-curated weekly picks straight to your inbox. Every Sunday. No spam.</p>
+        <form id="nl-form" onsubmit="subscribeNL(event)">
+          <div class="nl-row" style="margin-bottom:12px">
+            <input type="email" id="nl-email" class="nl-input" placeholder="your@email.com" autocomplete="email" required>
+            <button type="submit" class="btn-gold nl-btn" style="padding:13px 24px;justify-content:center">Subscribe →</button>
+          </div>
+        </form>
+        <p style="font-size:12px;color:var(--t3)">Join the list. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="../assets/novahub_logo.svg" alt="NovaHub" class="logo-icon"> NovaHub
+        </div>
+        <p class="footer-tagline">Your AI-powered discovery platform for everything worth your time. Updated daily.</p>
+        <div class="footer-social">
+          <a href="https://github.com/Mossesmuwa"         target="_blank" rel="noopener" title="GitHub">⌥</a>
+          <a href="https://www.instagram.com/mosses.muwa/" target="_blank" rel="noopener" title="Instagram">◈</a>
+          <a href="#" title="Twitter / X">𝕏</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Discover</h4>
+        <div class="footer-links">
+          <a href="category.html?cat=movies">Movies &amp; TV</a>
+          <a href="category.html?cat=books">Books</a>
+          <a href="category.html?cat=ai-tools">AI Tools</a>
+          <a href="category.html?cat=games">Games</a>
+          <a href="category.html?cat=security">Cyber Security</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <div class="footer-links">
+          <a href="discover.html">Vibe Discover</a>
+          <a href="weekly.html">The Weekly</a>
+          <a href="blog.html">Blog</a>
+          <a href="search.html">Explore</a>
+          <a href="account/register.html">Create Account</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <div class="footer-links">
+          <a href="https://github.com/Mossesmuwa"   target="_blank" rel="noopener">GitHub</a>
+          <a href="https://mossesmuwa.github.io"     target="_blank" rel="noopener">Portfolio</a>
+          <a href="contact.html">Contact</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>NovaHub © 2026 — Built by Mosses Muwa</span>
+      <span style="color:var(--gold);font-weight:700">Discover Everything ✦</span>
+    </div>
+  </div>
+</footer>
+
+<div id="nova-toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/items.js"></script>
+<script src="../js/favorites.js"></script>
+<script src="../js/comments.js"></script>
+<script>
+'use strict';
+
+/* ── TOAST ─────────────────────────────────────────────────── */
+function toast(msg, type) {
+  var c = document.getElementById('nova-toasts');
+  var colors = {success:'var(--gold)',error:'#FF453A',warning:'#FF9F0A',info:'var(--t2)'};
+  var icons  = {success:'✦',error:'✕',warning:'⚠',info:'◆'};
+  var t = type||'info';
+  var el = document.createElement('div'); el.className='nova-toast';
+  el.innerHTML='<span style="color:'+colors[t]+';font-size:15px;flex-shrink:0">'+icons[t]+'</span><span>'+msg+'</span>';
+  c.appendChild(el);
+  setTimeout(function(){ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(function(){ el.remove(); },300); }, 2800);
+}
+if (!window.NovaUI) window.NovaUI = {}; window.NovaUI.toast = toast;
+
+/* ── NAV ────────────────────────────────────────────────────── */
+window.addEventListener('scroll',function(){ document.getElementById('main-nav').classList.toggle('scrolled',scrollY>48); },{passive:true});
+document.getElementById('mobile-btn').addEventListener('click',function(){
+  var o=document.getElementById('mobile-menu').classList.toggle('open');
+  this.setAttribute('aria-expanded',o);
+});
+document.querySelectorAll('.mobile-menu .nav-link').forEach(function(a){
+  a.addEventListener('click',function(){ document.getElementById('mobile-menu').classList.remove('open'); });
+});
+
+/* ── SEARCH ────────────────────────────────────────────────── */
+function _goSearch(q){ if(q&&q.trim()) window.location.href='search.html?q='+encodeURIComponent(q.trim()); }
+document.getElementById('global-search').addEventListener('keydown',function(e){ if(e.key==='Enter') _goSearch(this.value); });
+document.getElementById('mobile-search-input').addEventListener('keydown',function(e){ if(e.key==='Enter') _goSearch(this.value); });
+function heroSearch(){ _goSearch(document.getElementById('hero-input').value); }
+document.getElementById('hero-input').addEventListener('keypress',function(e){ if(e.key==='Enter') heroSearch(); });
+
+/* ── VIBE PILLS ─────────────────────────────────────────────── */
+document.querySelector('.vibe-pills-row').addEventListener('click',function(e){
+  var pill=e.target.closest('.vibe-pill-btn');
+  if(!pill) return;
+  document.querySelectorAll('.vibe-pill-btn').forEach(function(p){ p.classList.remove('active'); });
+  pill.classList.add('active');
+  var vibe=pill.dataset.vibe;
+  if(vibe!=='all') toast('Showing '+vibe+' picks ✦','success');
+});
+
+/* ── ONBOARDING NUDGE ───────────────────────────────────────── */
+(function(){
+  var done=localStorage.getItem('nova_onboard_done');
+  var skip=localStorage.getItem('nova_onboard_skip');
+  if(!done && !skip) document.getElementById('onboard-nudge').style.display='block';
+})();
+function dismissNudge(){
+  localStorage.setItem('nova_onboard_skip','1');
+  document.getElementById('onboard-nudge').style.display='none';
+}
+
+/* ── AI SEARCH ──────────────────────────────────────────────── */
+function aiSearch(){
+  var input=document.getElementById('ai-input');
+  var result=document.getElementById('ai-result');
+  var q=input&&input.value.trim();
+  if(!q) return;
+  result.classList.remove('hidden');
+  result.innerHTML='<span style="color:var(--t3)">✦ Searching…</span>';
+  NovaItems.search(q,{limit:6}).then(function(items){
+    if(!items.length){ result.innerHTML='No exact match — <a href="search.html?q='+encodeURIComponent(q)+'" style="color:var(--gold)">Try full search →</a>'; return; }
+    result.innerHTML='<strong>'+items.length+' result'+(items.length!==1?'s':'')+'</strong> for "'+_esc(q)+'":<br><br>'+
+      items.map(function(i){
+        return '<a href="item.html?slug='+encodeURIComponent(i.slug)+'" style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;margin:3px;background:var(--bg4);border:1px solid var(--border);border-radius:99px;font-weight:700;font-size:13px;color:var(--gold)">→ '+_esc(i.name)+'</a>';
+      }).join('');
+  });
+}
+document.getElementById('ai-input').addEventListener('keypress',function(e){ if(e.key==='Enter') aiSearch(); });
+
+/* ── CAROUSEL ───────────────────────────────────────────────── */
+function car(id,dir){ var el=document.getElementById(id); if(el) el.scrollBy({left:dir*280,behavior:'smooth'}); }
+
+/* ── HELPERS ────────────────────────────────────────────────── */
+function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderCard(item){
+  if(!item) return '';
+  var href='item.html?slug='+encodeURIComponent(item.slug);
+  if(item.type==='movie'||item.type==='book'||item.type==='game'){
+    var sub=item.director||item.author||item.developer||item.genre||'';
+    var badge=item.trending?'<span class="badge badge-trending">🔥 Hot</span>':item.daily_pick?'<span class="badge badge-pick">⭐ Pick</span>':'';
+    return '<a href="'+href+'" class="card-poster">'+
+      '<div class="bg-zoom" style="background-image:url(\''+_esc(item.image||'')+'\')"></div>'+
+      badge+
+      '<button class="fav-btn-overlay" data-fav-btn data-item-id="'+item.id+'" aria-label="Save">♡ Save</button>'+
+      '<div class="card-poster-content">'+
+        '<div class="card-poster-title">'+_esc(item.name)+'</div>'+
+        (sub?'<div class="card-poster-sub">'+_esc(sub)+'</div>':'')+
+        (item.rating?'<div class="card-poster-rating">★ '+item.rating+'</div>':'')+
+      '</div></a>';
+  }
+  if(item.type==='video'){
+    return '<a href="'+href+'" class="card-video">'+
+      '<div class="card-video-thumb" style="background-image:url(\''+_esc(item.image||'')+'\')">'+
+        '<div class="card-video-overlay"><div class="play-btn">▶</div></div>'+
+      '</div><div class="card-video-body"><div class="card-video-title">'+_esc(item.name)+'</div>'+
+      '<div class="card-video-meta">'+_esc(item.platforms||'')+'</div></div></a>';
+  }
+  var isFree=(item.pricing||'').toLowerCase().indexOf('free')!==-1;
+  return '<div class="card" onclick="location.href=\''+href+'\'">'+
+    '<div class="card-icon">'+_esc((item.name||'?').charAt(0))+'</div>'+
+    '<div class="card-title">'+_esc(item.name)+'</div>'+
+    (item.pricing?'<span class="'+(isFree?'tag-free':'tag-paid')+'" style="display:inline-block;margin-bottom:10px">'+_esc(item.pricing)+'</span>':'')+
+    '<p class="card-desc">'+_esc(item.short_desc||'')+'</p>'+
+    '<div class="card-actions">'+
+      '<a href="'+href+'" class="btn-secondary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Details</a>'+
+      '<a href="'+_esc(item.affiliate_link||href)+'" target="_blank" rel="noopener" class="btn-primary" style="font-size:12px;padding:7px 14px" onclick="event.stopPropagation()">Get →</a>'+
+    '</div></div>';
+}
+
+function renderCarousel(items,id,width){
+  var el=document.getElementById(id); if(!el) return;
+  width=width||'150px';
+  if(!items||!items.length){ el.innerHTML='<div style="color:var(--t3);padding:24px;font-size:14px">Add items in this category to see them here.</div>'; return; }
+  el.innerHTML=items.map(function(i){ return '<div class="carousel-item" style="width:'+width+'">'+renderCard(i)+'</div>'; }).join('');
+  setTimeout(function(){ if(window.NovaFavorites) NovaFavorites.initAll(); },80);
+}
+
+function renderGrid(items,id,gridClass){
+  var el=document.getElementById(id); if(!el) return;
+  gridClass=gridClass||'grid-4 stagger';
+  if(!items||!items.length){ el.innerHTML='<div class="empty-state"><span class="empty-state-icon">📭</span><p>Nothing here yet.</p></div>'; return; }
+  el.innerHTML='<div class="'+gridClass+'">'+items.map(function(i){ return '<div class="reveal-scale">'+renderCard(i)+'</div>'; }).join('')+'</div>';
+  setTimeout(function(){ if(window.NovaFavorites) NovaFavorites.initAll(); initReveal(); },80);
+}
+
+/* ── SCROLL REVEAL ──────────────────────────────────────────── */
+var _io=null;
+function initReveal(){
+  if(!_io) _io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      if(e.target.classList.contains('stagger'))
+        Array.from(e.target.children).forEach(function(c,i){ c.style.transitionDelay=(i*.065)+'s'; c.classList.add('visible'); });
+      _io.unobserve(e.target);
+    });
+  },{threshold:.05,rootMargin:'0px 0px -32px 0px'});
+  document.querySelectorAll('.reveal,.reveal-scale,.stagger').forEach(function(el){ _io.observe(el); });
+}
+
+/* ── CARD GLOW ──────────────────────────────────────────────── */
+if(window.matchMedia('(hover:hover)').matches){
+  document.addEventListener('mousemove',function(e){
+    var card=e.target&&e.target.closest&&e.target.closest('.card');
+    if(!card) return;
+    var r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    card.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+}
+
+/* ── RIPPLE ─────────────────────────────────────────────────── */
+document.addEventListener('click',function(e){
+  var btn=e.target&&e.target.closest&&e.target.closest('.btn-primary,.btn-gold');
+  if(!btn) return;
+  var r=document.createElement('span');
+  var br=btn.getBoundingClientRect();
+  var s=Math.max(br.width,br.height)*2;
+  r.className='ripple';
+  r.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(e.clientX-br.left-s/2)+'px;top:'+(e.clientY-br.top-s/2)+'px';
+  btn.appendChild(r);
+  setTimeout(function(){ r.remove(); },700);
+});
+
+/* ── NEWSLETTER ──────────────────────────────────────────────── */
+function subscribeNL(e){
+  e.preventDefault();
+  var email=document.getElementById('nl-email').value.trim();
+  if(!email) return;
+  toast('✦ You\'re on the list! See you Sunday.','success');
+  document.getElementById('nl-form').innerHTML='<p style="color:var(--green,#30D158);font-size:14px;font-weight:700">✓ Subscribed! Check your inbox Sunday.</p>';
+}
+
+/* ── MAIN INIT ───────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async function(){
+  initReveal();
+  if(window.NovaAuth) NovaAuth.updateNavUI();
+
+  try {
+    var results = await Promise.all([
+      NovaItems.getFeatured(5),
+      NovaItems.getTrending(14),
+      NovaItems.getByCategory('ai-tools',{limit:8}),
+      NovaItems.getByCategory('movies',  {limit:10}),
+      NovaItems.getByCategory('games',   {limit:10}),
+      NovaItems.getByCategory('security',{limit:6}),
+      NovaItems.getByCategory('books',   {limit:10}),
+      NovaItems.getRecommendations(6)
+    ]);
+
+    var featured=results[0], trending=results[1], aiTools=results[2];
+    var movies=results[3],   games=results[4],   security=results[5];
+    var books=results[6],    recs=results[7];
+
+    /* Featured grid */
+    var featEl=document.getElementById('featured-grid');
+    if(featEl && featured.length>=2){
+      var hero=featured[0], rest=featured.slice(1,5);
+      featEl.innerHTML=
+        '<a href="item.html?slug='+encodeURIComponent(hero.slug)+'" class="featured-hero-card">'+
+          '<img src="'+_esc(hero.image||'')+'" alt="'+_esc(hero.name)+'" loading="lazy">'+
+          '<div class="feat-overlay"></div>'+
+          '<div class="feat-info">'+
+            '<div class="feat-type">'+_esc((hero.type||'').toUpperCase())+'</div>'+
+            '<div class="feat-title">'+_esc(hero.name)+'</div>'+
+            (hero.rating?'<div class="feat-rating">★ '+hero.rating+'</div>':'')+
+          '</div></a>'+
+        rest.map(function(i){
+          return '<a href="item.html?slug='+encodeURIComponent(i.slug)+'" class="featured-card">'+
+            '<img src="'+_esc(i.image||'')+'" alt="'+_esc(i.name)+'" loading="lazy">'+
+            '<div class="feat-overlay"></div>'+
+            '<div class="feat-info">'+
+              '<div class="feat-type">'+_esc((i.type||'').toUpperCase())+'</div>'+
+              '<div class="feat-title" style="font-size:13px">'+_esc(i.name)+'</div>'+
+            '</div></a>';
+        }).join('');
+    } else if(featEl){
+      featEl.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--t3);font-size:14px">Set featured=true on items in Supabase to see them here.</div>';
+    }
+
+    /* AI Recs */
+    var aiRecsEl=document.getElementById('ai-recs-grid');
+    var reasons=['Trending now','Community pick','Editor\'s choice','Highly rated','New & noteworthy','Perfect for today'];
+    if(aiRecsEl&&recs.length){
+      aiRecsEl.innerHTML=recs.map(function(item,i){
+        var href='item.html?slug='+encodeURIComponent(item.slug);
+        return '<a href="'+href+'" class="ai-rec-card">'+
+          (item.image?'<img src="'+_esc(item.image)+'" class="ai-rec-img" alt="'+_esc(item.name)+'" loading="lazy">':'<div style="font-size:28px;margin-bottom:10px">'+_esc((item.name||'?').charAt(0))+'</div>')+
+          '<div class="ai-rec-name">'+_esc(item.name)+'</div>'+
+          '<div class="ai-rec-why">'+reasons[i%reasons.length]+'</div>'+
+        '</a>';
+      }).join('');
+    }
+
+    renderCarousel(trending, 'trending-carousel','150px');
+    renderCarousel(aiTools,  'tools-carousel',  '260px');
+    renderCarousel(movies,   'movies-carousel', '150px');
+    renderCarousel(games,    'games-carousel',  '150px');
+    renderCarousel(books,    'books-carousel',  '150px');
+    renderGrid(security,'security-grid','grid-3 stagger');
+    initReveal();
+
+  } catch(err){ console.error('[NovaHub] Init error:',err); }
+});
+</script>
+</body>
+</html>
