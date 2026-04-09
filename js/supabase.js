@@ -1,9 +1,12 @@
 // js/supabase.js — NovaHub Database Client
 // Load AFTER the Supabase CDN script tag
-// ⚠️  Replace YOUR_ANON_KEY_HERE with your real anon key from Supabase → Settings → API
+// Environment variables: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
-const NOVA_URL = "https://twkevfnwvrocaxiplcjk.supabase.co";
+const NOVA_URL =
+  import.meta.env.VITE_SUPABASE_URL ||
+  "https://twkevfnwvrocaxiplcjk.supabase.co";
 const NOVA_KEY =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3a2V2Zm53dnJvY2F4aXBsY2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMDA2MzYsImV4cCI6MjA4OTc3NjYzNn0.ISpw7w-s_jkAf4NnYn7kYoDzhfYHOoqopjlHt-AE2Y4";
 
 // Safe init — works with CDN (window.supabase) on all browsers
