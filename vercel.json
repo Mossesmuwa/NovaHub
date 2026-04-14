@@ -22,12 +22,8 @@
     }
   ],
   "functions": {
-    "api/ai-recommend.js": { "maxDuration": 30 },
-    "api/ai-stream.js": { "maxDuration": 60 },
-    "api/pulse.js": { "maxDuration": 60 },
-    "api/ingest/tmdb.js": { "maxDuration": 60 },
-    "api/ingest/rawg.js": { "maxDuration": 60 },
-    "api/ingest/books.js": { "maxDuration": 60 },
-    "api/ingest/producthunt.js": { "maxDuration": 60 }
+    "api/**/*.js": {
+      "maxDuration": 60
+    }
   }
 }
