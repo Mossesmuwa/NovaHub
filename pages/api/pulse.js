@@ -14,12 +14,14 @@
 //   - Items with no recent activity decay toward zero over ~70 days
 //   - A fresh item with 10 saves beats an old item with 10,000 views
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
+
+export const config = { maxDuration: 60 };
 
 // Service role bypasses RLS — required for bulk updates
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
 // ─── Decay function ───────────────────────────────────────────────────────────
@@ -43,24 +45,24 @@ function daysSince(isoTimestamp) {
 const BATCH_SIZE = 200;
 
 async function processBatch(items) {
-  const updates = items.map(item => {
+  const updates = items.map((item) => {
     const raw =
       (item.click_count || 0) * 0.2 +
-      (item.save_count  || 0) * 0.5 +
-      (item.view_count  || 0) * 0.3;
+      (item.save_count || 0) * 0.5 +
+      (item.view_count || 0) * 0.3;
 
     // Use the most recent of: last save, last view, creation
     const lastActive = item.last_activity_at || item.created_at;
-    const age        = daysSince(lastActive);
-    const score      = parseFloat((raw * decay(age)).toFixed(4));
+    const age = daysSince(lastActive);
+    const score = parseFloat((raw * decay(age)).toFixed(4));
 
     return { id: item.id, trending_score: score };
   });
 
   // Upsert all scores in one query
   const { error } = await supabase
-    .from('items')
-    .upsert(updates, { onConflict: 'id' });
+    .from("items")
+    .upsert(updates, { onConflict: "id" });
 
   if (error) throw error;
   return updates.length;
@@ -71,21 +73,21 @@ async function processBatch(items) {
 async function markTrending() {
   // Get top 20 by score
   const { data: topItems, error: fetchErr } = await supabase
-    .from('items')
-    .select('id')
-    .eq('approved', true)
-    .order('trending_score', { ascending: false })
+    .from("items")
+    .select("id")
+    .eq("approved", true)
+    .order("trending_score", { ascending: false })
     .limit(20);
 
   if (fetchErr) throw fetchErr;
-  const topIds = (topItems || []).map(i => i.id);
+  const topIds = (topItems || []).map((i) => i.id);
 
   // Clear all trending flags
-  await supabase.from('items').update({ trending: false }).neq('id', 'none');
+  await supabase.from("items").update({ trending: false }).neq("id", "none");
 
   // Set trending on top items
   if (topIds.length > 0) {
-    await supabase.from('items').update({ trending: true }).in('id', topIds);
+    await supabase.from("items").update({ trending: true }).in("id", topIds);
   }
 
   return topIds.length;
@@ -95,24 +97,26 @@ async function markTrending() {
 export default async function handler(req, res) {
   // Verify Vercel Cron auth
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return res.status(500).json({ error: 'SUPABASE_SERVICE_ROLE_KEY not set' });
+    return res.status(500).json({ error: "SUPABASE_SERVICE_ROLE_KEY not set" });
   }
 
   const started = Date.now();
-  let   totalProcessed = 0;
-  let   page           = 0;
+  let totalProcessed = 0;
+  let page = 0;
 
   try {
     // Stream through all items in pages
     while (true) {
       const { data: items, error } = await supabase
-        .from('items')
-        .select('id, click_count, save_count, view_count, created_at, last_activity_at')
-        .eq('approved', true)
+        .from("items")
+        .select(
+          "id, click_count, save_count, view_count, created_at, last_activity_at",
+        )
+        .eq("approved", true)
         .range(page * BATCH_SIZE, (page + 1) * BATCH_SIZE - 1);
 
       if (error) throw error;
@@ -130,17 +134,18 @@ export default async function handler(req, res) {
     const trendingCount = await markTrending();
 
     const duration = ((Date.now() - started) / 1000).toFixed(1);
-    console.log(`[pulse] Done — ${totalProcessed} items scored, ${trendingCount} marked trending in ${duration}s`);
+    console.log(
+      `[pulse] Done — ${totalProcessed} items scored, ${trendingCount} marked trending in ${duration}s`,
+    );
 
     return res.status(200).json({
-      success:    true,
-      processed:  totalProcessed,
-      trending:   trendingCount,
+      success: true,
+      processed: totalProcessed,
+      trending: trendingCount,
       duration_s: parseFloat(duration),
     });
-
   } catch (err) {
-    console.error('[pulse] Error:', err.message);
+    console.error("[pulse] Error:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 }

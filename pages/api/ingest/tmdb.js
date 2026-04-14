@@ -9,6 +9,8 @@ const BATCH_SIZE = 20;
 
 import { createClient } from "@supabase/supabase-js";
 
+export const config = { maxDuration: 60 };
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",

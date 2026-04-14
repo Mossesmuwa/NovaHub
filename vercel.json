@@ -5,10 +5,5 @@
     { "path": "/api/ingest/rawg", "schedule": "0 3 * * *" },
     { "path": "/api/ingest/books", "schedule": "0 4 * * *" },
     { "path": "/api/ingest/producthunt", "schedule": "0 5 * * *" }
-  ],
-  "functions": {
-    "api/pulse": { "maxDuration": 60 },
-    "api/ingest/*": { "maxDuration": 60 },
-    "api/ai-*": { "maxDuration": 60 }
-  }
+  ]
 }
