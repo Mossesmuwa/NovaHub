@@ -1,29 +1,14 @@
 {
   "crons": [
-    {
-      "path": "/api/pulse",
-      "schedule": "0 1 * * *"
-    },
-    {
-      "path": "/api/ingest/tmdb",
-      "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/ingest/rawg",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/ingest/books",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/ingest/producthunt",
-      "schedule": "0 5 * * *"
-    }
+    { "path": "/api/pulse", "schedule": "0 1 * * *" },
+    { "path": "/api/ingest/tmdb", "schedule": "0 2 * * *" },
+    { "path": "/api/ingest/rawg", "schedule": "0 3 * * *" },
+    { "path": "/api/ingest/books", "schedule": "0 4 * * *" },
+    { "path": "/api/ingest/producthunt", "schedule": "0 5 * * *" }
   ],
   "functions": {
-    "pages/api/**/*.js": {
-      "maxDuration": 60
-    }
+    "api/pulse": { "maxDuration": 60 },
+    "api/ingest/*": { "maxDuration": 60 },
+    "api/ai-*": { "maxDuration": 60 }
   }
 }
