@@ -1,27 +1,23 @@
 {
-  "cleanUrls": false,
-  "trailingSlash": false,
-  "headers": [
+  "crons": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-      ]
+      "path": "/api/ingest/tmdb",
+      "schedule": "0 2 * * *"
     },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
+      "path": "/api/ingest/rawg",
+      "schedule": "0 3 * * *"
     },
     {
-      "source": "/js/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" }
-      ]
+      "path": "/api/ingest/books",
+      "schedule": "0 4 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "pages/api/ai-recommend.js": { "maxDuration": 30 },
+    "pages/api/ai-stream.js":    { "maxDuration": 60 },
+    "pages/api/ingest/tmdb.js":  { "maxDuration": 60 },
+    "pages/api/ingest/rawg.js":  { "maxDuration": 60 },
+    "pages/api/ingest/books.js": { "maxDuration": 60 }
+  }
 }

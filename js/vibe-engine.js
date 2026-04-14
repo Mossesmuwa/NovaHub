@@ -1,101 +1,105 @@
-/**
- * NovaHub Vibe Engine
- * Maps physical slider UI to backend AI prompt parameters.
- */
+// js/vibe-engine.js — NovaHub Vibe Discovery Engine
+// Dynamic slider / mood selection that triggers category filtering and search queries
 
-document.addEventListener('DOMContentLoaded', () => {
-  const mood = document.getElementById('dial-mood');
-  const energy = document.getElementById('dial-energy');
-  const focus = document.getElementById('dial-focus');
-  if (!mood) return; // Not on discover page
+const VibeEngine = (() => {
 
-  const vibeState = {
-    mood: 50,
-    energy: 25,
-    focus: 80
-  };
+  const VIBES = [
+    { id: 'focus', icon: '🧠', name: 'Deep Focus', dbQuery: 'productivity tool', theme: '#30D158' },
+    { id: 'chill', icon: '🍵', name: 'Chill & Unwind', dbQuery: 'relaxing game movie', theme: '#5AC8FA' },
+    { id: 'learn', icon: '📚', name: 'Mind Expansion', dbQuery: 'book document tool', theme: '#FF9F0A' },
+    { id: 'hype', icon: '🔥', name: 'Hype & Energy', dbQuery: 'action trending game', theme: '#FF453A' },
+    { id: 'creative', icon: '🎨', name: 'Creative Flow', dbQuery: 'design art tool', theme: '#BF5AF2' }
+  ];
 
-  function updateVibeText() {
-    const moodVal = document.getElementById('val-mood');
-    const energyVal = document.getElementById('val-energy');
-    const focusVal = document.getElementById('val-focus');
+  let currentVibeIndex = 0;
+  let isSearching = false;
 
-    if (vibeState.mood < 33) moodVal.textContent = 'Dark/Serious';
-    else if (vibeState.mood < 66) moodVal.textContent = 'Neutral';
-    else moodVal.textContent = 'Light/Fun';
+  function _db() { return window.NovaDB && window.NovaDB.client; }
 
-    if (vibeState.energy < 33) energyVal.textContent = 'Chill';
-    else if (vibeState.energy < 66) energyVal.textContent = 'Balanced';
-    else energyVal.textContent = 'High Energy';
-
-    if (vibeState.focus < 33) focusVal.textContent = 'Deep Work Tools';
-    else if (vibeState.focus < 66) focusVal.textContent = 'Mixed Discovery';
-    else focusVal.textContent = 'Pure Entertainment';
-  }
-
-  function handleInput(e, key) {
-    vibeState[key] = parseInt(e.target.value);
-    updateVibeText();
-  }
-
-  mood.addEventListener('input', e => handleInput(e, 'mood'));
-  energy.addEventListener('input', e => handleInput(e, 'energy'));
-  focus.addEventListener('input', e => handleInput(e, 'focus'));
-
-  window.fetchVibe = async function() {
-    const resultsBlock = document.getElementById('vibe-results');
-    if (!resultsBlock) return;
+  async function getItemsByVibe(vibeId, limit = 12) {
+    const vibeReq = VIBES.find(v => v.id === vibeId) || VIBES[0];
     
-    resultsBlock.classList.add('loading');
-    
+    // Use heavy text search approximation on what is available, via our existing Items.js search.
     try {
-      // Use the newly created API
-      const result = await window.NovaAPI.getAIRecommendations(vibeState);
-      
-      if (!result || !result.success) {
-        resultsBlock.innerHTML = '<div style="color:var(--t3);padding:24px;">Failed to fetch vibes. Is the backend running?</div>';
-        return;
+      if (window.NovaItems && window.NovaItems.search) {
+         const results = await window.NovaItems.search(vibeReq.dbQuery, { limit });
+         if (results && results.length > 0) return results;
       }
-
-      // Render the AI recommendations visually
-      resultsBlock.innerHTML = result.recommendations.map(r => {
-        return `
-          <div class="card reveal" style="border: 1px solid var(--gold-glow); box-shadow: 0 8px 32px var(--gold-glow2);">
-            <div class="card-title" style="color:var(--gold); font-size:18px;">${r.name}</div>
-            <div style="font-size:10px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">${r.type}</div>
-            <p class="card-desc" style="color:var(--t1)">${r.why || ''}</p>
-            <div class="card-actions">
-              <a href="search.html?q=${encodeURIComponent(r.name)}" class="btn-primary" style="font-size:12px;padding:7px 14px">Explore →</a>
-            </div>
-          </div>
-        `;
-      }).join('');
       
-    } catch (err) {
-      console.error(err);
-      resultsBlock.innerHTML = '<div style="color:var(--t3);padding:24px;">An error occurred connecting to the Vibe Engine.</div>';
-    } finally {
-      resultsBlock.classList.remove('loading');
+      // Fallback: If no NovaItems or no search match, grab trending
+      if (window.NovaItems && window.NovaItems.getTrending) {
+          return await window.NovaItems.getTrending(limit);
+      }
+      return [];
+    } catch {
+      return [];
     }
-  };
-
-  // Check URL parameters for direct vibe links
-  const urlParams = new URLSearchParams(window.location.search);
-  const vibeArg = urlParams.get('vibe');
-  if (vibeArg) {
-    if (vibeArg === 'mind-bending') { mood.value=10; energy.value=80; focus.value=90; }
-    if (vibeArg === 'chill') { mood.value=70; energy.value=10; focus.value=100; }
-    if (vibeArg === 'productive') { mood.value=50; energy.value=60; focus.value=10; }
-    
-    // trigger state updates
-    mood.dispatchEvent(new Event('input'));
-    energy.dispatchEvent(new Event('input'));
-    focus.dispatchEvent(new Event('input'));
-    
-    // Auto fetch
-    window.fetchVibe();
-  } else {
-    // Basic initial fetch
-    window.fetchVibe();
   }
-});
+
+  function renderVibeUI(containerId, gridId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="vibe-dial-wrapper">
+        <div class="vibe-dial">
+          ${VIBES.map((v, i) => `
+            <button class="vibe-opt ${i === 0 ? 'active' : ''}" data-idx="${i}" data-vid="${v.id}" style="--vt:${v.theme}">
+              <span class="vibe-icon">${v.icon}</span>
+              <span class="vibe-label">${v.name}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    // Attach events
+    const opts = container.querySelectorAll('.vibe-opt');
+    opts.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        opts.forEach(o => o.classList.remove('active'));
+        const btn = e.currentTarget;
+        btn.classList.add('active');
+        
+        currentVibeIndex = parseInt(btn.getAttribute('data-idx') || '0', 10);
+        executeVibeSearch(gridId);
+      });
+    });
+    
+    // Auto execute initial
+    if (gridId) executeVibeSearch(gridId);
+  }
+
+  async function executeVibeSearch(gridId) {
+    if (isSearching) return;
+    
+    const vibe = VIBES[currentVibeIndex];
+    if (window.NovaUI) {
+      window.NovaUI.showLoading(gridId, `Dialing into <strong>${vibe.name}</strong>…`);
+    }
+
+    isSearching = true;
+
+    // Optional delay to give a fluid UI look
+    await new Promise(r => setTimeout(r, 600));
+
+    const results = await getItemsByVibe(vibe.id, 12);
+    
+    if (window.NovaUI) {
+      window.NovaUI.renderGrid(results, gridId, 'grid-4');
+    }
+    
+    // Animate glow color update across document
+    document.documentElement.style.setProperty('--vibe-color', vibe.theme);
+    const bgGlow = document.getElementById('vibe-bg-glow');
+    if (bgGlow) {
+      bgGlow.style.background = \`radial-gradient(ellipse 70% 80% at 50% -20%, \${vibe.theme}25 0%, transparent 70%)\`;
+    }
+
+    isSearching = false;
+  }
+
+  return { getItemsByVibe, renderVibeUI, executeVibeSearch, VIBES };
+})();
+
+window.VibeEngine = VibeEngine;

@@ -55,6 +55,7 @@ const NovaAPI = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-nova-key": process.env.NEXT_PUBLIC_INTERNAL_API_SECRET,
         },
         body: JSON.stringify(payload),
       });
@@ -64,6 +65,21 @@ const NovaAPI = {
     } catch (err) {
       console.error("[NovaAPI] getAIRecommendations error:", err);
       return { success: false, error: err.message };
+    }
+  },
+
+  async getProductHuntTrending(limit = 10) {
+    try {
+      const url = new URL(`${API_BASE}/producthunt`);
+      url.searchParams.set("limit", String(limit));
+
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error("API Error");
+      const data = await res.json();
+      return data.success ? data.posts : [];
+    } catch (err) {
+      console.error("[NovaAPI] getProductHuntTrending error:", err);
+      return [];
     }
   },
 };

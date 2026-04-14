@@ -1,17 +1,19 @@
 {
-  "name": "novahub-backend",
-  "version": "1.0.0",
-  "description": "NovaHub Backend & API Services",
-  "main": "backend/server.js",
+  "name": "novahub",
+  "version": "2.0.0",
+  "private": true,
+  "description": "NovaHub — AI-powered discovery platform",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node backend/server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@supabase/supabase-js": "^2.42.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
