@@ -3,36 +3,36 @@
     {
       "path": "/api/pulse",
       "schedule": "0 1 * * *",
-      "comment": "Nova Pulse — recalculate trending_score for all items, 1am UTC nightly"
+      "description": "Nova Pulse — recalculate trending_score for all items, 1am UTC nightly"
     },
     {
       "path": "/api/ingest/tmdb",
       "schedule": "0 2 * * *",
-      "comment": "TMDB — pull trending movies and TV shows, 2am UTC nightly"
+      "description": "TMDB — pull trending movies and TV shows, 2am UTC nightly"
     },
     {
       "path": "/api/ingest/rawg",
       "schedule": "0 3 * * *",
-      "comment": "RAWG — pull top-rated and recent games, 3am UTC nightly"
+      "description": "RAWG — pull top-rated and recent games, 3am UTC nightly"
     },
     {
       "path": "/api/ingest/books",
       "schedule": "0 4 * * *",
-      "comment": "Google Books — pull curated subject lists, 4am UTC nightly"
+      "description": "Google Books — pull curated subject lists, 4am UTC nightly"
     },
     {
       "path": "/api/ingest/producthunt",
       "schedule": "0 5 * * *",
-      "comment": "Product Hunt — pull trending tools, 5am UTC nightly"
+      "description": "Product Hunt — pull trending tools, 5am UTC nightly"
     }
   ],
   "functions": {
-    "pages/api/ai-recommend.js":        { "maxDuration": 30 },
-    "pages/api/ai-stream.js":           { "maxDuration": 60 },
-    "pages/api/pulse.js":               { "maxDuration": 60 },
-    "pages/api/ingest/tmdb.js":         { "maxDuration": 60 },
-    "pages/api/ingest/rawg.js":         { "maxDuration": 60 },
-    "pages/api/ingest/books.js":        { "maxDuration": 60 },
-    "pages/api/ingest/producthunt.js":  { "maxDuration": 60 }
+    "pages/api/ai-recommend.js": { "maxDuration": 30 },
+    "pages/api/ai-stream.js": { "maxDuration": 60 },
+    "pages/api/pulse.js": { "maxDuration": 60 },
+    "pages/api/ingest/tmdb.js": { "maxDuration": 60 },
+    "pages/api/ingest/rawg.js": { "maxDuration": 60 },
+    "pages/api/ingest/books.js": { "maxDuration": 60 },
+    "pages/api/ingest/producthunt.js": { "maxDuration": 60 }
   }
 }
