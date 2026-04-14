@@ -2,28 +2,23 @@
   "crons": [
     {
       "path": "/api/pulse",
-      "schedule": "0 1 * * *",
-      "description": "Nova Pulse — recalculate trending_score for all items, 1am UTC nightly"
+      "schedule": "0 1 * * *"
     },
     {
       "path": "/api/ingest/tmdb",
-      "schedule": "0 2 * * *",
-      "description": "TMDB — pull trending movies and TV shows, 2am UTC nightly"
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/ingest/rawg",
-      "schedule": "0 3 * * *",
-      "description": "RAWG — pull top-rated and recent games, 3am UTC nightly"
+      "schedule": "0 3 * * *"
     },
     {
       "path": "/api/ingest/books",
-      "schedule": "0 4 * * *",
-      "description": "Google Books — pull curated subject lists, 4am UTC nightly"
+      "schedule": "0 4 * * *"
     },
     {
       "path": "/api/ingest/producthunt",
-      "schedule": "0 5 * * *",
-      "description": "Product Hunt — pull trending tools, 5am UTC nightly"
+      "schedule": "0 5 * * *"
     }
   ],
   "functions": {
