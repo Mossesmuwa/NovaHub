@@ -79,11 +79,14 @@ const TRENDING_QUERY = `
 
 // ─── Fetch from Product Hunt API ──────────────────────────────────────────────
 async function fetchPHTrending(limit = BATCH_SIZE) {
+  const token = (process.env.PRODUCTHUNT_DEVELOPER_TOKEN || "").trim();
+  const authHeader = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
   const res = await fetch(PH_API, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.PRODUCTHUNT_DEVELOPER_TOKEN}`,
+      Authorization: authHeader,
       Accept: "application/json",
     },
     body: JSON.stringify({
@@ -150,12 +153,10 @@ function phPostToItem(post) {
 
 // ─── Upsert to Supabase ───────────────────────────────────────────────────────
 async function upsertItems(items) {
-  const { error } = await supabase
-    .from("items")
-    .upsert(items, {
-      onConflict: "source_id,source_name",
-      ignoreDuplicates: false,
-    });
+  const { error } = await supabase.from("items").upsert(items, {
+    onConflict: "source_id,source_name",
+    ignoreDuplicates: false,
+  });
   if (error) throw error;
   return items.length;
 }

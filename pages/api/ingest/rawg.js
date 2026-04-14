@@ -26,11 +26,26 @@ function slugify(str) {
 }
 
 async function rawgFetch(path, params = {}) {
-  const qs = new URLSearchParams({
-    key: process.env.RAWG_API_KEY,
-    ...params,
-  }).toString();
-  const res = await fetch(`${RAWG_BASE}${path}?${qs}`);
+  const token = (process.env.RAWG_API_KEY || "").trim();
+  const useBearer =
+    token.startsWith("Bearer ") ||
+    token.startsWith("eyJ") ||
+    token.includes(".");
+  const headers = {};
+  const queryParams = { ...params };
+
+  if (!useBearer) {
+    queryParams.key = token;
+  } else {
+    headers.Authorization = token.startsWith("Bearer ")
+      ? token
+      : `Bearer ${token}`;
+  }
+
+  const qs = new URLSearchParams(queryParams).toString();
+  const res = await fetch(`${RAWG_BASE}${path}${qs ? `?${qs}` : ""}`, {
+    headers,
+  });
   if (!res.ok) throw new Error(`RAWG error: ${res.status}`);
   return res.json();
 }
@@ -64,12 +79,10 @@ function gameToItem(g) {
 }
 
 async function upsertItems(items) {
-  const { error } = await supabase
-    .from("items")
-    .upsert(items, {
-      onConflict: "source_id,source_name",
-      ignoreDuplicates: false,
-    });
+  const { error } = await supabase.from("items").upsert(items, {
+    onConflict: "source_id,source_name",
+    ignoreDuplicates: false,
+  });
   if (error) throw error;
   return items.length;
 }

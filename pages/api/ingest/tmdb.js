@@ -26,8 +26,23 @@ function slugify(str) {
 }
 
 async function tmdbFetch(path) {
-  const url = `${TMDB_BASE}${path}?api_key=${process.env.TMDB_API_KEY}&language=en-US`;
-  const res = await fetch(url);
+  const token = (process.env.TMDB_API_KEY || "").trim();
+  const useBearer =
+    token.startsWith("Bearer ") ||
+    token.startsWith("eyJ") ||
+    token.includes(".");
+  const headers = {};
+  let url = `${TMDB_BASE}${path}?language=en-US`;
+
+  if (useBearer) {
+    headers.Authorization = token.startsWith("Bearer ")
+      ? token
+      : `Bearer ${token}`;
+  } else {
+    url += `&api_key=${encodeURIComponent(token)}`;
+  }
+
+  const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`TMDB error: ${res.status} ${path}`);
   return res.json();
 }

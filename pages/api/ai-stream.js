@@ -24,7 +24,10 @@ import crypto from "crypto";
 
 export const config = { maxDuration: 60 };
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropicKey = (process.env.ANTHROPIC_API_KEY || "")
+  .trim()
+  .replace(/^Bearer\s+/i, "");
+const anthropic = new Anthropic({ apiKey: anthropicKey });
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,

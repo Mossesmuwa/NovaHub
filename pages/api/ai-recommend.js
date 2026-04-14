@@ -14,7 +14,10 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropicKey = (process.env.ANTHROPIC_API_KEY || "")
+  .trim()
+  .replace(/^Bearer\s+/i, "");
+const anthropic = new Anthropic({ apiKey: anthropicKey });
 
 // ─── Cache ────────────────────────────────────────────────────────────────────
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
@@ -207,12 +210,10 @@ export default async function handler(req, res) {
 
   const VALID_MODES = ["query", "vibe", "related", "taste"];
   if (!VALID_MODES.includes(mode))
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: `Invalid mode. Use: ${VALID_MODES.join(" | ")}`,
-      });
+    return res.status(400).json({
+      success: false,
+      error: `Invalid mode. Use: ${VALID_MODES.join(" | ")}`,
+    });
 
   if (body.query?.length > 300)
     return res

@@ -78,11 +78,22 @@ function bookToItem(vol) {
 }
 
 async function fetchSubject(subject) {
-  const key = process.env.GOOGLE_BOOKS_API_KEY
-    ? `&key=${process.env.GOOGLE_BOOKS_API_KEY}`
+  const token = (process.env.GOOGLE_BOOKS_API_KEY || "").trim();
+  const useBearer =
+    token.startsWith("Bearer ") ||
+    token.startsWith("eyJ") ||
+    token.includes(".");
+  const authHeader = useBearer
+    ? token.startsWith("Bearer ")
+      ? token
+      : `Bearer ${token}`
     : "";
-  const url = `${BOOKS_BASE}/volumes?q=subject:${encodeURIComponent(subject)}&orderBy=relevance&maxResults=${BATCH_SIZE}&printType=books&langRestrict=en${key}`;
-  const res = await fetch(url);
+  const keyParam =
+    token && !useBearer ? `&key=${encodeURIComponent(token)}` : "";
+  const url = `${BOOKS_BASE}/volumes?q=subject:${encodeURIComponent(subject)}&orderBy=relevance&maxResults=${BATCH_SIZE}&printType=books&langRestrict=en${keyParam}`;
+  const res = await fetch(url, {
+    headers: authHeader ? { Authorization: authHeader } : {},
+  });
   if (!res.ok) throw new Error(`Books API error: ${res.status}`);
   const data = await res.json();
   return (data.items || []).filter(
@@ -91,12 +102,10 @@ async function fetchSubject(subject) {
 }
 
 async function upsertItems(items) {
-  const { error } = await supabase
-    .from("items")
-    .upsert(items, {
-      onConflict: "source_id,source_name",
-      ignoreDuplicates: false,
-    });
+  const { error } = await supabase.from("items").upsert(items, {
+    onConflict: "source_id,source_name",
+    ignoreDuplicates: false,
+  });
   if (error) throw error;
   return items.length;
 }
