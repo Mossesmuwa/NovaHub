@@ -6,6 +6,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import { getEnvCredential } from "../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
@@ -14,9 +15,10 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
-const anthropicKey = (process.env.ANTHROPIC_API_KEY || "")
-  .trim()
-  .replace(/^Bearer\s+/i, "");
+const anthropicKey = getEnvCredential(
+  "ANTHROPIC_API_KEY",
+  "ANTHROPIC_ACCESS_TOKEN",
+);
 const anthropic = new Anthropic({ apiKey: anthropicKey });
 
 // ─── Cache ────────────────────────────────────────────────────────────────────
@@ -201,7 +203,7 @@ export default async function handler(req, res) {
   if (secret && req.headers["x-nova-key"] !== secret)
     return res.status(401).json({ success: false, error: "Unauthorized" });
 
-  if (!process.env.ANTHROPIC_API_KEY)
+  if (!anthropicKey)
     return res
       .status(500)
       .json({ success: false, error: "AI service not configured" });

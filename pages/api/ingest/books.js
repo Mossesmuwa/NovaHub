@@ -5,6 +5,7 @@
 // (but add GOOGLE_BOOKS_API_KEY to Vercel env for higher quota).
 
 import { createClient } from "@supabase/supabase-js";
+import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
@@ -78,7 +79,10 @@ function bookToItem(vol) {
 }
 
 async function fetchSubject(subject) {
-  const token = (process.env.GOOGLE_BOOKS_API_KEY || "").trim();
+  const token = getEnvCredential(
+    "GOOGLE_BOOKS_API_KEY",
+    "GOOGLE_BOOKS_ACCESS_TOKEN",
+  );
   const useBearer =
     token.startsWith("Bearer ") ||
     token.startsWith("eyJ") ||

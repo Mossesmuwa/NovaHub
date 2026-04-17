@@ -8,6 +8,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const BATCH_SIZE = 20;
 
 import { createClient } from "@supabase/supabase-js";
+import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
@@ -26,7 +27,7 @@ function slugify(str) {
 }
 
 async function tmdbFetch(path) {
-  const token = (process.env.TMDB_API_KEY || "").trim();
+  const token = getEnvCredential("TMDB_API_KEY", "TMDB_ACCESS_TOKEN");
   const useBearer =
     token.startsWith("Bearer ") ||
     token.startsWith("eyJ") ||
@@ -83,10 +84,11 @@ export default async function handler(req, res) {
     return res.status(401).json({ success: false, error: "Unauthorized" });
   }
 
-  if (!process.env.TMDB_API_KEY) {
+  const tmdbToken = getEnvCredential("TMDB_API_KEY", "TMDB_ACCESS_TOKEN");
+  if (!tmdbToken) {
     return res
       .status(500)
-      .json({ success: false, error: "TMDB_API_KEY not set" });
+      .json({ success: false, error: "TMDB API credential not set" });
   }
 
   if (

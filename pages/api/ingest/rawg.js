@@ -4,6 +4,7 @@
 // Get free API key: https://rawg.io/apidocs
 
 import { createClient } from "@supabase/supabase-js";
+import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
@@ -26,7 +27,7 @@ function slugify(str) {
 }
 
 async function rawgFetch(path, params = {}) {
-  const token = (process.env.RAWG_API_KEY || "").trim();
+  const token = getEnvCredential("RAWG_API_KEY", "RAWG_ACCESS_TOKEN");
   const useBearer =
     token.startsWith("Bearer ") ||
     token.startsWith("eyJ") ||
@@ -91,8 +92,9 @@ export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`)
     return res.status(401).json({ error: "Unauthorized" });
 
-  if (!process.env.RAWG_API_KEY)
-    return res.status(500).json({ error: "RAWG_API_KEY not set" });
+  const rawgToken = getEnvCredential("RAWG_API_KEY", "RAWG_ACCESS_TOKEN");
+  if (!rawgToken)
+    return res.status(500).json({ error: "RAWG API credential not set" });
 
   const results = { topRated: 0, recent: 0, errors: [] };
   const today = new Date().toISOString().split("T")[0];

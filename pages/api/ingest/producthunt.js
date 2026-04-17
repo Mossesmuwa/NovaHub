@@ -9,6 +9,7 @@
 //   3. Add CRON_SECRET to Vercel env vars
 
 import { createClient } from "@supabase/supabase-js";
+import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
@@ -79,7 +80,10 @@ const TRENDING_QUERY = `
 
 // ─── Fetch from Product Hunt API ──────────────────────────────────────────────
 async function fetchPHTrending(limit = BATCH_SIZE) {
-  const token = (process.env.PRODUCTHUNT_DEVELOPER_TOKEN || "").trim();
+  const token = getEnvCredential(
+    "PRODUCTHUNT_DEVELOPER_TOKEN",
+    "PRODUCTHUNT_ACCESS_TOKEN",
+  );
   const authHeader = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
 
   const res = await fetch(PH_API, {
@@ -167,10 +171,15 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  if (!process.env.PRODUCTHUNT_DEVELOPER_TOKEN) {
+  const phToken = getEnvCredential(
+    "PRODUCTHUNT_DEVELOPER_TOKEN",
+    "PRODUCTHUNT_ACCESS_TOKEN",
+  );
+
+  if (!phToken) {
     return res
       .status(500)
-      .json({ error: "PRODUCTHUNT_DEVELOPER_TOKEN not set" });
+      .json({ error: "Product Hunt API credential not set" });
   }
 
   try {

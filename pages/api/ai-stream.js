@@ -21,12 +21,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import { getEnvCredential } from "../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
-const anthropicKey = (process.env.ANTHROPIC_API_KEY || "")
-  .trim()
-  .replace(/^Bearer\s+/i, "");
+const anthropicKey = getEnvCredential(
+  "ANTHROPIC_API_KEY",
+  "ANTHROPIC_ACCESS_TOKEN",
+);
 const anthropic = new Anthropic({ apiKey: anthropicKey });
 
 const supabase = createClient(
@@ -183,6 +185,10 @@ export default async function handler(req, res) {
     item: itemJson ? JSON.parse(itemJson) : undefined,
     taste: tasteJson ? JSON.parse(tasteJson) : undefined,
   };
+
+  if (!anthropicKey) {
+    return res.status(500).json({ error: "AI service not configured" });
+  }
 
   // ─── Set SSE headers ────────────────────────────────────────────────────────
   res.setHeader("Content-Type", "text/event-stream");
