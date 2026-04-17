@@ -7,13 +7,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pipeline:sync": "node -e \"Promise.all([import('./lib/ingest/TMDBProvider.js'),import('./lib/ingest/ProductHuntProvider.js')]).then(async([t,p])=>{const r1=await new t.TMDBProvider().sync();const r2=await new p.ProductHuntProvider().sync();console.log('Done',JSON.stringify([r1,r2],null,2))})\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
+    "@google/genai": "^1.50.1",
     "@supabase/supabase-js": "^2.42.0",
     "next": "^14.2.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "slugify": "^1.6.9"
   }
 }
