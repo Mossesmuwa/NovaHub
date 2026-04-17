@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en" data-theme="dark">
       <Head>
         {/* 1. Fix for TMDB Image Blocking (OpaqueResponseBlocking) */}
-        <meta name="referrer" content="no-referrer-when-downgrade" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
 
         {/* 2. Optimized Font Loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,11 +24,15 @@ export default function Document() {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-          try {
-            var t = localStorage.getItem('nh-theme');
-            if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', t);
-          } catch(e) {}
+          (function() {
+            try {
+              var t = localStorage.getItem('nh-theme');
+              if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              requestAnimationFrame(function() {
+                document.documentElement.setAttribute('data-theme', t);
+              });
+            } catch(e) {}
+          })();
         `,
           }}
         />
