@@ -376,10 +376,10 @@ export default function Dashboard() {
                         Current Mode
                       </div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--t1)' }}>
-                        {taste.mood === 'learn'     && '🧠 Learn & Grow'}
-                        {taste.mood === 'entertain' && '🍿 Entertain Me'}
-                        {taste.mood === 'tools'     && '⚡ Find Tools'}
-                        {taste.mood === 'explore'   && '🔭 Just Exploring'}
+                        {taste.mood === 'learn'     && 'Learn & Grow'}
+                        {taste.mood === 'entertain' && 'Entertain Me'}
+                        {taste.mood === 'tools'     && 'Find Tools'}
+                        {taste.mood === 'explore'   && 'Just Exploring'}
                         {!['learn','entertain','tools','explore'].includes(taste.mood) && taste.mood}
                       </div>
                     </div>
