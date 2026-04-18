@@ -48,6 +48,19 @@ CREATE INDEX IF NOT EXISTS idx_items_trending ON items(trending,save_count DESC)
 CREATE INDEX IF NOT EXISTS idx_items_approved ON items(approved);
 CREATE INDEX IF NOT EXISTS idx_items_slug     ON items(slug);
 
+CREATE TABLE IF NOT EXISTS alternatives (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  item_id UUID REFERENCES items(id) ON DELETE CASCADE NOT NULL,
+  alternative_id UUID REFERENCES items(id) ON DELETE CASCADE NOT NULL,
+  reason TEXT NOT NULL, -- "Cheaper alternative", "More powerful", "Simpler interface", etc.
+  advantage TEXT, -- Key advantage over the original
+  similarity_score INT DEFAULT 0, -- 0-100, how similar they are
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(item_id, alternative_id)
+);
+CREATE INDEX IF NOT EXISTS idx_alternatives_item ON alternatives(item_id);
+CREATE INDEX IF NOT EXISTS idx_alternatives_alt  ON alternatives(alternative_id);
+
 CREATE TABLE IF NOT EXISTS anon_sessions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), fingerprint TEXT,
   favorites_count INT DEFAULT 0, comments_today INT DEFAULT 0, last_comment_date TEXT,

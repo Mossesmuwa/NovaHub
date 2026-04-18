@@ -89,13 +89,13 @@ No \`\`\`json fences. Just the raw JSON array.
 
 Each item must have exactly:
 {
-  "name": "Exact item name",
-  "type": "movie|book|game|tool|video|podcast|tv|course",
+  "title": "Exact item name",
+  "description": "Brief description (max 50 words)",
+  "reason": "Why this is recommended (max 15 words)",
   "category": "movies|books|ai-tools|games|security|productivity|music|courses|videos|design|science|finance|news",
-  "reason": "One crisp sentence (max 15 words) explaining why this fits",
-  "slug_hint": "kebab-case-name-guess",
-  "tags": ["tag1", "tag2", "tag3"],
-  "pricing": "Free|Freemium|Paid|Open Source|null"
+  "type": "alternative" | "discovery",
+  "similarity_score": 0-100 (how similar to query, or 0 for discovery),
+  "slug_hint": "kebab-case-name-guess"
 }
 
 Return exactly the number of items requested. No duplicates.`;
@@ -108,21 +108,41 @@ function buildPrompt(mode, body) {
       const tasteHint = body.taste?.cats?.length
         ? `User likes: ${body.taste.cats.join(", ")}. Mood: ${body.taste.mood || "any"}.`
         : "";
-      return `Recommend ${count} items for: "${body.query}". ${tasteHint} Return a JSON array of ${count} items.`;
+      return `Analyze query: "${body.query}". Is this asking for ALTERNATIVES to something (like "Notion alternative", "tools like X", "movies like X") or DISCOVERY (like "best productivity apps", "something useful", "cool tools")?
+
+For ALTERNATIVES: Return ${count} items that are genuine alternatives with high similarity_score (70-100). Explain why each is a better/cheaper/simpler alternative.
+
+For DISCOVERY: Return ${count} items that are interesting discoveries with low similarity_score (0-30). Focus on curated, useful recommendations.
+
+${tasteHint} Return a JSON array of ${count} items.`;
+    }
+    case "alternatives": {
+      const { item } = body;
+      if (!item) throw new Error("mode=alternatives requires an item object");
+      return `Find ${count} genuine alternatives to "${item.name}" (${item.type}, ${item.category}). Each alternative should have:
+- High similarity_score (70-100) if very similar
+- Medium similarity_score (40-70) if same category but different approach
+- Clear reason why it's an alternative (cheaper, simpler, more powerful, etc.)
+- Brief description of what makes it better
+
+Return JSON array of ${count} alternatives.`;
     }
     case "vibe": {
       const { mood = 50, energy = 50, focus = 50 } = body;
-      return `Recommend ${count} items for vibe — Mood: ${vibeLabel(mood, "chill", "intense")} (${mood}/100), Energy: ${vibeLabel(energy, "relaxed", "energetic")} (${energy}/100), Focus: ${vibeLabel(focus, "casual", "deep-focus")} (${focus}/100). Be precise. Return JSON array.`;
+      return `Recommend ${count} items for vibe — Mood: ${vibeLabel(mood, "chill", "intense")} (${mood}/100), Energy: ${vibeLabel(energy, "relaxed", "energetic")} (${energy}/100), Focus: ${vibeLabel(focus, "casual", "deep-focus")} (${focus}/100). Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     case "related": {
       const { item } = body;
       if (!item) throw new Error("mode=related requires an item object");
-      return `Recommend ${count} items related to "${item.name}" (${item.type}, tags: ${(item.tags || []).join(", ")}). Share vibe not just category. Return JSON array.`;
+      return `Recommend ${count} items related to "${item.name}" (${item.type}, tags: ${(item.tags || []).join(", ")}). Share vibe not just category. Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     case "taste": {
       const { taste } = body;
       if (!taste) throw new Error("mode=taste requires a taste object");
-      return `Recommend ${count} personalised picks — likes: ${taste.cats?.join(", ") || "general"}, loved: ${taste.loved?.join(", ") || "none"}, goal: ${taste.mood || "explore"}. Mix types. Return JSON array.`;
+      return `Recommend ${count} personalised picks — likes: ${taste.cats?.join(", ") || "general"}, loved: ${taste.loved?.join(", ") || "none"}, goal: ${taste.mood || "explore"}. Mix types. Set type="discovery", similarity_score=0. Return JSON array.`;
+    }
+    case "surprise": {
+      return `Return ${count} "surprise me" recommendations — mix of hidden gems, underrated tools, and slightly unexpected but useful items. Focus on quality over randomness. Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     default:
       throw new Error(`Unknown mode: "${mode}"`);
@@ -133,7 +153,7 @@ function buildPrompt(mode, body) {
 async function crossReference(suggestions) {
   if (!suggestions?.length) return [];
   const slugs = suggestions.map((s) => s.slug_hint).filter(Boolean);
-  const names = suggestions.map((s) => s.name).filter(Boolean);
+  const names = suggestions.map((s) => s.title).filter(Boolean);
   let dbItems = [];
   if (slugs.length || names.length) {
     const orFilter = [
@@ -154,11 +174,26 @@ async function crossReference(suggestions) {
     const match = dbItems.find(
       (db) =>
         db.slug === s.slug_hint ||
-        db.name.toLowerCase() === s.name.toLowerCase(),
+        db.name.toLowerCase() === s.title.toLowerCase(),
     );
     return match
-      ? { ...match, reason: s.reason, is_db_item: true, is_suggestion: false }
-      : { ...s, slug: s.slug_hint, is_db_item: false, is_suggestion: true };
+      ? {
+          ...match,
+          reason: s.reason,
+          is_db_item: true,
+          is_suggestion: false,
+          type: s.type || "discovery",
+          similarity_score: s.similarity_score || 0,
+        }
+      : {
+          ...s,
+          name: s.title,
+          slug: s.slug_hint,
+          is_db_item: false,
+          is_suggestion: true,
+          type: s.type || "discovery",
+          similarity_score: s.similarity_score || 0,
+        };
   });
 }
 
