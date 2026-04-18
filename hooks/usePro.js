@@ -7,7 +7,7 @@
 //   if (!can('vibeDialUnlimited')) return <ProGate feature="vibeDialUnlimited" />;
 
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, getCurrentUser } from "../lib/supabase";
 
 // ─── Feature access map ───────────────────────────────────────────────────────
 // Defines exactly what free vs pro users can do.
@@ -114,23 +114,14 @@ export function usePro() {
 
     async function init() {
       setLoading(true);
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      const user = await getCurrentUser();
 
-      if (error) {
-        console.error("[usePro] Session recovery failed:", error.message);
+      if (!user?.id) {
         if (mounted) setLoading(false);
         return;
       }
 
-      if (!session?.user?.id) {
-        if (mounted) setLoading(false);
-        return;
-      }
-
-      const userId = session.user.id;
+      const userId = user.id;
       if (mounted) setUserId(userId);
       await fetchProfile(userId);
     }
