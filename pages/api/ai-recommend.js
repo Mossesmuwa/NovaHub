@@ -3,10 +3,8 @@
 // Use this for: server-side rendering, prefetch, non-realtime surfaces.
 // For realtime streaming UI use pages/api/ai-stream.js instead.
 
-import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
-import { getEnvCredential } from "../../lib/helpers";
+import { createRateLimit } from "../../lib/rateLimit";
+import { validateRequest } from "../../lib/validation";
 
 export const config = { maxDuration: 60 };
 
@@ -206,33 +204,75 @@ function parseClaudeJSON(text) {
 }
 
 // ─── Rate limiting ────────────────────────────────────────────────────────────
-const rateLimitMap = new Map();
-function isRateLimited(ip) {
-  const now = Date.now(),
-    window = 60_000,
-    limit = 20;
-  const entry = rateLimitMap.get(ip) || { count: 0, reset: now + window };
-  if (now > entry.reset) {
-    rateLimitMap.set(ip, { count: 1, reset: now + window });
-    return false;
-  }
-  if (entry.count >= limit) return true;
-  entry.count++;
-  rateLimitMap.set(ip, entry);
-  return false;
-}
+const rateLimit = createRateLimit({
+  windowMs: 60000, // 1 minute
+  maxRequests: 20, // 20 requests per minute
+  progressiveDelay: true,
+});
+
+// ─── Validation schema ──────────────────────────────────────────────────────
+const validationSchema = {
+  mode: {
+    required: false,
+    validate: "query", // mode should be safe text
+    sanitize: (v) => String(v || "query"),
+  },
+  query: {
+    required: false,
+    validate: "query",
+    sanitize: (v) => String(v || "").substring(0, 300),
+  },
+  limit: {
+    required: false,
+    sanitize: (v) => Math.min(Math.max(parseInt(v) || 6, 1), 12),
+  },
+  taste: {
+    required: false,
+    sanitize: (v) => {
+      if (!v || typeof v !== "object") return {};
+      return {
+        cats: Array.isArray(v.cats) ? v.cats.slice(0, 13).map(String) : [],
+        loved: Array.isArray(v.loved) ? v.loved.slice(0, 20).map(String) : [],
+        mood: typeof v.mood === "string" ? v.mood.substring(0, 50) : "",
+      };
+    },
+  },
+  item: {
+    required: false,
+    sanitize: (v) =>
+      v && typeof v === "object"
+        ? {
+            name: String(v.name || "").substring(0, 200),
+            type: String(v.type || "").substring(0, 50),
+            category: String(v.category || "").substring(0, 50),
+            tags: Array.isArray(v.tags) ? v.tags.slice(0, 10).map(String) : [],
+          }
+        : undefined,
+  },
+};
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    rateLimit(req, res, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
   if (req.method !== "POST")
     return res
       .status(405)
       .json({ success: false, error: "Method not allowed" });
 
-  const ip =
-    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
-  if (isRateLimited(ip))
-    return res.status(429).json({ success: false, error: "Too many requests" });
+  // Apply validation
+  await new Promise((resolve, reject) => {
+    validateRequest(validationSchema)(req, res, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 
   const secret = process.env.INTERNAL_API_SECRET;
   if (secret && req.headers["x-nova-key"] !== secret)
@@ -251,27 +291,6 @@ export default async function handler(req, res) {
       success: false,
       error: `Invalid mode. Use: ${VALID_MODES.join(" | ")}`,
     });
-
-  if (body.query?.length > 300)
-    return res
-      .status(400)
-      .json({ success: false, error: "Query too long — max 300 characters" });
-
-  if (body.taste) {
-    body.taste = {
-      cats: Array.isArray(body.taste.cats)
-        ? body.taste.cats.slice(0, 13).map(String)
-        : [],
-      loved: Array.isArray(body.taste.loved)
-        ? body.taste.loved.slice(0, 20).map(String)
-        : [],
-      mood:
-        typeof body.taste.mood === "string" ? body.taste.mood.slice(0, 50) : "",
-    };
-  }
-
-  const limit = Math.min(Math.max(parseInt(body.limit) || 6, 1), 12);
-  body.limit = limit;
 
   // ─── Cache check ─────────────────────────────────────────────────────────
   const cacheKey = makeCacheKey(mode, body);
