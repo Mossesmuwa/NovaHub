@@ -461,6 +461,7 @@ export default function Home() {
   const [nlEmail, setNlEmail] = useState("");
   const [nlDone, setNlDone] = useState(false);
   const [heroQuery, setHeroQuery] = useState("");
+  const [windowWidth, setWindowWidth] = useState(null);
   useScrollReveal();
 
   useEffect(() => {
@@ -499,6 +500,16 @@ export default function Home() {
         console.error("[Home] init:", e);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    // Set initial window width
+    setWindowWidth(window.innerWidth);
+
+    // Handle window resize
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   function goSearch() {
@@ -691,7 +702,7 @@ export default function Home() {
                     className="stat-divider"
                     style={{
                       alignSelf: "center",
-                      display: window?.innerWidth > 480 ? "block" : "none",
+                      display: windowWidth > 480 ? "block" : "none",
                     }}
                   />
                 )}
