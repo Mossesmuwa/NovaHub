@@ -10,12 +10,12 @@ export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
   // Only allow in development
-//   if (process.env.NODE_ENV === "production") {
-//     return res.status(403).json({
-//       success: false,
-//       error: "Debug endpoint not available in production",
-//     });
-//   }
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({
+      success: false,
+      error: "Debug endpoint not available in production",
+    });
+  }
 
   const reqId = `[debug-${Date.now()}]`;
   const provider = req.query.provider?.toLowerCase() || "producthunt";
