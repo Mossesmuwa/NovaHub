@@ -10,7 +10,6 @@ const SECTIONS = [
     content: [
       { strong: 'Account info', text: '— Name, email, and profile picture when you register.' },
       { strong: 'Usage data', text: '— Browser type, IP address, and pages visited (anonymised).' },
-      { strong: 'Anonymous sessions', text: '— Temporary UUIDs in localStorage for anon saves and comments.' },
       { strong: 'Taste preferences', text: '— Your onboarding quiz results, stored locally until you sign up.' },
     ],
   },
@@ -32,7 +31,7 @@ const SECTIONS = [
   {
     title: 'Cookies and local storage',
     icon: '◫',
-    body: 'We use localStorage to persist your theme preference, taste profile, and session data. We use cookies for authentication (managed by Supabase). You can clear these at any time in your browser settings.',
+    body: 'We use localStorage to persist your theme preference and taste profile only. Authentication sessions are managed entirely by Supabase using secure cookies. You can clear these at any time in your browser settings.',
   },
   {
     title: 'Changes to this policy',

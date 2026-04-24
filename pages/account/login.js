@@ -53,7 +53,7 @@ export default function LoginPage() {
             <div className="form-group"><label className="form-label" htmlFor="password">Password</label><input className="form-input" type="password" id="password" placeholder="Your password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} /></div>
             <button className="btn-primary" type="submit" disabled={loading}>{loading ? 'Signing in…' : 'Sign In'}</button>
           </form>
-          <div className="anon-note">No account? Browse NovaHub and save up to 10 items — no sign up needed. <Link href="/" style={{ color: 'var(--gold)', fontWeight: 700 }}>Continue anonymously →</Link></div>
+          <div className="browse-note">Just browsing? <Link href="/" style={{ color: 'var(--gold)', fontWeight: 700 }}>Explore NovaHub →</Link> — no account needed to discover content.</div>
           <div className="auth-footer">New to NovaHub? <Link href="/account/register">Create free account</Link></div>
         </div>
       </div>

@@ -31,9 +31,8 @@ export default function UpgradeModal({
         <div style={iconStyle}>✦</div>
         <h2 style={titleStyle}>Join NovaHub</h2>
         <p style={copyStyle}>
-          You&apos;re hitting the limit for anonymous/free saved items. Create a
-          free account to sync your guest favorites, or upgrade to Nova Pro for
-          unlimited saves.
+          Create a free account to save your favorites, post comments, and
+          get personalised AI recommendations — it only takes a moment.
         </p>
         {message && <p style={messageStyle}>{message}</p>}
         <div style={buttonRowStyle}>

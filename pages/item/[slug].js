@@ -354,6 +354,11 @@ export default function ItemPage() {
 
   async function toggleSave() {
     if (!item || saveLoading) return;
+    // Redirect unauthenticated users to login with return URL
+    if (!user) {
+      router.push(`/account/login?return=${encodeURIComponent(router.asPath)}`);
+      return;
+    }
     setSaveLoading(true);
     if (isSaved) {
       await Favorites.removeFavorite(item.id);
@@ -944,55 +949,78 @@ export default function ItemPage() {
           </div>
 
           {/* Comment form */}
-          <form onSubmit={postComment} style={{ marginBottom: 28 }}>
-            <textarea
-              placeholder={
-                user
-                  ? "Add a comment…"
-                  : "Sign in to comment, or post anonymously…"
-              }
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              rows={3}
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                background: "var(--bg3)",
-                border: "1px solid var(--border2)",
-                borderRadius: "var(--r)",
-                padding: "14px 16px",
-                fontSize: 14,
-                fontFamily: "var(--font)",
-                color: "var(--t1)",
-                resize: "vertical",
-                outline: "none",
-                transition: "border-color var(--ease)",
-                lineHeight: 1.6,
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "var(--gold)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "var(--border2)";
-              }}
-            />
+          {user ? (
+            <form onSubmit={postComment} style={{ marginBottom: 28 }}>
+              <textarea
+                placeholder="Add a comment…"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                rows={3}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  background: "var(--bg3)",
+                  border: "1px solid var(--border2)",
+                  borderRadius: "var(--r)",
+                  padding: "14px 16px",
+                  fontSize: 14,
+                  fontFamily: "var(--font)",
+                  color: "var(--t1)",
+                  resize: "vertical",
+                  outline: "none",
+                  transition: "border-color var(--ease)",
+                  lineHeight: 1.6,
+                }}
+                onFocus={(e) => { e.target.style.borderColor = "var(--gold)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "var(--border2)"; }}
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={posting || !commentText.trim()}
+                  style={{ fontSize: 13, padding: "10px 20px" }}
+                >
+                  {posting ? "Posting…" : "Post Comment"}
+                </button>
+              </div>
+            </form>
+          ) : (
             <div
               style={{
+                background: "var(--bg2)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--r)",
+                padding: "20px 24px",
+                marginBottom: 28,
                 display: "flex",
-                justifyContent: "flex-end",
-                marginTop: 10,
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 12,
               }}
             >
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={posting || !commentText.trim()}
-                style={{ fontSize: 13, padding: "10px 20px" }}
-              >
-                {posting ? "Posting…" : "Post Comment"}
-              </button>
+              <p style={{ margin: 0, fontSize: 14, color: "var(--t2)" }}>
+                💬 <strong style={{ color: "var(--t1)" }}>Sign in</strong> to join the conversation.
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Link
+                  href={`/account/login?return=${encodeURIComponent(router.asPath)}`}
+                  className="btn-primary"
+                  style={{ fontSize: 13, padding: "9px 18px" }}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/account/register"
+                  className="btn-secondary"
+                  style={{ fontSize: 13, padding: "9px 18px" }}
+                >
+                  Create Account
+                </Link>
+              </div>
             </div>
-          </form>
+          )}
 
           {/* Comment list */}
           {comments.length === 0 ? (

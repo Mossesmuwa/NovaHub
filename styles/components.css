@@ -201,7 +201,7 @@
 .divider-row { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
 .divider-row span { font-size: 12px; color: var(--t3); font-weight: 500; white-space: nowrap; }
 .divider-row::before, .divider-row::after { content: ""; flex: 1; height: 1px; background: var(--border2); }
-.anon-note { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); padding: 12px 14px; font-size: 13px; color: var(--t2); margin-top: 14px; line-height: 1.55; }
+.browse-note { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rsm); padding: 12px 14px; font-size: 13px; color: var(--t2); margin-top: 14px; line-height: 1.55; }
 .forgot { font-size: 12px; color: var(--t3); text-align: right; margin-top: -6px; margin-bottom: 6px; }
 .forgot a { color: var(--gold); }
 .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
@@ -372,7 +372,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .comment-textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--rsm); padding: 12px 14px; font-family: var(--font); font-size: 16px; color: var(--t1); resize: vertical; min-height: 90px; outline: none; transition: border-color var(--ease); margin-bottom: 12px; -webkit-appearance: none; }
 .comment-textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
 .comment-form-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-.comment-anon-note { font-size: 12px; color: var(--t3); }
+
 .comment-error { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.2); border-radius: var(--rsm); padding: 10px 14px; font-size: 13px; color: #FF453A; margin-top: 10px; }
 .comment-error.hidden { display: none; }
 .comment-item { padding: 18px 0; border-bottom: 1px solid var(--border); }
