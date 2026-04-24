@@ -19,7 +19,7 @@
 //   source.addEventListener('error', (e) => { console.error(e.data); source.close(); });
 
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "../../lib/supabaseClient";
 import crypto from "crypto";
 import { getEnvCredential } from "../../lib/helpers";
 
@@ -30,11 +30,6 @@ const anthropicKey = getEnvCredential(
   "ANTHROPIC_ACCESS_TOKEN",
 );
 const anthropic = new Anthropic({ apiKey: anthropicKey });
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
 
 // ─── SSE helpers ──────────────────────────────────────────────────────────────
 function sendEvent(res, event, data) {
@@ -55,6 +50,7 @@ function makeCacheKey(mode, params) {
 
 async function getCached(cacheKey) {
   try {
+    const supabase = getSupabase();
     const { data } = await supabase
       .from("ai_cache")
       .select("response, hit_count")
@@ -75,6 +71,7 @@ async function getCached(cacheKey) {
 }
 
 async function setCache(cacheKey, mode, response) {
+  const supabase = getSupabase();
   const expires = new Date(Date.now() + CACHE_TTL_MS).toISOString();
   await supabase.from("ai_cache").upsert(
     {
@@ -125,6 +122,7 @@ function buildPrompt(mode, params) {
 // ─── Output verification — cross-check each item against Supabase ─────────────
 async function verifyItem(item) {
   try {
+    const supabase = getSupabase();
     const { data } = await supabase
       .from("items")
       .select(

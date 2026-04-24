@@ -4,7 +4,7 @@
 // Google Books API is free, no key required for basic queries
 // (but add GOOGLE_BOOKS_API_KEY to Vercel env for higher quota).
 
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
@@ -23,12 +23,6 @@ const SUBJECTS = [
   "game design",
   "philosophy mind",
 ];
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
 
 function slugify(str) {
   return str
@@ -106,7 +100,10 @@ async function fetchSubject(subject) {
 }
 
 async function upsertItems(items) {
-  const { error } = await supabase.from("items").upsert(items, {
+  if (!supabaseAdmin) {
+    throw new Error("Admin client not initialized");
+  }
+  const { error } = await supabaseAdmin.from("items").upsert(items, {
     onConflict: "source_id,source_name",
     ignoreDuplicates: false,
   });

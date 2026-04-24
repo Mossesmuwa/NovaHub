@@ -14,15 +14,9 @@
 //   - Items with no recent activity decay toward zero over ~70 days
 //   - A fresh item with 10 saves beats an old item with 10,000 views
 
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "../../lib/supabaseAdmin";
 
 export const config = { maxDuration: 60 };
-
-// Service role bypasses RLS — required for bulk updates
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-);
 
 // ─── Decay function ───────────────────────────────────────────────────────────
 // Returns a value between 0 and 1.
@@ -45,6 +39,8 @@ function daysSince(isoTimestamp) {
 const BATCH_SIZE = 200;
 
 async function processBatch(items) {
+  if (!supabaseAdmin) throw new Error("Admin client not initialized");
+
   const updates = items.map((item) => {
     const raw =
       (item.click_count || 0) * 0.2 +
@@ -60,7 +56,7 @@ async function processBatch(items) {
   });
 
   // Upsert all scores in one query
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("items")
     .upsert(updates, { onConflict: "id" });
 
@@ -71,8 +67,10 @@ async function processBatch(items) {
 // ─── Mark top-N as trending ───────────────────────────────────────────────────
 // After scores are written, flip the `trending` boolean on the top 20
 async function markTrending() {
+  if (!supabaseAdmin) throw new Error("Admin client not initialized");
+
   // Get top 20 by score
-  const { data: topItems, error: fetchErr } = await supabase
+  const { data: topItems, error: fetchErr } = await supabaseAdmin
     .from("items")
     .select("id")
     .eq("approved", true)
@@ -83,11 +81,17 @@ async function markTrending() {
   const topIds = (topItems || []).map((i) => i.id);
 
   // Clear all trending flags
-  await supabase.from("items").update({ trending: false }).neq("id", "none");
+  await supabaseAdmin
+    .from("items")
+    .update({ trending: false })
+    .neq("id", "none");
 
   // Set trending on top items
   if (topIds.length > 0) {
-    await supabase.from("items").update({ trending: true }).in("id", topIds);
+    await supabaseAdmin
+      .from("items")
+      .update({ trending: true })
+      .in("id", topIds);
   }
 
   return topIds.length;
@@ -109,9 +113,13 @@ export default async function handler(req, res) {
   let page = 0;
 
   try {
+    if (!supabaseAdmin) {
+      throw new Error("Admin client not initialized");
+    }
+
     // Stream through all items in pages
     while (true) {
-      const { data: items, error } = await supabase
+      const { data: items, error } = await supabaseAdmin
         .from("items")
         .select(
           "id, click_count, save_count, view_count, created_at, last_activity_at",

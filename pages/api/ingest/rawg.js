@@ -3,19 +3,13 @@
 // Runs daily at 3am UTC. Pulls top-rated + newly released games.
 // Get free API key: https://rawg.io/apidocs
 
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { getEnvCredential } from "../../../lib/helpers";
 
 export const config = { maxDuration: 60 };
 
 const RAWG_BASE = "https://api.rawg.io/api";
 const BATCH_SIZE = 20;
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
 
 function slugify(str) {
   return str
@@ -80,7 +74,10 @@ function gameToItem(g) {
 }
 
 async function upsertItems(items) {
-  const { error } = await supabase.from("items").upsert(items, {
+  if (!supabaseAdmin) {
+    throw new Error("Admin client not initialized");
+  }
+  const { error } = await supabaseAdmin.from("items").upsert(items, {
     onConflict: "source_id,source_name",
     ignoreDuplicates: false,
   });

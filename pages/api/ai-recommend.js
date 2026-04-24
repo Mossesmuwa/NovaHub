@@ -5,13 +5,12 @@
 
 import { createRateLimit } from "../../lib/rateLimit";
 import { validateRequest } from "../../lib/validation";
+import { getSupabase } from "../../lib/supabaseClient";
+import { getEnvCredential } from "../../lib/helpers";
+import Anthropic from "@anthropic-ai/sdk";
+import crypto from "crypto";
 
 export const config = { maxDuration: 60 };
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
 
 const anthropicKey = getEnvCredential(
   "ANTHROPIC_API_KEY",
@@ -154,6 +153,7 @@ async function crossReference(suggestions) {
   const names = suggestions.map((s) => s.title).filter(Boolean);
   let dbItems = [];
   if (slugs.length || names.length) {
+    const supabase = getSupabase();
     const orFilter = [
       ...slugs.map((s) => `slug.eq.${s}`),
       ...names.map((n) => `name.ilike.${n}`),
