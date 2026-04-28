@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pipeline:sync": "node -e \"Promise.all([import('./lib/ingest/TMDBProvider.js'),import('./lib/ingest/ProductHuntProvider.js')]).then(async([t,p])=>{const r1=await new t.TMDBProvider().sync();const r2=await new p.ProductHuntProvider().sync();console.log('Done',JSON.stringify([r1,r2],null,2))})\""
+    "pipeline:sync": "node -e \"Promise.all([import('./lib/pipeline/SyncEngine.js'),import('./lib/pipeline/TMDBProvider.js'),import('./lib/pipeline/ProductHuntProvider.js'),import('./lib/pipeline/BooksProvider.js')]).then(async([s,t,p,b])=>{const e=new s.SyncEngine({skipAI:true});const r1=await e.syncProvider(new t.TMDBProvider({limit:20}));const r2=await e.syncProvider(new p.ProductHuntProvider({limit:20}));const r3=await e.syncProvider(new b.BooksProvider({limit:10,subjectsPerRun:3}));console.log('Done',JSON.stringify([r1,r2,r3],null,2))})\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

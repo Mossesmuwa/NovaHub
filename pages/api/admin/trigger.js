@@ -159,9 +159,22 @@ export default async function handler(req, res) {
       return new TMDBProvider({ limit: 20 }).sync();
     },
     producthunt: async () => {
+      const { SyncEngine } =
+        await import("../../../lib/pipeline/SyncEngine.js");
       const { ProductHuntProvider } =
-        await import("../../../lib/ingest/ProductHuntProvider");
-      return new ProductHuntProvider({ limit: 20 }).sync();
+        await import("../../../lib/pipeline/ProductHuntProvider.js");
+      const engine = new SyncEngine({ skipAI: true });
+      const provider = new ProductHuntProvider({ limit: 20 });
+      return engine.syncProvider(provider);
+    },
+    books: async () => {
+      const { SyncEngine } =
+        await import("../../../lib/pipeline/SyncEngine.js");
+      const { BooksProvider } =
+        await import("../../../lib/pipeline/BooksProvider.js");
+      const engine = new SyncEngine({ skipAI: true });
+      const provider = new BooksProvider({ limit: 10, subjectsPerRun: 3 });
+      return engine.syncProvider(provider);
     },
   };
 
