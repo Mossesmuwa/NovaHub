@@ -1,4 +1,4 @@
-// pages/account/delete.js
+// pages/api/account/delete.js
 // Permanently deletes a user account and all associated data.
 // Requires: SUPABASE_SERVICE_ROLE_KEY (to delete from auth.users)
 // Called from dashboard settings → danger zone
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   } = await userClient.auth.getUser();
   if (error || !user) return res.status(401).json({ error: "Invalid session" });
 
-  const admin = getAdminClient();
+  const admin = supabaseAdmin;
 
   try {
     // ── 1. Get profile for Stripe customer ID ────────────────────────────────
