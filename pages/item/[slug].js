@@ -9,6 +9,7 @@ import Link from "next/link";
 import * as Items from "../../lib/items";
 import * as Favorites from "../../lib/favorites";
 import * as Comments from "../../lib/comments";
+import AddToList from "../../components/AddToList";
 import { getCategoryInfo } from "../../lib/helpers";
 import { useSupabase } from "../../lib/SupabaseContext";
 

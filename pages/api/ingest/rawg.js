@@ -1,31 +1,20 @@
 // pages/api/ingest/rawg.js
-// Vercel Cron: 0 3 * * * (3am UTC)
-// Get API key: https://rawg.io/login?forward=developer
+// NovaHub — RAWG Games Ingestion Cron
+// Runs daily at 3am UTC via Vercel Cron.
 
 import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
 import { RAWGProvider } from "../../../lib/pipeline/RAWGProvider.js";
+import { isAuthorizedCron } from "../../../lib/helpers.js";
 
 export const config = { maxDuration: 60 };
 
 export default async function handler(req, res) {
-  if (!["GET", "POST"].includes(req.method)) return res.status(405).end();
-
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret)
-    return res.status(500).json({ error: "CRON_SECRET not set" });
-  if (req.headers.authorization !== `Bearer ${cronSecret}`) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  if (!process.env.RAWG_API_KEY) {
-    return res.status(500).json({
-      error: "RAWG_API_KEY not set",
-      note: "Get a free key at rawg.io/login?forward=developer",
-    });
+  if (!isAuthorizedCron(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
   }
 
   try {
-    const engine = new SyncEngine({ skipAI: true });
+    const engine = new SyncEngine({ skipAI: false });
     const provider = new RAWGProvider({ limit: 20 });
     const result = await engine.syncProvider(provider);
 
