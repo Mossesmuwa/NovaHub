@@ -155,7 +155,8 @@ export default async function handler(req, res) {
 
   const PROVIDERS = {
     tmdb: async () => {
-      const { TMDBProvider } = await import("../../../lib/ingest/TMDBProvider");
+      const { TMDBProvider } =
+        await import("../../../lib/pipeline/TMDBProvider");
       return new TMDBProvider({ limit: 20 }).sync();
     },
     producthunt: async () => {
