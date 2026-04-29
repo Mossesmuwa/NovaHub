@@ -769,6 +769,7 @@ export default function ItemPage() {
                 >
                   {shareState === "copied" ? "✓ Copied!" : "↗ Share"}
                 </button>
+                <AddToList itemId={item.id} itemName={item.name} />
 
                 <Link
                   href={`/category?cat=${item.category_id}`}
@@ -972,10 +973,20 @@ export default function ItemPage() {
                   transition: "border-color var(--ease)",
                   lineHeight: 1.6,
                 }}
-                onFocus={(e) => { e.target.style.borderColor = "var(--gold)"; }}
-                onBlur={(e) => { e.target.style.borderColor = "var(--border2)"; }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--gold)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border2)";
+                }}
               />
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: 10,
+                }}
+              >
                 <button
                   type="submit"
                   className="btn-primary"
@@ -1002,7 +1013,8 @@ export default function ItemPage() {
               }}
             >
               <p style={{ margin: 0, fontSize: 14, color: "var(--t2)" }}>
-                💬 <strong style={{ color: "var(--t1)" }}>Sign in</strong> to join the conversation.
+                💬 <strong style={{ color: "var(--t1)" }}>Sign in</strong> to
+                join the conversation.
               </p>
               <div style={{ display: "flex", gap: 8 }}>
                 <Link
