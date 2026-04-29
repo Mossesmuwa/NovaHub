@@ -1,20 +1,7 @@
 // pages/api/ingest/rawg.js
-// ⚠️ DISABLED - RAWGProvider not yet implemented
 // Vercel Cron: 0 3 * * * (3am UTC)
 // Get API key: https://rawg.io/login?forward=developer
 
-export const config = { maxDuration: 60 };
-
-export default async function handler(req, res) {
-  // Temporarily disabled until RAWGProvider is implemented
-  return res.status(501).json({
-    error: "RAWG ingestion not yet implemented",
-    note: "To enable: Create lib/pipeline/RAWGProvider.js extending BaseProvider",
-  });
-}
-
-/*
-// ORIGINAL CODE (disabled until implementation)
 import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
 import { RAWGProvider } from "../../../lib/pipeline/RAWGProvider.js";
 
@@ -31,17 +18,15 @@ export default async function handler(req, res) {
   }
 
   if (!process.env.RAWG_API_KEY) {
-    return res
-      .status(500)
-      .json({
-        error:
-          "RAWG_API_KEY not set — get it at rawg.io/login?forward=developer",
-      });
+    return res.status(500).json({
+      error: "RAWG_API_KEY not set",
+      note: "Get a free key at rawg.io/login?forward=developer",
+    });
   }
 
   try {
     const engine = new SyncEngine({ skipAI: true });
-    const provider = new RAWGProvider({ limit: 20, mode: "both" });
+    const provider = new RAWGProvider({ limit: 20 });
     const result = await engine.syncProvider(provider);
 
     return res.status(200).json({ success: true, ...result });
@@ -50,4 +35,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
-*/
