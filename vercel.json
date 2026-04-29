@@ -1,8 +1,9 @@
 {
   "crons": [
-    {
-      "path": "/api/cron",
-      "schedule": "0 2 * * *"
-    }
+    { "path": "/api/ingest/tmdb", "schedule": "0 2 * * *" },
+    { "path": "/api/ingest/producthunt", "schedule": "0 5 * * *" },
+    { "path": "/api/ingest/rawg", "schedule": "0 3 * * *" },
+    { "path": "/api/ingest/books", "schedule": "0 4 * * *" },
+    { "path": "/api/pulse", "schedule": "0 6 * * *" }
   ]
 }
