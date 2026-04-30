@@ -1,7 +1,5 @@
 // pages/api/admin/trigger.js
-// Accepts two auth methods:
-// 1. Supabase JWT (from admin UI) — verifies user + checks is_admin
-// 2. CRON_SECRET as Bearer token (for direct API calls)
+// Accepts Supabase JWT (from admin UI) or CRON_SECRET directly.
 
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
@@ -15,19 +13,16 @@ export default async function handler(req, res) {
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice(7).trim()
     : "";
+  if (!token) return res.status(401).json({ error: "No authorization token" });
 
-  if (!token)
-    return res.status(401).json({ error: "No authorization token provided" });
-
-  // ── Auth method 1: CRON_SECRET direct key ──────────────────────────────────
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && token === cronSecret) {
+  // Auth method 1: CRON_SECRET
+  if (process.env.CRON_SECRET && token === process.env.CRON_SECRET) {
     return runProviders(req, res, "cron");
   }
 
-  // ── Auth method 2: Supabase JWT + is_admin check ───────────────────────────
+  // Auth method 2: Supabase JWT + is_admin
   try {
-    const anonClient = createClient(
+    const client = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
@@ -35,19 +30,12 @@ export default async function handler(req, res) {
         auth: { persistSession: false },
       },
     );
-
     const {
       data: { user },
-      error: userErr,
-    } = await anonClient.auth.getUser();
-    if (userErr || !user) {
-      return res
-        .status(401)
-        .json({
-          error: "Invalid or expired session",
-          detail: userErr?.message,
-        });
-    }
+      error,
+    } = await client.auth.getUser();
+    if (error || !user)
+      return res.status(401).json({ error: "Invalid session" });
 
     const { data: profile } = await supabaseAdmin
       .from("profiles")
@@ -55,12 +43,11 @@ export default async function handler(req, res) {
       .eq("id", user.id)
       .single();
 
-    if (!profile?.is_admin) {
+    if (!profile?.is_admin)
       return res.status(403).json({
         error: "Admin access required",
-        fix: `Run in Supabase SQL: UPDATE profiles SET is_admin = TRUE WHERE id = '${user.id}';`,
+        fix: `UPDATE profiles SET is_admin = TRUE WHERE id = '${user.id}';`,
       });
-    }
 
     return runProviders(req, res, profile.display_name || user.email);
   } catch (err) {
@@ -72,60 +59,87 @@ async function runProviders(req, res, authAs) {
   const { provider = "all" } = req.body || {};
   const results = {};
 
-  if (provider === "all" || provider === "tmdb") {
+  async function run(key, fn) {
     try {
-      const { SyncEngine } =
-        await import("../../../lib/pipeline/SyncEngine.js");
-      const { TMDBProvider } =
-        await import("../../../lib/pipeline/TMDBProvider.js");
-      results.tmdb = await new SyncEngine({ skipAI: true }).syncProvider(
-        new TMDBProvider({ pages: 3 }),
-      );
+      console.log(`[trigger] Running ${key}...`);
+      results[key] = await fn();
+      console.log(`[trigger] ${key} done:`, JSON.stringify(results[key]));
     } catch (err) {
-      results.tmdb = { error: err.message };
+      console.error(`[trigger] ${key} error:`, err.message);
+      results[key] = { error: err.message };
     }
+  }
+
+  if (provider === "all" || provider === "tmdb") {
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { TMDBProvider } =
+      await import("../../../lib/pipeline/TMDBProvider.js");
+    await run("tmdb", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
+        new TMDBProvider({ pages: 3 }),
+      ),
+    );
   }
 
   if (provider === "all" || provider === "producthunt") {
-    try {
-      const { SyncEngine } =
-        await import("../../../lib/pipeline/SyncEngine.js");
-      const { ProductHuntProvider } =
-        await import("../../../lib/pipeline/ProductHuntProvider.js");
-      results.producthunt = await new SyncEngine({ skipAI: true }).syncProvider(
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { ProductHuntProvider } =
+      await import("../../../lib/pipeline/ProductHuntProvider.js");
+    await run("producthunt", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
         new ProductHuntProvider({ limit: 50 }),
-      );
-    } catch (err) {
-      results.producthunt = { error: err.message };
-    }
+      ),
+    );
   }
 
   if (provider === "all" || provider === "rawg") {
-    try {
-      const { SyncEngine } =
-        await import("../../../lib/pipeline/SyncEngine.js");
-      const { RAWGProvider } =
-        await import("../../../lib/pipeline/RAWGProvider.js");
-      results.rawg = await new SyncEngine({ skipAI: true }).syncProvider(
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { RAWGProvider } =
+      await import("../../../lib/pipeline/RAWGProvider.js");
+    await run("rawg", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
         new RAWGProvider({ limit: 20 }),
-      );
-    } catch (err) {
-      results.rawg = { error: err.message };
-    }
+      ),
+    );
   }
 
   if (provider === "all" || provider === "books") {
-    try {
-      const { SyncEngine } =
-        await import("../../../lib/pipeline/SyncEngine.js");
-      const { BooksProvider } =
-        await import("../../../lib/pipeline/BooksProvider.js");
-      results.books = await new SyncEngine({ skipAI: true }).syncProvider(
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { BooksProvider } =
+      await import("../../../lib/pipeline/BooksProvider.js");
+    await run("books", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
         new BooksProvider({ limitPerQuery: 5 }),
-      );
-    } catch (err) {
-      results.books = { error: err.message };
-    }
+      ),
+    );
+  }
+
+  if (provider === "all" || provider === "github") {
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { GitHubProvider } =
+      await import("../../../lib/pipeline/GitHubProvider.js");
+    await run("github", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
+        new GitHubProvider({ limit: 30, since: "weekly" }),
+      ),
+    );
+  }
+
+  if (provider === "all" || provider === "hackernews") {
+    const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+    const { HackerNewsProvider } =
+      await import("../../../lib/pipeline/HackerNewsProvider.js");
+    await run("hackernews", () =>
+      new SyncEngine({ skipAI: true }).syncProvider(
+        new HackerNewsProvider({ limit: 30 }),
+      ),
+    );
+  }
+
+  if (provider === "all" || provider === "omdb") {
+    const { enrichMovies } =
+      await import("../../../lib/pipeline/OMDBEnricher.js");
+    await run("omdb", () => enrichMovies());
   }
 
   return res.status(200).json({ success: true, auth_as: authAs, results });

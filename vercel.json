@@ -1,9 +1,12 @@
 {
   "crons": [
-    { "path": "/api/ingest/tmdb", "schedule": "0 2 * * *" },
+    { "path": "/api/ingest/tmdb",        "schedule": "0 2 * * *" },
     { "path": "/api/ingest/producthunt", "schedule": "0 5 * * *" },
-    { "path": "/api/ingest/rawg", "schedule": "0 3 * * *" },
-    { "path": "/api/ingest/books", "schedule": "0 4 * * *" },
-    { "path": "/api/pulse", "schedule": "0 6 * * *" }
+    { "path": "/api/ingest/rawg",        "schedule": "0 3 * * *" },
+    { "path": "/api/ingest/books",       "schedule": "0 4 * * *" },
+    { "path": "/api/ingest/github",      "schedule": "0 1 * * *" },
+    { "path": "/api/ingest/hackernews",  "schedule": "0 8 * * *" },
+    { "path": "/api/ingest/omdb",        "schedule": "0 7 * * *" },
+    { "path": "/api/pulse",              "schedule": "0 6 * * *" }
   ]
 }
