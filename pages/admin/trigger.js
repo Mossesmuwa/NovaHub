@@ -1,6 +1,5 @@
 // pages/admin/trigger.js
-// Key fix: calls supabase.auth.getSession() fresh before EVERY API call,
-// never caches the token. A stale token was the likely cause of 403s.
+// Admin UI — triggers ingestion providers manually.
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -12,15 +11,25 @@ const PROVIDERS = [
     key: "tmdb",
     label: "TMDB",
     icon: "🎬",
-    desc: "Trending movies + TV",
-    env: "TMDB_BEARER_TOKEN",
+    desc: "Movies + TV from TMDB (3 pages × 12 endpoints)",
   },
   {
     key: "producthunt",
     label: "Product Hunt",
     icon: "🚀",
-    desc: "Trending tools",
-    env: "PRODUCTHUNT_DEVELOPER_TOKEN",
+    desc: "Trending tools from Product Hunt (50 posts)",
+  },
+  {
+    key: "rawg",
+    label: "RAWG Games",
+    icon: "🎮",
+    desc: "Top-rated games from RAWG.io (needs RAWG_API_KEY)",
+  },
+  {
+    key: "books",
+    label: "Google Books",
+    icon: "📚",
+    desc: "Curated books from Google Books API",
   },
 ];
 
@@ -30,9 +39,9 @@ export default function AdminTrigger() {
   const [results, setResults] = useState({});
   const [running, setRunning] = useState({});
   const [itemCount, setItemCount] = useState(null);
+  const [breakdown, setBreakdown] = useState([]);
   const [envStatus, setEnvStatus] = useState(null);
 
-  // Redirect non-admins
   useEffect(() => {
     if (!loading) {
       if (!user) router.replace("/account/login");
@@ -40,34 +49,43 @@ export default function AdminTrigger() {
     }
   }, [user, profile, loading]);
 
-  // Load item count + env status on mount
   useEffect(() => {
     if (!profile?.is_admin) return;
-
-    supabase
-      .from("items")
-      .select("*", { count: "exact", head: true })
-      .then(({ count }) => setItemCount(count));
-
-    // Check env vars
+    loadStats();
     fetch("/api/admin/env-check")
       .then((r) => r.json())
       .then(setEnvStatus)
       .catch(() => {});
   }, [profile]);
 
-  // ── Get fresh session token every time ──────────────────────────────────────
+  async function loadStats() {
+    const { count } = await supabase
+      .from("items")
+      .select("*", { count: "exact", head: true });
+    setItemCount(count);
+
+    // Get breakdown by source
+    const { data } = await supabase
+      .from("items")
+      .select("source_name")
+      .eq("approved", true);
+
+    if (data) {
+      const counts = data.reduce((acc, row) => {
+        acc[row.source_name] = (acc[row.source_name] || 0) + 1;
+        return acc;
+      }, {});
+      setBreakdown(Object.entries(counts).sort((a, b) => b[1] - a[1]));
+    }
+  }
+
   async function getFreshToken() {
-    // Always refresh — never use a cached token
     const {
       data: { session },
       error,
     } = await supabase.auth.getSession();
-    if (error || !session?.access_token) {
-      throw new Error(
-        "Could not get session. Please reload the page and try again.",
-      );
-    }
+    if (error || !session?.access_token)
+      throw new Error("Could not get session — reload and try again.");
     return session.access_token;
   }
 
@@ -77,29 +95,20 @@ export default function AdminTrigger() {
 
     try {
       const token = await getFreshToken();
-
       const res = await fetch("/api/admin/trigger", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // fresh token every call
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ provider: providerKey }),
       });
-
       const data = await res.json();
       setResults((p) => ({
         ...p,
         [providerKey]: { ...data, status: res.status },
       }));
-
-      // Refresh item count after successful ingestion
-      if (res.ok) {
-        const { count } = await supabase
-          .from("items")
-          .select("*", { count: "exact", head: true });
-        setItemCount(count);
-      }
+      if (res.ok) loadStats();
     } catch (e) {
       setResults((p) => ({
         ...p,
@@ -112,6 +121,17 @@ export default function AdminTrigger() {
 
   async function triggerAll() {
     for (const p of PROVIDERS) await trigger(p.key);
+  }
+
+  function getResultSummary(key, res) {
+    if (!res?.success) return null;
+    const r = res.results?.[key] || res.results;
+    if (!r) return "complete";
+    if (key === "tmdb") return `${r.synced || 0} synced`;
+    if (key === "producthunt") return `${r.synced || 0} tools synced`;
+    if (key === "rawg") return `${r.synced || 0} games synced`;
+    if (key === "books") return `${r.synced || 0} books synced`;
+    return `${r.synced || r.count || 0} synced`;
   }
 
   if (loading || !profile?.is_admin)
@@ -190,7 +210,7 @@ export default function AdminTrigger() {
                 Admin Panel
               </h1>
               <p style={{ fontSize: 13, color: "#636366", margin: 0 }}>
-                Logged in as {profile?.display_name || user.email}
+                {profile?.display_name || user.email}
               </p>
             </div>
             <button
@@ -198,48 +218,56 @@ export default function AdminTrigger() {
               onClick={triggerAll}
               disabled={anyRunning}
             >
-              {anyRunning ? "⟳ Running…" : "▶ Run All"}
+              {anyRunning ? "⟳ Running…" : "▶ Run All Providers"}
             </button>
           </div>
         </div>
 
         {/* Stats */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(140px,1fr))",
+            gap: 12,
+            marginBottom: 24,
+          }}
+        >
           <div
             style={{
-              flex: 1,
               padding: "16px 20px",
               background: "#111116",
               border: "1px solid rgba(255,255,255,.07)",
               borderRadius: 12,
             }}
           >
-            <div style={{ fontSize: 24, fontWeight: 900, color: "#C9A84C" }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#C9A84C" }}>
               {itemCount ?? "…"}
             </div>
             <div style={{ fontSize: 12, color: "#636366", marginTop: 2 }}>
-              Items in DB
+              Total items
             </div>
           </div>
-          <div
-            style={{
-              flex: 1,
-              padding: "16px 20px",
-              background: "#111116",
-              border: "1px solid rgba(255,255,255,.07)",
-              borderRadius: 12,
-            }}
-          >
-            <div style={{ fontSize: 24, fontWeight: 900, color: "#C9A84C" }}>
-              {PROVIDERS.length}
+          {breakdown.map(([source, count]) => (
+            <div
+              key={source}
+              style={{
+                padding: "16px 20px",
+                background: "#111116",
+                border: "1px solid rgba(255,255,255,.07)",
+                borderRadius: 12,
+              }}
+            >
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#C9A84C" }}>
+                {count}
+              </div>
+              <div style={{ fontSize: 12, color: "#636366", marginTop: 2 }}>
+                {source}
+              </div>
             </div>
-            <div style={{ fontSize: 12, color: "#636366", marginTop: 2 }}>
-              Providers
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Env status */}
+        {/* Env check */}
         {envStatus && (
           <div
             style={{
@@ -260,7 +288,7 @@ export default function AdminTrigger() {
                 marginBottom: 12,
               }}
             >
-              Environment check
+              Environment
             </div>
             <div
               style={{
@@ -288,19 +316,6 @@ export default function AdminTrigger() {
                 </div>
               ))}
             </div>
-            {envStatus.VERCEL_ENV && (
-              <div style={{ marginTop: 10, fontSize: 11, color: "#3A3A3C" }}>
-                Vercel env:{" "}
-                <strong style={{ color: "#636366" }}>
-                  {envStatus.VERCEL_ENV}
-                </strong>
-                {envStatus.VERCEL_ENV !== "production" && (
-                  <span style={{ color: "#FF9F0A", marginLeft: 8 }}>
-                    ⚠ Not production — env vars may differ
-                  </span>
-                )}
-              </div>
-            )}
           </div>
         )}
 
@@ -311,6 +326,7 @@ export default function AdminTrigger() {
             const active = running[p.key];
             const ok = res?.success;
             const isErr = res && !ok;
+            const summary = getResultSummary(p.key, res);
 
             return (
               <div className="card" key={p.key}>
@@ -411,7 +427,6 @@ export default function AdminTrigger() {
                   </button>
                 </div>
 
-                {/* Result */}
                 {res && (
                   <div
                     style={{
@@ -432,12 +447,7 @@ export default function AdminTrigger() {
                           fontWeight: 600,
                         }}
                       >
-                        ✓ Done —{" "}
-                        {res.results?.tmdb
-                          ? `${res.results.tmdb.movies || 0} movies, ${res.results.tmdb.tv || 0} TV`
-                          : res.results?.producthunt
-                            ? `${res.results.producthunt.count || 0} tools`
-                            : "complete"}
+                        ✓ {summary}
                       </div>
                     ) : (
                       <div>
@@ -452,11 +462,6 @@ export default function AdminTrigger() {
                           ✗ {res.error || "Failed"}{" "}
                           {res.status ? `(${res.status})` : ""}
                         </div>
-                        {res.step && (
-                          <div style={{ fontSize: 11, color: "#636366" }}>
-                            Failed at step {res.step}
-                          </div>
-                        )}
                         {res.fix && (
                           <div
                             style={{
@@ -472,6 +477,28 @@ export default function AdminTrigger() {
                             Fix: {res.fix}
                           </div>
                         )}
+                        {/* Show full error JSON for debugging */}
+                        <details style={{ marginTop: 8 }}>
+                          <summary
+                            style={{
+                              fontSize: 11,
+                              color: "#636366",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Full response
+                          </summary>
+                          <pre
+                            style={{
+                              fontSize: 10,
+                              color: "#636366",
+                              marginTop: 6,
+                              overflow: "auto",
+                            }}
+                          >
+                            {JSON.stringify(res, null, 2)}
+                          </pre>
+                        </details>
                       </div>
                     )}
                   </div>
@@ -481,7 +508,6 @@ export default function AdminTrigger() {
           })}
         </div>
 
-        {/* Cron note */}
         <div
           style={{
             marginTop: 28,
@@ -495,12 +521,12 @@ export default function AdminTrigger() {
           }}
         >
           <strong style={{ color: "#C9A84C" }}>Cron schedule:</strong> TMDB 2am
-          · PH 5am · Pulse 1am (UTC).
+          · PH 5am · RAWG 3am · Books 4am · Pulse 6am (UTC daily).
           <br />
-          If crons return 401, check Vercel → Settings → Environment Variables →
-          ensure <code style={{ color: "#AEAEB2" }}>CRON_SECRET</code> is set
-          for <strong style={{ color: "#FF9F0A" }}>Production</strong>, not just
-          Preview.
+          RAWG requires <code style={{ color: "#AEAEB2" }}>
+            RAWG_API_KEY
+          </code>{" "}
+          in Vercel env vars — free at rawg.io.
         </div>
       </div>
     </>
