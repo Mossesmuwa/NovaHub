@@ -1,6 +1,4 @@
 // pages/admin/trigger.js
-// Admin UI — triggers ingestion providers manually.
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../lib/supabase";
@@ -10,43 +8,97 @@ const PROVIDERS = [
     key: "tmdb",
     label: "TMDB",
     icon: "🎬",
-    desc: "Movies + TV · 3 pages × 12 endpoints · ~500 items",
+    desc: "Movies + TV · ~500 items",
+    needsKey: false,
   },
   {
     key: "producthunt",
     label: "Product Hunt",
     icon: "🚀",
     desc: "Trending tools · 50 posts",
+    needsKey: false,
   },
   {
     key: "rawg",
     label: "RAWG Games",
     icon: "🎮",
-    desc: "Top-rated games · needs RAWG_API_KEY",
+    desc: "Top games · 40 items",
+    needsKey: true,
+    keyName: "RAWG_API_KEY",
   },
   {
     key: "books",
     label: "Google Books",
     icon: "📚",
-    desc: "Curated books across 8 subjects",
+    desc: "Curated books · 8 subjects",
+    needsKey: false,
   },
   {
     key: "github",
     label: "GitHub",
     icon: "⚡",
-    desc: "Trending repos this week · 30 items",
+    desc: "Trending repos · 30 items",
+    needsKey: false,
   },
   {
     key: "hackernews",
     label: "Hacker News",
     icon: "🔶",
-    desc: "Top HN stories today · 30 items",
+    desc: "Top stories · 30 items",
+    needsKey: false,
+  },
+  {
+    key: "steam",
+    label: "Steam",
+    icon: "🖥️",
+    desc: "Top PC games · 40 items",
+    needsKey: false,
+  },
+  {
+    key: "arxiv",
+    label: "arXiv",
+    icon: "🔬",
+    desc: "Research papers · 30 items",
+    needsKey: false,
+  },
+  {
+    key: "reddit",
+    label: "Reddit",
+    icon: "🟠",
+    desc: "Top posts across subreddits",
+    needsKey: false,
+  },
+  {
+    key: "spotify",
+    label: "Spotify",
+    icon: "🎵",
+    desc: "Trending music · 40 items",
+    needsKey: true,
+    keyName: "SPOTIFY_CLIENT_ID",
+  },
+  {
+    key: "nyt",
+    label: "NYT Books",
+    icon: "📰",
+    desc: "Bestseller lists",
+    needsKey: true,
+    keyName: "NYT_API_KEY",
+  },
+  {
+    key: "youtube",
+    label: "YouTube",
+    icon: "▶️",
+    desc: "Trending videos · 50 items",
+    needsKey: true,
+    keyName: "YOUTUBE_API_KEY",
   },
   {
     key: "omdb",
     label: "OMDB Enricher",
     icon: "⭐",
-    desc: "Adds IMDB + RT + Metacritic to movies",
+    desc: "Adds IMDB+RT+Metacritic to movies",
+    needsKey: true,
+    keyName: "OMDB_API_KEY",
   },
 ];
 
@@ -57,8 +109,7 @@ export default function AdminTrigger() {
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState({});
   const [running, setRunning] = useState({});
-  const [breakdown, setBreakdown] = useState([]);
-  const [itemCount, setItemCount] = useState(null);
+  const [stats, setStats] = useState({ total: null, breakdown: [] });
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -69,7 +120,7 @@ export default function AdminTrigger() {
       setUser(user);
       supabase
         .from("profiles")
-        .select("is_admin, display_name")
+        .select("is_admin,display_name")
         .eq("id", user.id)
         .single()
         .then(({ data }) => {
@@ -89,7 +140,6 @@ export default function AdminTrigger() {
       .from("items")
       .select("*", { count: "exact", head: true })
       .eq("approved", true);
-    setItemCount(count);
     const { data } = await supabase
       .from("items")
       .select("source_name")
@@ -99,7 +149,10 @@ export default function AdminTrigger() {
         acc[r.source_name] = (acc[r.source_name] || 0) + 1;
         return acc;
       }, {});
-      setBreakdown(Object.entries(counts).sort((a, b) => b[1] - a[1]));
+      setStats({
+        total: count,
+        breakdown: Object.entries(counts).sort((a, b) => b[1] - a[1]),
+      });
     }
   }
 
@@ -119,7 +172,7 @@ export default function AdminTrigger() {
         body: JSON.stringify({ provider: key }),
       });
       const data = await res.json();
-      setResults((p) => ({ ...p, [key]: { ...data, status: res.status } }));
+      setResults((p) => ({ ...p, [key]: { ...data, httpStatus: res.status } }));
       if (res.ok) loadStats();
     } catch (e) {
       setResults((p) => ({ ...p, [key]: { error: e.message } }));
@@ -127,16 +180,16 @@ export default function AdminTrigger() {
     setRunning((p) => ({ ...p, [key]: false }));
   }
 
-  async function triggerAll() {
+  async function runAll() {
     for (const p of PROVIDERS) await trigger(p.key);
   }
 
-  function getSummary(key, res) {
+  function summary(key, res) {
     if (!res?.success) return null;
     const r = res.results?.[key];
-    if (!r) return null;
-    if (key === "omdb") return `${r.enriched || 0} movies enriched`;
-    return `${r.synced || 0} items synced`;
+    if (!r) return "done";
+    if (key === "omdb") return `${r.enriched || 0} enriched`;
+    return `${r.synced || 0} synced`;
   }
 
   if (loading)
@@ -154,7 +207,7 @@ export default function AdminTrigger() {
           style={{
             width: 32,
             height: 32,
-            border: "2px solid #333",
+            border: "2px solid #222",
             borderTopColor: "#7C3AED",
             borderRadius: "50%",
             animation: "spin .8s linear infinite",
@@ -168,15 +221,8 @@ export default function AdminTrigger() {
 
   return (
     <>
-      <style>{`
-        *{box-sizing:border-box;margin:0;padding:0}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-        body{background:#09090C;color:#F2F2F7;font-family:Inter,system-ui,sans-serif}
-      `}</style>
-
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
-        {/* Header */}
+      <style>{`*{box-sizing:border-box;margin:0;padding:0}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}body{background:#09090C;color:#F2F2F7;font-family:Inter,system-ui,sans-serif}`}</style>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "40px 20px" }}>
         <div
           style={{
             display: "flex",
@@ -202,7 +248,7 @@ export default function AdminTrigger() {
             </p>
           </div>
           <button
-            onClick={triggerAll}
+            onClick={runAll}
             disabled={anyRunning}
             style={{
               background: "#7C3AED",
@@ -212,11 +258,11 @@ export default function AdminTrigger() {
               padding: "10px 24px",
               fontSize: 14,
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: anyRunning ? "not-allowed" : "pointer",
               opacity: anyRunning ? 0.5 : 1,
             }}
           >
-            {anyRunning ? "⟳ Running..." : "▶ Run All"}
+            {anyRunning ? "⟳ Running..." : "▶ Run All Providers"}
           </button>
         </div>
 
@@ -224,8 +270,8 @@ export default function AdminTrigger() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))",
-            gap: 10,
+            gridTemplateColumns: "repeat(auto-fill,minmax(120px,1fr))",
+            gap: 8,
             marginBottom: 28,
           }}
         >
@@ -234,43 +280,58 @@ export default function AdminTrigger() {
               background: "#111116",
               border: "1px solid rgba(255,255,255,.07)",
               borderRadius: 12,
-              padding: "16px 18px",
+              padding: "14px 16px",
             }}
           >
-            <div style={{ fontSize: 26, fontWeight: 900, color: "#7C3AED" }}>
-              {itemCount ?? "…"}
+            <div style={{ fontSize: 24, fontWeight: 900, color: "#7C3AED" }}>
+              {stats.total ?? "…"}
             </div>
-            <div style={{ fontSize: 12, color: "#636366", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "#636366", marginTop: 2 }}>
               Total items
             </div>
           </div>
-          {breakdown.map(([src, count]) => (
+          {stats.breakdown.map(([src, count]) => (
             <div
               key={src}
               style={{
                 background: "#111116",
                 border: "1px solid rgba(255,255,255,.07)",
                 borderRadius: 12,
-                padding: "16px 18px",
+                padding: "14px 16px",
               }}
             >
-              <div style={{ fontSize: 26, fontWeight: 900, color: "#7C3AED" }}>
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#7C3AED" }}>
                 {count}
               </div>
-              <div style={{ fontSize: 12, color: "#636366", marginTop: 2 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#636366",
+                  marginTop: 2,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {src}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Provider cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Providers */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill,minmax(380px,1fr))",
+            gap: 10,
+          }}
+        >
           {PROVIDERS.map((p) => {
             const res = results[p.key];
             const busy = running[p.key];
             const ok = res?.success;
-            const summary = getSummary(p.key, res);
+            const sum = summary(p.key, res);
 
             return (
               <div
@@ -279,43 +340,60 @@ export default function AdminTrigger() {
                   background: "#18181F",
                   border: "1px solid rgba(255,255,255,.07)",
                   borderRadius: 14,
-                  padding: "20px 22px",
+                  padding: "18px 20px",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     justifyContent: "space-between",
-                    gap: 16,
+                    gap: 12,
                   }}
                 >
                   <div
                     style={{
                       display: "flex",
-                      gap: 14,
+                      gap: 12,
                       alignItems: "flex-start",
                       flex: 1,
+                      minWidth: 0,
                     }}
                   >
-                    <span style={{ fontSize: 26 }}>{p.icon}</span>
-                    <div>
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>
+                      {p.icon}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
                           gap: 8,
-                          marginBottom: 4,
+                          marginBottom: 3,
                         }}
                       >
-                        <span style={{ fontSize: 14, fontWeight: 700 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700 }}>
                           {p.label}
                         </span>
+                        {p.needsKey && (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              background: "rgba(255,159,10,.15)",
+                              color: "#FF9F0A",
+                              padding: "1px 5px",
+                              borderRadius: 4,
+                              fontWeight: 700,
+                            }}
+                          >
+                            KEY
+                          </span>
+                        )}
                         {busy && (
                           <span
                             style={{
-                              width: 7,
-                              height: 7,
+                              width: 6,
+                              height: 6,
                               borderRadius: "50%",
                               background: "#7C3AED",
                               display: "inline-block",
@@ -326,8 +404,8 @@ export default function AdminTrigger() {
                         {!busy && ok && (
                           <span
                             style={{
-                              width: 7,
-                              height: 7,
+                              width: 6,
+                              height: 6,
                               borderRadius: "50%",
                               background: "#30D158",
                               display: "inline-block",
@@ -337,8 +415,8 @@ export default function AdminTrigger() {
                         {!busy && res && !ok && (
                           <span
                             style={{
-                              width: 7,
-                              height: 7,
+                              width: 6,
+                              height: 6,
                               borderRadius: "50%",
                               background: "#FF453A",
                               display: "inline-block",
@@ -346,7 +424,7 @@ export default function AdminTrigger() {
                           />
                         )}
                       </div>
-                      <div style={{ fontSize: 12, color: "#636366" }}>
+                      <div style={{ fontSize: 11, color: "#636366" }}>
                         {p.desc}
                       </div>
                     </div>
@@ -356,13 +434,13 @@ export default function AdminTrigger() {
                     disabled={busy}
                     style={{
                       background: "transparent",
-                      border: "1px solid rgba(255,255,255,.12)",
+                      border: "1px solid rgba(255,255,255,.1)",
                       color: "#AEAEB2",
                       borderRadius: 8,
-                      padding: "8px 18px",
-                      fontSize: 13,
+                      padding: "6px 14px",
+                      fontSize: 12,
                       fontWeight: 600,
-                      cursor: "pointer",
+                      cursor: busy ? "not-allowed" : "pointer",
                       flexShrink: 0,
                       opacity: busy ? 0.5 : 1,
                     }}
@@ -372,24 +450,24 @@ export default function AdminTrigger() {
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: 6,
+                          gap: 5,
                         }}
                       >
                         <span
                           style={{
-                            width: 11,
-                            height: 11,
-                            border: "1.5px solid #555",
+                            width: 10,
+                            height: 10,
+                            border: "1.5px solid #444",
                             borderTopColor: "#7C3AED",
                             borderRadius: "50%",
                             display: "inline-block",
                             animation: "spin .7s linear infinite",
                           }}
                         />
-                        Running
+                        …
                       </span>
                     ) : (
-                      "▶ Run"
+                      "▶"
                     )}
                   </button>
                 </div>
@@ -397,8 +475,8 @@ export default function AdminTrigger() {
                 {res && (
                   <div
                     style={{
-                      marginTop: 14,
-                      padding: "10px 14px",
+                      marginTop: 12,
+                      padding: "8px 12px",
                       borderRadius: 8,
                       background: ok
                         ? "rgba(48,209,88,.05)"
@@ -409,58 +487,36 @@ export default function AdminTrigger() {
                     {ok ? (
                       <span
                         style={{
-                          fontSize: 13,
+                          fontSize: 12,
                           color: "#30D158",
                           fontWeight: 600,
                         }}
                       >
-                        ✓ {summary || "Complete"}
+                        ✓ {sum}
                       </span>
                     ) : (
                       <div>
                         <div
                           style={{
-                            fontSize: 13,
+                            fontSize: 12,
                             color: "#FF453A",
                             fontWeight: 600,
                           }}
                         >
-                          ✗ {res.error || "Failed"}
+                          ✗ {res.error || `HTTP ${res.httpStatus}`}
                         </div>
                         {res.fix && (
                           <div
                             style={{
-                              fontSize: 11,
+                              fontSize: 10,
                               color: "#FF9F0A",
-                              marginTop: 6,
+                              marginTop: 4,
                               fontFamily: "monospace",
                             }}
                           >
-                            Fix: {res.fix}
+                            {res.fix}
                           </div>
                         )}
-                        <details style={{ marginTop: 8 }}>
-                          <summary
-                            style={{
-                              fontSize: 11,
-                              color: "#636366",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Full response
-                          </summary>
-                          <pre
-                            style={{
-                              fontSize: 10,
-                              color: "#636366",
-                              marginTop: 6,
-                              overflow: "auto",
-                              maxHeight: 200,
-                            }}
-                          >
-                            {JSON.stringify(res, null, 2)}
-                          </pre>
-                        </details>
                       </div>
                     )}
                   </div>
@@ -473,13 +529,14 @@ export default function AdminTrigger() {
         <div
           style={{
             marginTop: 24,
-            fontSize: 12,
-            color: "#3a3a3a",
-            lineHeight: 1.8,
+            fontSize: 11,
+            color: "#2a2a2a",
+            lineHeight: 2,
           }}
         >
-          Crons: GitHub 1am · TMDB 2am · RAWG 3am · Books 4am · PH 5am · Pulse
-          6am · OMDB 7am · HN 8am (UTC)
+          Crons (UTC): GitHub 1am · TMDB 2am · RAWG 3am · Books 4am · PH 5am ·
+          Pulse 6am · OMDB 7am · HN 8am · Reddit 9am · arXiv 10am · Steam 11am ·
+          Spotify 12pm · NYT 1pm · YouTube 2pm
         </div>
       </div>
     </>
