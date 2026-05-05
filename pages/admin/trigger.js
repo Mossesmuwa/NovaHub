@@ -1,5 +1,5 @@
 // pages/admin/trigger.js
-// Nova Admin Platform — Unified admin dashboard with providers, analytics, security & settings
+// Nova Admin Panel — Gold theme, full features
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
@@ -222,23 +222,10 @@ export default function AdminPanel() {
     total: null,
     bySource: [],
     byCategory: [],
-    totalItems: 0,
-    approvedItems: 0,
-    pendingItems: 0,
-    totalUsers: 0,
-    proUsers: 0,
   });
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("providers");
   const [logs, setLogs] = useState([]);
   const [filter, setFilter] = useState("all"); // all | content | enricher | needsKey
-  const [searchQuery, setSearchQuery] = useState("");
-  const [anomalies, setAnomalies] = useState([]);
-  const [pendingItems, setPendingItems] = useState([]);
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [apiKeys, setApiKeys] = useState({});
-  const [settings, setSettings] = useState({});
-  const [showNewKeyForm, setShowNewKeyForm] = useState(false);
-  const [newKeyName, setNewKeyName] = useState("");
   const logsRef = useRef(null);
 
   useEffect(() => {
@@ -260,151 +247,50 @@ export default function AdminPanel() {
           }
           setProfile(data);
           setAuthLoading(false);
-          loadAllData();
+          loadStats();
         });
     });
   }, []);
 
-  async function loadAllData() {
-    await Promise.all([
-      loadStats(),
-      loadAnomalies(),
-      loadPendingItems(),
-      loadAuditLogs(),
-      loadApiKeys(),
-      loadSettings(),
-    ]);
+  useEffect(() => {
+    if (logsRef.current)
+      logsRef.current.scrollTop = logsRef.current.scrollHeight;
+  }, [logs]);
+
+  function addLog(msg, type = "info") {
+    const time = new Date().toLocaleTimeString("en", { hour12: false });
+    setLogs((l) => [...l.slice(-99), { msg, type, time, id: Date.now() }]);
   }
 
   async function loadStats() {
-    const [itemsRes, usersRes, sourceRes, catRes] = await Promise.all([
-      supabase.from("items").select("id, approved, category_id, created_at"),
-      supabase.from("profiles").select("id, is_pro, created_at"),
-      supabase.from("items").select("source_name").eq("approved", true),
-      supabase.from("items").select("category_id").eq("approved", true),
-    ]);
-
-    const items = itemsRes.data || [];
-    const users = usersRes.data || [];
-    const sourceData = sourceRes.data || [];
-    const catData = catRes.data || [];
+    const { count } = await supabase
+      .from("items")
+      .select("*", { count: "exact", head: true })
+      .eq("approved", true);
+    const { data: sourceData } = await supabase
+      .from("items")
+      .select("source_name")
+      .eq("approved", true);
+    const { data: catData } = await supabase
+      .from("items")
+      .select("category_id")
+      .eq("approved", true);
 
     const bySource = Object.entries(
-      sourceData.reduce((a, r) => {
+      (sourceData || []).reduce((a, r) => {
         a[r.source_name] = (a[r.source_name] || 0) + 1;
         return a;
       }, {}),
     ).sort((a, b) => b[1] - a[1]);
 
     const byCategory = Object.entries(
-      catData.reduce((a, r) => {
+      (catData || []).reduce((a, r) => {
         a[r.category_id] = (a[r.category_id] || 0) + 1;
         return a;
       }, {}),
     ).sort((a, b) => b[1] - a[1]);
 
-    setStats({
-      total: items.length,
-      bySource,
-      byCategory,
-      totalItems: items.length,
-      approvedItems: items.filter((i) => i.approved).length,
-      pendingItems: items.filter((i) => !i.approved).length,
-      totalUsers: users.length,
-      proUsers: users.filter((u) => u.is_pro).length,
-    });
-  }
-
-  async function loadAnomalies() {
-    const { data } = await supabase
-      .from("trend_anomalies")
-      .select("*, items(name)")
-      .eq("reviewed", false)
-      .order("detected_at", { ascending: false })
-      .limit(20);
-    setAnomalies(data || []);
-  }
-
-  async function loadPendingItems() {
-    const { data } = await supabase
-      .from("pending_items")
-      .select("*")
-      .eq("status", "pending")
-      .order("submitted_at", { ascending: false })
-      .limit(20);
-    setPendingItems(data || []);
-  }
-
-  async function loadAuditLogs() {
-    const { data } = await supabase
-      .from("admin_audit_logs")
-      .select("*, profiles(display_name)")
-      .order("created_at", { ascending: false })
-      .limit(50);
-    setAuditLogs(data || []);
-  }
-
-  async function loadApiKeys() {
-    // For now, manage from settings. In production, use a secure API keys table
-    const keys = {};
-    PROVIDERS.filter((p) => p.needsKey).forEach((p) => {
-      keys[p.keyName] = process.env[p.keyName] ? "●●●●●●●●" : "not set";
-    });
-    setApiKeys(keys);
-  }
-
-  async function loadSettings() {
-    setSettings({
-      rateLimitPerMinute: 60,
-      maxItemsPerRun: 500,
-      enableAutoSync: true,
-      emailOnError: true,
-      maintenanceMode: false,
-    });
-  }
-
-  async function approveItem(pendingId, itemData) {
-    try {
-      const { data: newItem, error } = await supabase
-        .from("items")
-        .insert([{ ...itemData, approved: true }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await supabase
-        .from("pending_items")
-        .update({
-          status: "approved",
-          reviewed_by: user.id,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq("id", pendingId);
-
-      addLog("✓ Item approved", "success");
-      loadPendingItems();
-    } catch (err) {
-      addLog(`✗ Error: ${err.message}`, "error");
-    }
-  }
-
-  async function rejectItem(pendingId) {
-    try {
-      await supabase
-        .from("pending_items")
-        .update({
-          status: "rejected",
-          reviewed_by: user.id,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq("id", pendingId);
-
-      addLog("✓ Item rejected", "success");
-      loadPendingItems();
-    } catch (err) {
-      addLog(`✗ Error: ${err.message}`, "error");
-    }
+    setStats({ total: count, bySource, byCategory });
   }
 
   async function trigger(key) {
@@ -469,23 +355,11 @@ export default function AdminPanel() {
   }
 
   const filteredProviders = PROVIDERS.filter((p) => {
-    const matchesFilter =
-      filter === "content"
-        ? p.group === "content"
-        : filter === "enricher"
-          ? p.group === "enricher"
-          : filter === "needsKey"
-            ? p.needsKey
-            : filter === "free"
-              ? !p.needsKey
-              : true;
-
-    const matchesSearch =
-      searchQuery === "" ||
-      p.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.desc.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesFilter && matchesSearch;
+    if (filter === "content") return p.group === "content";
+    if (filter === "enricher") return p.group === "enricher";
+    if (filter === "needsKey") return p.needsKey;
+    if (filter === "free") return !p.needsKey;
+    return true;
   });
 
   const anyRunning = Object.values(running).some(Boolean);
@@ -931,25 +805,20 @@ export default function AdminPanel() {
               justifyContent: "space-between",
             }}
           >
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 4 }}>
               {[
-                { id: "overview", label: "📊 Overview" },
-                { id: "providers", label: "⚙️ Providers" },
-                { id: "schedule", label: "🕐 Schedule" },
-                { id: "intelligence", label: "🧠 Intelligence" },
-                { id: "security", label: "🔒 Security" },
-                { id: "settings", label: "⚡ Settings" },
+                { id: "providers", label: "Providers" },
+                { id: "schedule", label: "Cron Schedule" },
                 {
                   id: "logs",
-                  label: `📝 Logs ${logs.length > 0 ? `(${logs.length})` : ""}`,
+                  label: `Logs ${logs.length > 0 ? `(${logs.length})` : ""}`,
                 },
-                { id: "sources", label: "📈 Breakdown" },
+                { id: "sources", label: "Source Breakdown" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   className={`tab ${activeTab === tab.id ? "tab-active" : "tab-inactive"}`}
                   onClick={() => setActiveTab(tab.id)}
-                  style={{ fontSize: 12 }}
                 >
                   {tab.label}
                 </button>
@@ -957,30 +826,7 @@ export default function AdminPanel() {
             </div>
 
             {activeTab === "providers" && (
-              <div
-                style={{
-                  display: "flex",
-                  gap: 6,
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Search providers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: 8,
-                    border: `1px solid ${GOLD.borderSoft}`,
-                    background: GOLD.surface,
-                    color: GOLD.text,
-                    fontSize: 12,
-                    fontFamily: "'Syne', sans-serif",
-                    outline: "none",
-                  }}
-                />
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {[
                   { id: "all", label: "All" },
                   { id: "content", label: "Content" },
@@ -1503,696 +1349,8 @@ export default function AdminPanel() {
               ))}
             </div>
           )}
-
-          {/* Overview tab */}
-          {activeTab === "overview" && (
-            <div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-                  gap: 12,
-                  marginBottom: 32,
-                }}
-              >
-                <StatCard
-                  label="Total Items"
-                  value={stats.totalItems}
-                  color={GOLD.primary}
-                />
-                <StatCard
-                  label="Approved"
-                  value={stats.approvedItems}
-                  color={GOLD.green}
-                />
-                <StatCard
-                  label="Pending"
-                  value={stats.pendingItems}
-                  color={GOLD.orange}
-                />
-                <StatCard
-                  label="Total Users"
-                  value={stats.totalUsers}
-                  color={GOLD.blue}
-                />
-                <StatCard
-                  label="Pro Users"
-                  value={stats.proUsers}
-                  color={GOLD.primary}
-                />
-              </div>
-              <div
-                style={{
-                  padding: 20,
-                  borderRadius: 12,
-                  border: `1px solid ${GOLD.border}`,
-                  background: GOLD.surface,
-                }}
-              >
-                <p style={{ fontSize: 13, color: GOLD.muted, lineHeight: 1.6 }}>
-                  ✓ System operational · All services running normally ·
-                  Pipeline syncs {stats.total} approved items from{" "}
-                  {PROVIDERS.length} providers
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Intelligence tab */}
-          {activeTab === "intelligence" && (
-            <div>
-              <h3
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  marginBottom: 16,
-                  color: GOLD.text,
-                }}
-              >
-                Anomalies & Pending Items
-              </h3>
-
-              <div style={{ marginBottom: 32 }}>
-                <h4
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: GOLD.muted,
-                    marginBottom: 12,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                  }}
-                >
-                  Trend Anomalies
-                </h4>
-                {anomalies.length === 0 ? (
-                  <div
-                    style={{
-                      padding: 20,
-                      borderRadius: 12,
-                      border: `1px solid ${GOLD.borderSoft}`,
-                      background: GOLD.surface,
-                      textAlign: "center",
-                      color: GOLD.muted,
-                    }}
-                  >
-                    No anomalies detected
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 10,
-                    }}
-                  >
-                    {anomalies.map((a) => (
-                      <div
-                        key={a.id}
-                        style={{
-                          padding: 14,
-                          borderRadius: 12,
-                          border: `1px solid ${a.severity === "critical" ? GOLD.red + "50" : GOLD.orange + "50"}`,
-                          background: GOLD.surface,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 700 }}>
-                              {a.items?.name || "Unknown"}
-                            </div>
-                            <div
-                              style={{
-                                fontSize: 11,
-                                color: GOLD.muted,
-                                marginTop: 4,
-                              }}
-                            >
-                              {a.anomaly_type} · {a.metric_name} ·{" "}
-                              {a.change_percentage > 0 ? "+" : ""}
-                              {a.change_percentage.toFixed(0)}%
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 10,
-                              padding: "4px 8px",
-                              borderRadius: 6,
-                              background:
-                                a.severity === "critical"
-                                  ? GOLD.red + "15"
-                                  : GOLD.orange + "15",
-                              color:
-                                a.severity === "critical"
-                                  ? GOLD.red
-                                  : GOLD.orange,
-                              fontWeight: 800,
-                            }}
-                          >
-                            {a.severity.toUpperCase()}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h4
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: GOLD.muted,
-                    marginBottom: 12,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                  }}
-                >
-                  Pending Approval ({pendingItems.length})
-                </h4>
-                {pendingItems.length === 0 ? (
-                  <div
-                    style={{
-                      padding: 20,
-                      borderRadius: 12,
-                      border: `1px solid ${GOLD.borderSoft}`,
-                      background: GOLD.surface,
-                      textAlign: "center",
-                      color: GOLD.muted,
-                    }}
-                  >
-                    No items pending review
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 12,
-                    }}
-                  >
-                    {pendingItems.map((p) => (
-                      <div
-                        key={p.id}
-                        style={{
-                          padding: 16,
-                          borderRadius: 12,
-                          border: `1px solid ${GOLD.borderSoft}`,
-                          background: GOLD.surface,
-                        }}
-                      >
-                        <div style={{ marginBottom: 12 }}>
-                          <div
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 700,
-                              marginBottom: 4,
-                            }}
-                          >
-                            {p.item_data?.name || "Untitled"}
-                          </div>
-                          <div style={{ fontSize: 11, color: GOLD.muted }}>
-                            Source: {p.source_name} · Category:{" "}
-                            {p.suggested_category}
-                          </div>
-                        </div>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <button
-                            onClick={() => approveItem(p.id, p.item_data)}
-                            style={{
-                              padding: "8px 16px",
-                              borderRadius: 8,
-                              background: GOLD.green,
-                              color: "#000",
-                              fontSize: 11,
-                              fontWeight: 700,
-                              border: "none",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => rejectItem(p.id)}
-                            style={{
-                              padding: "8px 16px",
-                              borderRadius: 8,
-                              border: `1px solid ${GOLD.borderSoft}`,
-                              background: "transparent",
-                              color: GOLD.text,
-                              fontSize: 11,
-                              fontWeight: 700,
-                              cursor: "pointer",
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Security tab */}
-          {activeTab === "security" && (
-            <div>
-              <h3
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  marginBottom: 16,
-                  color: GOLD.text,
-                }}
-              >
-                Audit Logs
-              </h3>
-              {auditLogs.length === 0 ? (
-                <div
-                  style={{
-                    padding: 20,
-                    borderRadius: 12,
-                    border: `1px solid ${GOLD.borderSoft}`,
-                    background: GOLD.surface,
-                    textAlign: "center",
-                    color: GOLD.muted,
-                  }}
-                >
-                  No audit logs yet
-                </div>
-              ) : (
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                >
-                  {auditLogs.map((log) => (
-                    <div
-                      key={log.id}
-                      style={{
-                        padding: 12,
-                        borderRadius: 8,
-                        border: `1px solid ${GOLD.borderSoft}`,
-                        background: GOLD.surface,
-                        fontSize: 11,
-                        fontFamily: "JetBrains Mono, monospace",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: 4,
-                        }}
-                      >
-                        <span style={{ color: GOLD.primary, fontWeight: 700 }}>
-                          {log.action}
-                        </span>
-                        <span style={{ color: GOLD.muted }}>
-                          {new Date(log.created_at).toLocaleString()}
-                        </span>
-                      </div>
-                      <div style={{ color: GOLD.muted }}>
-                        User: {log.profiles?.display_name || "Unknown"} ·
-                        Resource: {log.resource_type}/{log.resource_id}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Settings tab */}
-          {activeTab === "settings" && (
-            <div>
-              <h3
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  marginBottom: 24,
-                  color: GOLD.text,
-                }}
-              >
-                System Settings
-              </h3>
-
-              <div
-                style={{
-                  background: GOLD.surface,
-                  border: `1px solid ${GOLD.borderSoft}`,
-                  borderRadius: 14,
-                  padding: 20,
-                  marginBottom: 20,
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 800,
-                    color: GOLD.text,
-                    marginBottom: 16,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                  }}
-                >
-                  General
-                </h4>
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 14 }}
-                >
-                  <SettingToggle
-                    label="Enable Auto-Sync"
-                    value={settings.enableAutoSync}
-                    onChange={(v) =>
-                      setSettings({ ...settings, enableAutoSync: v })
-                    }
-                  />
-                  <SettingToggle
-                    label="Email on Provider Error"
-                    value={settings.emailOnError}
-                    onChange={(v) =>
-                      setSettings({ ...settings, emailOnError: v })
-                    }
-                  />
-                  <SettingToggle
-                    label="Maintenance Mode"
-                    value={settings.maintenanceMode}
-                    onChange={(v) =>
-                      setSettings({ ...settings, maintenanceMode: v })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  background: GOLD.surface,
-                  border: `1px solid ${GOLD.borderSoft}`,
-                  borderRadius: 14,
-                  padding: 20,
-                  marginBottom: 20,
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 800,
-                    color: GOLD.text,
-                    marginBottom: 16,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                  }}
-                >
-                  Rate Limiting
-                </h4>
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
-                >
-                  <div>
-                    <label
-                      style={{
-                        fontSize: 11,
-                        color: GOLD.muted,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Requests per minute
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.rateLimitPerMinute}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          rateLimitPerMinute: parseInt(e.target.value),
-                        })
-                      }
-                      style={{
-                        marginTop: 6,
-                        padding: "8px 12px",
-                        borderRadius: 8,
-                        border: `1px solid ${GOLD.borderSoft}`,
-                        background: GOLD.bg,
-                        color: GOLD.text,
-                        fontSize: 12,
-                        fontFamily: "'Syne', sans-serif",
-                        width: "100%",
-                        maxWidth: 200,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      style={{
-                        fontSize: 11,
-                        color: GOLD.muted,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Max items per provider run
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.maxItemsPerRun}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          maxItemsPerRun: parseInt(e.target.value),
-                        })
-                      }
-                      style={{
-                        marginTop: 6,
-                        padding: "8px 12px",
-                        borderRadius: 8,
-                        border: `1px solid ${GOLD.borderSoft}`,
-                        background: GOLD.bg,
-                        color: GOLD.text,
-                        fontSize: 12,
-                        fontFamily: "'Syne', sans-serif",
-                        width: "100%",
-                        maxWidth: 200,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  background: GOLD.surface,
-                  border: `1px solid ${GOLD.borderSoft}`,
-                  borderRadius: 14,
-                  padding: 20,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 16,
-                  }}
-                >
-                  <h4
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 800,
-                      color: GOLD.text,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                    }}
-                  >
-                    API Keys
-                  </h4>
-                  <button
-                    className="btn-ghost"
-                    onClick={() => setShowNewKeyForm(!showNewKeyForm)}
-                    style={{ fontSize: 11 }}
-                  >
-                    + Add
-                  </button>
-                </div>
-
-                {showNewKeyForm && (
-                  <div
-                    style={{
-                      padding: 12,
-                      borderRadius: 8,
-                      border: `1px solid ${GOLD.border}`,
-                      background: GOLD.bg,
-                      marginBottom: 16,
-                      display: "flex",
-                      gap: 8,
-                    }}
-                  >
-                    <input
-                      type="text"
-                      placeholder="API Key Name"
-                      value={newKeyName}
-                      onChange={(e) => setNewKeyName(e.target.value)}
-                      style={{
-                        flex: 1,
-                        padding: "8px 12px",
-                        borderRadius: 6,
-                        border: `1px solid ${GOLD.borderSoft}`,
-                        background: GOLD.surface,
-                        color: GOLD.text,
-                        fontSize: 11,
-                        fontFamily: "'Syne', sans-serif",
-                      }}
-                    />
-                    <button
-                      className="btn-gold"
-                      onClick={() => {
-                        addLog(
-                          "⚠️ API key management requires env updates",
-                          "info",
-                        );
-                        setShowNewKeyForm(false);
-                      }}
-                      style={{ fontSize: 11, padding: "8px 16px" }}
-                    >
-                      Save
-                    </button>
-                  </div>
-                )}
-
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                >
-                  {Object.entries(apiKeys).map(([key, status]) => (
-                    <div
-                      key={key}
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        border: `1px solid ${GOLD.borderSoft}`,
-                        background: GOLD.bg,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontFamily: "JetBrains Mono, monospace",
-                          color: GOLD.muted,
-                        }}
-                      >
-                        {key}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          padding: "3px 8px",
-                          borderRadius: 4,
-                          background:
-                            status === "●●●●●●●●"
-                              ? GOLD.green + "15"
-                              : GOLD.red + "15",
-                          color: status === "●●●●●●●●" ? GOLD.green : GOLD.red,
-                          fontWeight: 700,
-                        }}
-                      >
-                        {status === "●●●●●●●●" ? "✓ SET" : "✗ NOT SET"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>
-  );
-}
-
-// ============================================================================
-// HELPER COMPONENTS
-// ============================================================================
-
-function StatCard({ label, value, color }) {
-  return (
-    <div
-      style={{
-        padding: 16,
-        borderRadius: 12,
-        border: `1px solid ${GOLD.borderSoft}`,
-        background: GOLD.surface,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 11,
-          color: GOLD.muted,
-          marginBottom: 8,
-          fontWeight: 800,
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: 32,
-          fontWeight: 900,
-          color,
-          letterSpacing: "-0.04em",
-        }}
-      >
-        {value.toLocaleString()}
-      </div>
-    </div>
-  );
-}
-
-function SettingToggle({ label, value, onChange }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <span style={{ fontSize: 12, color: GOLD.text }}>{label}</span>
-      <button
-        onClick={() => onChange(!value)}
-        style={{
-          width: 40,
-          height: 24,
-          borderRadius: 12,
-          border: "none",
-          background: value ? GOLD.green : GOLD.muted2,
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          padding: "2px 4px",
-          transition: "all 0.2s",
-        }}
-      >
-        <div
-          style={{
-            width: 18,
-            height: 18,
-            borderRadius: "50%",
-            background: GOLD.bg,
-            marginLeft: value ? "auto" : 0,
-            transition: "margin 0.2s",
-          }}
-        />
-      </button>
-    </div>
   );
 }
