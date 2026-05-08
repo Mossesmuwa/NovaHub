@@ -1,0 +1,304 @@
+// pages/admin/dashboard.js - Main Admin Dashboard
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
+import Head from "next/head";
+import OverviewTab from "../../components/admin/OverviewTab";
+import PipelineTab from "../../components/admin/PipelineTab";
+import IntelligenceTab from "../../components/admin/IntelligenceTab";
+import SecurityTab from "../../components/admin/SecurityTab";
+import BusinessTab from "../../components/admin/BusinessTab";
+import SettingsTab from "../../components/admin/SettingsTab";
+
+const G = {
+  bg: "#09090C",
+  bg2: "#0F0F14",
+  bg3: "#16161E",
+  bg4: "#1C1C26",
+  gold: "#C9A84C",
+  goldL: "#E8C97A",
+  border: "rgba(255,255,255,0.06)",
+  borderG: "rgba(201,168,76,0.20)",
+  t1: "#F2F2F7",
+  t2: "#AEAEB2",
+  t3: "#636366",
+  green: "#30D158",
+  red: "#FF453A",
+  orange: "#FF9F0A",
+  blue: "#0A84FF",
+};
+
+const Icon = {
+  shield: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+  database: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    </svg>
+  ),
+  brain: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.14Z" />
+    </svg>
+  ),
+  users: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  refresh: () => (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <polyline points="23 4 23 10 17 10" />
+      <polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  ),
+  settings: () => (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 1v6m0 6v6m5.66-12.66L15 9m-6 6-2.66 2.66M23 12h-6m-6 0H1m17.66 5.66L15 15m-6-6-2.66-2.66" />
+    </svg>
+  ),
+};
+
+export default function AdminDashboard() {
+  const [tab, setTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  async function checkAuth() {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    if (!authUser) {
+      window.location.href = "/account/login";
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+
+    if (!profile?.is_admin) {
+      alert("Admin access required");
+      window.location.href = "/";
+      return;
+    }
+
+    setUser(profile);
+    setLoading(false);
+  }
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: G.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: G.t2,
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+            Loading Admin Dashboard...
+          </div>
+          <div style={{ fontSize: 12, color: G.t3 }}>Verifying permissions</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Admin Dashboard - Nova</title>
+      </Head>
+
+      <div style={{ minHeight: "100vh", background: G.bg }}>
+        {/* Header */}
+        <div
+          style={{
+            padding: "20px 24px",
+            borderBottom: `1px solid ${G.border}`,
+            background: G.bg2,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1600,
+              margin: "0 auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <h1
+                style={{
+                  fontSize: 24,
+                  fontWeight: 900,
+                  marginBottom: 4,
+                  color: G.t1,
+                }}
+              >
+                Nova Intelligence Admin
+              </h1>
+              <p style={{ fontSize: 13, color: G.t3 }}>
+                Welcome back, {user?.display_name || "Admin"}
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <div
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  background: G.gold + "15",
+                  color: G.gold,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {user?.admin_role || "ADMIN"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div
+          style={{
+            borderBottom: `1px solid ${G.border}`,
+            background: G.bg,
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1600,
+              margin: "0 auto",
+              padding: "0 24px",
+              display: "flex",
+              gap: 8,
+              overflowX: "auto",
+            }}
+          >
+            {[
+              { id: "overview", label: "Overview", icon: Icon.database },
+              { id: "pipeline", label: "Pipeline", icon: Icon.refresh },
+              { id: "intelligence", label: "Intelligence", icon: Icon.brain },
+              { id: "security", label: "Security", icon: Icon.shield },
+              { id: "business", label: "Business", icon: Icon.users },
+              { id: "settings", label: "Settings", icon: Icon.settings },
+            ].map((t) => {
+              const IconComp = t.icon;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  style={{
+                    padding: "12px 16px",
+                    borderBottom:
+                      tab === t.id
+                        ? `2px solid ${G.gold}`
+                        : "2px solid transparent",
+                    background: "none",
+                    border: "none",
+                    color: tab === t.id ? G.gold : G.t3,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    whiteSpace: "nowrap",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (tab !== t.id) e.currentTarget.style.color = G.t2;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (tab !== t.id) e.currentTarget.style.color = G.t3;
+                  }}
+                >
+                  <IconComp /> {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{ maxWidth: 1600, margin: "0 auto", padding: "24px" }}>
+          {tab === "overview" && <OverviewTab />}
+          {tab === "pipeline" && <PipelineTab />}
+          {tab === "intelligence" && <IntelligenceTab />}
+          {tab === "security" && <SecurityTab />}
+          {tab === "business" && <BusinessTab />}
+          {tab === "settings" && <SettingsTab />}
+        </div>
+      </div>
+    </>
+  );
+}
