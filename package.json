@@ -1,24 +1,29 @@
 {
-  "name": "novahub",
+  "name": "novahub-monorepo",
   "version": "2.0.0",
   "private": true,
-  "description": "NovaHub — AI-powered discovery platform",
+  "packageManager": "npm@11.0.0",
+  "description": "NovaHub — AI-powered intelligence platform (monorepo)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "pipeline:sync": "node -e \"Promise.all([import('./lib/pipeline/SyncEngine.js'),import('./lib/pipeline/TMDBProvider.js'),import('./lib/pipeline/ProductHuntProvider.js'),import('./lib/pipeline/BooksProvider.js')]).then(async([s,t,p,b])=>{const e=new s.SyncEngine({skipAI:true});const r1=await e.syncProvider(new t.TMDBProvider({limit:20}));const r2=await e.syncProvider(new p.ProductHuntProvider({limit:20}));const r3=await e.syncProvider(new b.BooksProvider({limit:10,subjectsPerRun:3}));console.log('Done',JSON.stringify([r1,r2,r3],null,2))})\""
+    "dev:web": "turbo run dev --filter=web",
+    "dev:admin": "turbo run dev --filter=admin",
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=web",
+    "build:admin": "turbo run build --filter=admin",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo clean && rm -rf node_modules"
   },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.0",
-    "@google/genai": "^1.50.1",
-    "@supabase/supabase-js": "^2.104.1",
-    "micro": "^10.0.1",
-    "next": "^16.2.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "slugify": "^1.6.9",
-    "stripe": "^22.1.0"
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

@@ -1,0 +1,27 @@
+{
+  "name": "shared",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Shared utilities, types, and helpers for NovaHub",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./lib/*": "./lib/*",
+    "./types/*": "./types/*",
+    "./hooks/*": "./hooks/*"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "echo 'Shared package - no build needed'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
