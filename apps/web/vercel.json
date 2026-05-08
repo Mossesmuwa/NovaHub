@@ -1,15 +1,5 @@
 {
   "version": 2,
-  "projects": [
-    {
-      "name": "novahub-web",
-      "rootDirectory": "apps/web"
-    },
-    {
-      "name": "novahub-admin",
-      "rootDirectory": "apps/admin"
-    }
-  ],
   "crons": [
     { "path": "/api/ingest/github", "schedule": "0 1 * * *" },
     { "path": "/api/ingest/tmdb", "schedule": "0 2 * * *" },
