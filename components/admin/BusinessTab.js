@@ -20,7 +20,7 @@ const G = {
   blue: "#0A84FF",
 };
 
-export default function BusinessTab() {
+export default function BusinessTab({ notify }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -177,9 +177,9 @@ export default function BusinessTab() {
                         cursor: "pointer",
                       }}
                       onClick={() => {
-                        // TODO: Open lead detail modal
-                        alert(
-                          `Lead: ${lead.company_name}\nPlan: ${lead.plan_interest}\nValue: $${(lead.estimated_value || 0) / 100}/mo`,
+                        notify?.(
+                          "info",
+                          `${lead.company_name} · ${lead.plan_interest} · $${((lead.estimated_value || 0) / 100).toLocaleString()}/mo`,
                         );
                       }}
                     >
@@ -239,7 +239,7 @@ export default function BusinessTab() {
       {/* Add Lead Button */}
       <div style={{ marginTop: 24, textAlign: "center" }}>
         <button
-          onClick={() => alert("Add lead modal coming soon")}
+          onClick={() => notify?.("info", "Lead creation modal coming soon")}
           style={{
             padding: "12px 24px",
             borderRadius: 10,

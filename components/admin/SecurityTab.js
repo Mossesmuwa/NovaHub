@@ -22,8 +22,10 @@ const G = {
 
 export default function SecurityTab() {
   const [auditLogs, setAuditLogs] = useState([]);
+  const [providerErrors, setProviderErrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchAuditLogs();
@@ -42,10 +44,19 @@ export default function SecurityTab() {
         query = query.eq("action", filter);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
+      const [logsRes, providersRes] = await Promise.all([
+        query,
+        supabase
+          .from("provider_sync_status")
+          .select("provider_name,status,last_error_message,last_sync_at,items_failed")
+          .order("provider_name"),
+      ]);
 
-      setAuditLogs(data || []);
+      if (logsRes.error) throw logsRes.error;
+      if (providersRes.error) throw providersRes.error;
+
+      setAuditLogs(logsRes.data || []);
+      setProviderErrors((providersRes.data || []).filter((p) => p.status === "error" || p.items_failed > 0));
     } catch (err) {
       console.error("Failed to fetch audit logs:", err);
     }
@@ -53,6 +64,15 @@ export default function SecurityTab() {
   }
 
   const actionTypes = [...new Set(auditLogs.map((log) => log.action))];
+  const visibleLogs = auditLogs.filter((log) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (log.action || "").toLowerCase().includes(q) ||
+      (log.resource_type || "").toLowerCase().includes(q) ||
+      (log.profiles?.display_name || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div>
@@ -198,6 +218,51 @@ export default function SecurityTab() {
         </div>
       </div>
 
+      {/* Provider Error Tracking */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+          Provider Error Tracking
+        </h3>
+        {providerErrors.length === 0 ? (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 10,
+              border: `1px solid ${G.border}`,
+              background: G.bg2,
+              color: G.t3,
+              fontSize: 13,
+            }}
+          >
+            No provider errors currently detected.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
+            {providerErrors.map((p) => (
+              <div
+                key={p.provider_name}
+                style={{
+                  borderRadius: 10,
+                  border: `1px solid ${G.red}40`,
+                  background: `${G.red}10`,
+                  padding: 12,
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 800, color: G.red, marginBottom: 6 }}>
+                  {p.provider_name}
+                </div>
+                <div style={{ fontSize: 11, color: G.t2, marginBottom: 6 }}>
+                  Last sync: {p.last_sync_at ? new Date(p.last_sync_at).toLocaleString() : "N/A"}
+                </div>
+                <div style={{ fontSize: 11, color: G.t2 }}>
+                  {p.last_error_message || "Failure detected without message"}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Audit Log Table */}
       {loading ? (
         <div style={{ textAlign: "center", padding: 60, color: G.t3 }}>
@@ -225,13 +290,31 @@ export default function SecurityTab() {
             overflow: "hidden",
           }}
         >
-          {auditLogs.map((log, idx) => (
+          <div style={{ padding: 12, borderBottom: `1px solid ${G.border}` }}>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search actions, resources, or admin..."
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: `1px solid ${G.border}`,
+                background: G.bg3,
+                color: G.t1,
+                fontSize: 12,
+                outline: "none",
+              }}
+            />
+          </div>
+          {visibleLogs.map((log, idx) => (
             <div
               key={log.id}
               style={{
                 padding: 16,
                 borderBottom:
-                  idx < auditLogs.length - 1 ? `1px solid ${G.border}` : "none",
+                  idx < visibleLogs.length - 1 ? `1px solid ${G.border}` : "none",
                 fontFamily: "monospace",
                 fontSize: 12,
               }}

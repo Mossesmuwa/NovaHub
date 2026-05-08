@@ -107,7 +107,7 @@ function QuickAction({ label, onClick, variant = "default" }) {
   );
 }
 
-export default function OverviewTab() {
+export default function OverviewTab({ notify, confirmAction }) {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -172,57 +172,65 @@ export default function OverviewTab() {
   }
 
   async function runAllProviders() {
-    if (!confirm("Trigger all data providers? This may take several minutes."))
-      return;
+    confirmAction?.({
+      title: "Run all providers?",
+      message:
+        "This triggers the full content pipeline and may take several minutes.",
+      confirmLabel: "Run all",
+      onConfirm: async () => {
+        try {
+          const token = (await supabase.auth.getSession()).data.session
+            ?.access_token;
+          const res = await fetch("/api/admin/trigger", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ provider: "all" }),
+          });
 
-    try {
-      const token = (await supabase.auth.getSession()).data.session
-        ?.access_token;
-      const res = await fetch("/api/admin/trigger", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ provider: "all" }),
-      });
-
-      if (res.ok) {
-        alert("All providers triggered successfully!");
-        fetchStats();
-      } else {
-        const error = await res.json();
-        alert("Error: " + (error.error || "Failed to trigger providers"));
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
+          if (res.ok) {
+            notify?.("success", "All providers triggered");
+            fetchStats();
+          } else {
+            const error = await res.json();
+            notify?.("error", error.error || "Failed to trigger providers");
+          }
+        } catch (err) {
+          notify?.("error", err.message || "Failed to trigger providers");
+        }
+      },
+    });
   }
 
   async function calculateNovaScores() {
-    if (
-      !confirm("Recalculate Nova Scores for all items? This may take a while.")
-    )
-      return;
+    confirmAction?.({
+      title: "Recalculate Nova Scores?",
+      message:
+        "This recalculates score fields for many items and can take a while.",
+      confirmLabel: "Recalculate",
+      onConfirm: async () => {
+        try {
+          const token = (await supabase.auth.getSession()).data.session
+            ?.access_token;
+          const res = await fetch("/api/admin/calculate-scores", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-    try {
-      const token = (await supabase.auth.getSession()).data.session
-        ?.access_token;
-      const res = await fetch("/api/admin/calculate-scores", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.ok) {
-        alert("Nova Scores recalculated successfully!");
-      } else {
-        alert("Error calculating scores");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
+          if (res.ok) {
+            notify?.("success", "Nova Scores recalculated");
+          } else {
+            notify?.("error", "Failed to calculate scores");
+          }
+        } catch (err) {
+          notify?.("error", err.message || "Failed to calculate scores");
+        }
+      },
+    });
   }
 
   return (
@@ -309,12 +317,12 @@ export default function OverviewTab() {
           />
           <QuickAction
             label="Export Data"
-            onClick={() => alert("Export functionality coming soon")}
+            onClick={() => notify?.("info", "Export is coming soon")}
             variant="default"
           />
           <QuickAction
             label="View Logs"
-            onClick={() => alert("Opening logs...")}
+            onClick={() => notify?.("info", "Open Security tab for audit logs")}
             variant="default"
           />
         </div>

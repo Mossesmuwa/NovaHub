@@ -20,7 +20,7 @@ const G = {
   blue: "#0A84FF",
 };
 
-export default function SettingsTab() {
+export default function SettingsTab({ notify }) {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -66,10 +66,10 @@ export default function SettingsTab() {
       if (error) throw error;
 
       setSettings((prev) => ({ ...prev, [key]: value }));
-      alert("Setting updated successfully");
+      notify?.("success", "Setting updated");
     } catch (err) {
       console.error("Failed to update setting:", err);
-      alert("Error updating setting");
+      notify?.("error", "Failed to update setting");
     }
     setSaving(false);
   }

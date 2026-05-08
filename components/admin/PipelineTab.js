@@ -184,7 +184,7 @@ function ProviderCard({ provider, onTrigger }) {
   );
 }
 
-export default function PipelineTab() {
+export default function PipelineTab({ notify, confirmAction }) {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -226,14 +226,14 @@ export default function PipelineTab() {
       });
 
       if (res.ok) {
-        alert(`${providerName} triggered successfully!`);
+        notify?.("success", `${providerName} triggered`);
         fetchProviders();
       } else {
         const error = await res.json();
-        alert("Error: " + (error.error || "Failed to trigger"));
+        notify?.("error", error.error || "Failed to trigger");
       }
     } catch (err) {
-      alert("Error: " + err.message);
+      notify?.("error", err.message || "Failed to trigger");
     }
   }
 
@@ -274,6 +274,34 @@ export default function PipelineTab() {
         </div>
 
         <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() =>
+              confirmAction?.({
+                title: "Run all available providers?",
+                message:
+                  "This runs all providers one after another via the trigger API.",
+                confirmLabel: "Run all",
+                onConfirm: async () => {
+                  for (const provider of providers) {
+                    await triggerProvider(provider.provider_name);
+                  }
+                },
+              })
+            }
+            style={{
+              padding: "6px 12px",
+              borderRadius: 8,
+              border: `1px solid ${G.gold}40`,
+              background: G.gold + "12",
+              color: G.gold,
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+          >
+            run all
+          </button>
           {["all", "running", "idle", "error", "has_key", "no_key"].map((f) => (
             <button
               key={f}

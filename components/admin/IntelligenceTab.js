@@ -309,7 +309,7 @@ function PendingItemCard({ item, onApprove, onReject }) {
   );
 }
 
-export default function IntelligenceTab() {
+export default function IntelligenceTab({ notify }) {
   const [anomalies, setAnomalies] = useState([]);
   const [pendingItems, setPendingItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -370,7 +370,7 @@ export default function IntelligenceTab() {
       fetchData();
     } catch (err) {
       console.error("Failed to review anomaly:", err);
-      alert("Error reviewing anomaly");
+      notify?.("error", "Failed to review anomaly");
     }
   }
 
@@ -410,7 +410,7 @@ export default function IntelligenceTab() {
       fetchData();
     } catch (err) {
       console.error("Failed to approve item:", err);
-      alert("Error approving item: " + err.message);
+      notify?.("error", "Failed to approve item");
     }
   }
 
@@ -439,7 +439,7 @@ export default function IntelligenceTab() {
       fetchData();
     } catch (err) {
       console.error("Failed to reject item:", err);
-      alert("Error rejecting item");
+      notify?.("error", "Failed to reject item");
     }
   }
 

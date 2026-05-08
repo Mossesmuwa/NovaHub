@@ -8,6 +8,9 @@ import IntelligenceTab from "../../components/admin/IntelligenceTab";
 import SecurityTab from "../../components/admin/SecurityTab";
 import BusinessTab from "../../components/admin/BusinessTab";
 import SettingsTab from "../../components/admin/SettingsTab";
+import UsersTab from "../../components/admin/UsersTab";
+import ControlCenterTab from "../../components/admin/ControlCenterTab";
+import NotificationsTab from "../../components/admin/NotificationsTab";
 
 const G = {
   bg: "#09090C",
@@ -114,6 +117,15 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    confirmLabel: "Confirm",
+    tone: "default",
+    onConfirm: null,
+  });
 
   useEffect(() => {
     checkAuth();
@@ -142,6 +154,35 @@ export default function AdminDashboard() {
 
     setUser(profile);
     setLoading(false);
+  }
+
+  function notify(type, message) {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3200);
+  }
+
+  function openConfirm({
+    title,
+    message,
+    confirmLabel = "Confirm",
+    tone = "default",
+    onConfirm,
+  }) {
+    setConfirmState({
+      open: true,
+      title,
+      message,
+      confirmLabel,
+      tone,
+      onConfirm,
+    });
+  }
+
+  function closeConfirm() {
+    setConfirmState((prev) => ({ ...prev, open: false, onConfirm: null }));
   }
 
   if (loading) {
@@ -247,7 +288,10 @@ export default function AdminDashboard() {
             {[
               { id: "overview", label: "Overview", icon: Icon.database },
               { id: "pipeline", label: "Pipeline", icon: Icon.refresh },
+              { id: "control", label: "Control", icon: Icon.settings },
+              { id: "notifications", label: "Notifications", icon: Icon.database },
               { id: "intelligence", label: "Intelligence", icon: Icon.brain },
+              { id: "users", label: "Users", icon: Icon.users },
               { id: "security", label: "Security", icon: Icon.shield },
               { id: "business", label: "Business", icon: Icon.users },
               { id: "settings", label: "Settings", icon: Icon.settings },
@@ -291,14 +335,156 @@ export default function AdminDashboard() {
 
         {/* Content */}
         <div style={{ maxWidth: 1600, margin: "0 auto", padding: "24px" }}>
-          {tab === "overview" && <OverviewTab />}
-          {tab === "pipeline" && <PipelineTab />}
-          {tab === "intelligence" && <IntelligenceTab />}
+          {tab === "overview" && (
+            <OverviewTab notify={notify} confirmAction={openConfirm} />
+          )}
+          {tab === "pipeline" && (
+            <PipelineTab notify={notify} confirmAction={openConfirm} />
+          )}
+          {tab === "control" && <ControlCenterTab notify={notify} />}
+          {tab === "notifications" && <NotificationsTab />}
+          {tab === "intelligence" && (
+            <IntelligenceTab notify={notify} confirmAction={openConfirm} />
+          )}
+          {tab === "users" && (
+            <UsersTab notify={notify} confirmAction={openConfirm} />
+          )}
           {tab === "security" && <SecurityTab />}
-          {tab === "business" && <BusinessTab />}
-          {tab === "settings" && <SettingsTab />}
+          {tab === "business" && (
+            <BusinessTab notify={notify} confirmAction={openConfirm} />
+          )}
+          {tab === "settings" && <SettingsTab notify={notify} />}
         </div>
       </div>
+
+      {/* Toasts */}
+      <div
+        style={{
+          position: "fixed",
+          right: 20,
+          bottom: 20,
+          zIndex: 2000,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          maxWidth: 360,
+        }}
+      >
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: `1px solid ${
+                toast.type === "success"
+                  ? `${G.green}66`
+                  : toast.type === "error"
+                    ? `${G.red}66`
+                    : `${G.borderG}`
+              }`,
+              background:
+                toast.type === "success"
+                  ? `${G.green}1A`
+                  : toast.type === "error"
+                    ? `${G.red}1A`
+                    : G.bg3,
+              color:
+                toast.type === "success"
+                  ? G.green
+                  : toast.type === "error"
+                    ? G.red
+                    : G.t1,
+              fontSize: 12,
+              fontWeight: 700,
+              boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+              animation: "fadeIn 0.2s ease",
+            }}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
+
+      {/* Confirm Modal */}
+      {confirmState.open && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 2100,
+            background: "rgba(0,0,0,0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 460,
+              borderRadius: 14,
+              border: `1px solid ${G.border}`,
+              background: G.bg2,
+              padding: 20,
+            }}
+          >
+            <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>
+              {confirmState.title}
+            </div>
+            <p style={{ fontSize: 13, color: G.t2, lineHeight: 1.6 }}>
+              {confirmState.message}
+            </p>
+            <div
+              style={{
+                marginTop: 18,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+              }}
+            >
+              <button
+                onClick={closeConfirm}
+                style={{
+                  padding: "9px 14px",
+                  borderRadius: 8,
+                  border: `1px solid ${G.border}`,
+                  background: "transparent",
+                  color: G.t2,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  const fn = confirmState.onConfirm;
+                  closeConfirm();
+                  if (fn) await fn();
+                }}
+                style={{
+                  padding: "9px 14px",
+                  borderRadius: 8,
+                  border: "none",
+                  background:
+                    confirmState.tone === "danger"
+                      ? G.red
+                      : `linear-gradient(135deg, ${G.goldL}, ${G.gold})`,
+                  color: confirmState.tone === "danger" ? "#fff" : "#000",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                }}
+              >
+                {confirmState.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
