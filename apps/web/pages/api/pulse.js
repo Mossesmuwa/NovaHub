@@ -1,9 +1,9 @@
 // pages/api/pulse.js
 // NovaHub — Nova Pulse Cron Endpoint
-// Delegates to lib/nova-pulse.js which calculates trending scores.
+// Delegates to shared/lib/nova-pulse.js which calculates trending scores.
 // Runs every 6 hours via Vercel Cron (see vercel.json).
 
-import { runNovaPulse } from "../../lib/nova-pulse.js";
+import { runNovaPulse } from "shared/lib/nova-pulse.js";
 
 export const config = { maxDuration: 60 };
 

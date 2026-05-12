@@ -3,7 +3,7 @@
 // Requires: SUPABASE_SERVICE_ROLE_KEY (to delete from auth.users)
 // Called from dashboard settings → danger zone
 
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 

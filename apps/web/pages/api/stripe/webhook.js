@@ -7,7 +7,7 @@
 
 import { buffer } from "micro";
 import Stripe from "stripe";
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
 // Disable body parsing — Stripe needs the raw body to verify signature
 export const config = { api: { bodyParser: false } };

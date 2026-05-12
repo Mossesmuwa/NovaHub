@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 export default function ListPage() {
   const router = useRouter();

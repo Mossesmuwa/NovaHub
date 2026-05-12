@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../lib/supabase";
+﻿import { useEffect, useMemo, useState } from "react";
+import { supabase } from "shared/lib/supabase";
 
 const G = {
   bg2: "#0F0F14",

@@ -1,6 +1,6 @@
-// pages/admin/dashboard.js - Main Admin Dashboard
+﻿// pages/admin/dashboard.js - Main Admin Dashboard
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 import Head from "next/head";
 import OverviewTab from "../components/OverviewTab";
 import PipelineTab from "../components/PipelineTab";

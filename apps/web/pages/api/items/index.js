@@ -1,4 +1,4 @@
-import { getSupabase } from "../../../lib/supabaseClient";
+import { getSupabase } from "shared/lib/supabaseClient";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -42,3 +42,4 @@ export default async function handler(req, res) {
       .json({ success: false, error: err.message || "Failed to fetch items" });
   }
 }
+

@@ -1,4 +1,4 @@
-// lib/nova-score.js
+// packages/shared/lib/nova-score.js
 // NovaHub — NovaScore Engine
 // Calculates a personalised match percentage (0–100) between an item
 // and a user's taste profile (from localStorage nova_taste or Supabase profile).
@@ -472,7 +472,7 @@ export async function updateTrendingScores() {
 // their personal match score. See components/NovaScore.js for the UI.
 //
 // Usage:
-//   import { calcNovaScore } from '../lib/nova-score';
+//   import { calcNovaScore } from 'shared/lib/nova-score';
 //   const score = calcNovaScore(item, taste);
 //   // score: { value: 87, label: 'Strong match', breakdown: {...} }
 

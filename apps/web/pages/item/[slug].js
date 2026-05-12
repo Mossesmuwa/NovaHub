@@ -6,12 +6,12 @@ import SEO from "../../components/SEO";
 import Card, { PosterCard, ToolCard } from "../../components/Card";
 import useScrollReveal from "../../hooks/useScrollReveal";
 import Link from "next/link";
-import * as Items from "../../lib/items";
-import * as Favorites from "../../lib/favorites";
-import * as Comments from "../../lib/comments";
+import * as Items from "shared/lib/items";
+import * as Favorites from "shared/lib/favorites";
+import * as Comments from "shared/lib/comments";
 import AddToList from "../../components/AddToList";
-import { getCategoryInfo } from "../../lib/helpers";
-import { useSupabase } from "../../lib/SupabaseContext";
+import { getCategoryInfo } from "shared/lib/helpers";
+import { useSupabase } from "shared/lib/SupabaseContext";
 
 // ─── Star rating ───────────────────────────────────────────────────────────────
 function StarRating({ rating, count }) {

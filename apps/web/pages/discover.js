@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
 import Link from "next/link";
-import { useSupabase } from "../lib/SupabaseContext";
+import { useSupabase } from "shared/lib/SupabaseContext";
 
 // ─── Vibe label helpers ───────────────────────────────────────────────────────
 const MOOD_LABELS = [

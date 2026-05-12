@@ -2,9 +2,9 @@
 // NovaHub — Google Books Ingestion Cron
 // Runs daily at 4am UTC via Vercel Cron.
 
-import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
-import { BooksProvider } from "../../../lib/pipeline/BooksProvider.js";
-import { isAuthorizedCron } from "../../../lib/helpers.js";
+import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
+import { BooksProvider } from "shared/lib/pipeline/BooksProvider.js";
+import { isAuthorizedCron } from "shared/lib/helpers.js";
 
 export const config = { maxDuration: 60 };
 

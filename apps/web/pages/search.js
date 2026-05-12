@@ -3,9 +3,14 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
-import { PosterCard, ToolCard, Carousel, CarouselNav } from "../components/Card";
+import {
+  PosterCard,
+  ToolCard,
+  Carousel,
+  CarouselNav,
+} from "../components/Card";
 import useScrollReveal from "../hooks/useScrollReveal";
-import * as Items from "../lib/items";
+import * as Items from "shared/lib/items";
 
 const QUICK_TAGS = [
   "AI coding tools",
@@ -107,7 +112,9 @@ export default function SearchPage() {
 
   const types = [...new Set(results.map((i) => i.type || "other"))];
   const filtered =
-    tab === "all" ? results : results.filter((i) => (i.type || "other") === tab);
+    tab === "all"
+      ? results
+      : results.filter((i) => (i.type || "other") === tab);
   const posters = filtered.filter((i) => POSTER_TYPES.includes(i.type));
   const cards = filtered.filter((i) => !POSTER_TYPES.includes(i.type));
 
@@ -151,7 +158,8 @@ export default function SearchPage() {
             borderRadius: "50%",
             right: -100,
             top: -130,
-            background: "radial-gradient(circle, rgba(201,168,76,.13) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(201,168,76,.13) 0%, transparent 70%)",
             filter: "blur(12px)",
             animation: "floatOrb 7s ease-in-out infinite",
             pointerEvents: "none",
@@ -162,7 +170,10 @@ export default function SearchPage() {
           <div className="reveal" style={{ maxWidth: 860 }}>
             <div
               className="section-label"
-              style={{ marginBottom: 8, animation: "fadeSlideUp .5s ease both" }}
+              style={{
+                marginBottom: 8,
+                animation: "fadeSlideUp .5s ease both",
+              }}
             >
               Search Engine
             </div>
@@ -176,7 +187,9 @@ export default function SearchPage() {
                 animation: "fadeSlideUp .55s ease .05s both",
               }}
             >
-              {searched ? `Results for "${query}"` : "Discover anything in seconds"}
+              {searched
+                ? `Results for "${query}"`
+                : "Discover anything in seconds"}
             </h1>
             <p
               style={{
@@ -187,7 +200,8 @@ export default function SearchPage() {
                 animation: "fadeSlideUp .55s ease .1s both",
               }}
             >
-              Search curated content across tools, media, and knowledge domains. Filter by type and jump directly to what fits your intent.
+              Search curated content across tools, media, and knowledge domains.
+              Filter by type and jump directly to what fits your intent.
             </p>
 
             <div
@@ -222,7 +236,14 @@ export default function SearchPage() {
                     flexShrink: 0,
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.35-4.35" />
                   </svg>
@@ -253,7 +274,11 @@ export default function SearchPage() {
                       setResults([]);
                     }}
                     className="btn-secondary"
-                    style={{ padding: "10px 12px", fontSize: 12, flexShrink: 0 }}
+                    style={{
+                      padding: "10px 12px",
+                      fontSize: 12,
+                      flexShrink: 0,
+                    }}
                   >
                     Clear
                   </button>
@@ -265,7 +290,9 @@ export default function SearchPage() {
                   style={{
                     minWidth: 102,
                     justifyContent: "center",
-                    animation: loading ? "pulseGlow 1.5s ease-in-out infinite" : "none",
+                    animation: loading
+                      ? "pulseGlow 1.5s ease-in-out infinite"
+                      : "none",
                     flexShrink: 0,
                   }}
                   disabled={loading}
@@ -298,14 +325,33 @@ export default function SearchPage() {
               }}
             >
               Shortcut:{" "}
-              <kbd style={{ background: "var(--surf)", border: "1px solid var(--border2)", borderRadius: 6, padding: "2px 6px", fontSize: 11 }}>
+              <kbd
+                style={{
+                  background: "var(--surf)",
+                  border: "1px solid var(--border2)",
+                  borderRadius: 6,
+                  padding: "2px 6px",
+                  fontSize: 11,
+                }}
+              >
                 Ctrl/Cmd + K
               </kbd>
             </div>
 
-            <div className="search-filters" style={{ justifyContent: "flex-start", margin: "16px 0 0", animation: "fadeSlideUp .55s ease .24s both" }}>
+            <div
+              className="search-filters"
+              style={{
+                justifyContent: "flex-start",
+                margin: "16px 0 0",
+                animation: "fadeSlideUp .55s ease .24s both",
+              }}
+            >
               {QUICK_TAGS.map((tag) => (
-                <button key={tag} className="search-filter" onClick={() => quickSearch(tag)}>
+                <button
+                  key={tag}
+                  className="search-filter"
+                  onClick={() => quickSearch(tag)}
+                >
                   {tag}
                 </button>
               ))}
@@ -314,7 +360,10 @@ export default function SearchPage() {
         </div>
       </section>
 
-      <div className="container" style={{ paddingTop: 24, paddingBottom: 84, minHeight: 420 }}>
+      <div
+        className="container"
+        style={{ paddingTop: 24, paddingBottom: 84, minHeight: 420 }}
+      >
         {searched ? (
           <>
             <div
@@ -332,24 +381,34 @@ export default function SearchPage() {
                   "Searching..."
                 ) : (
                   <>
-                    <strong>{results.length}</strong> result{results.length !== 1 ? "s" : ""} for "{query}"
+                    <strong>{results.length}</strong> result
+                    {results.length !== 1 ? "s" : ""} for "{query}"
                   </>
                 )}
               </div>
 
-              <div className="search-filters" style={{ justifyContent: "flex-start", margin: 0 }}>
-                <button className={`search-filter${tab === "all" ? " active" : ""}`} onClick={() => setTab("all")}>
+              <div
+                className="search-filters"
+                style={{ justifyContent: "flex-start", margin: 0 }}
+              >
+                <button
+                  className={`search-filter${tab === "all" ? " active" : ""}`}
+                  onClick={() => setTab("all")}
+                >
                   All ({results.length})
                 </button>
                 {types.map((type) => {
-                  const count = results.filter((item) => (item.type || "other") === type).length;
+                  const count = results.filter(
+                    (item) => (item.type || "other") === type,
+                  ).length;
                   return (
                     <button
                       key={type}
                       className={`search-filter${tab === type ? " active" : ""}`}
                       onClick={() => setTab(type)}
                     >
-                      {TYPE_ICONS[type] || TYPE_ICONS.other} {type.charAt(0).toUpperCase() + type.slice(1)} ({count})
+                      {TYPE_ICONS[type] || TYPE_ICONS.other}{" "}
+                      {type.charAt(0).toUpperCase() + type.slice(1)} ({count})
                     </button>
                   );
                 })}
@@ -381,7 +440,9 @@ export default function SearchPage() {
             ) : filtered.length === 0 ? (
               <div className="empty-state reveal">
                 <span className="empty-state-icon">🔍</span>
-                <h3 style={{ fontSize: 22, marginBottom: 8 }}>No matches found</h3>
+                <h3 style={{ fontSize: 22, marginBottom: 8 }}>
+                  No matches found
+                </h3>
                 <p>
                   Try broader terms or visit{" "}
                   <Link href="/category" style={{ color: "var(--gold)" }}>
@@ -391,7 +452,11 @@ export default function SearchPage() {
                 </p>
                 <div className="search-filters" style={{ marginTop: 16 }}>
                   {QUICK_TAGS.slice(0, 4).map((tag) => (
-                    <button key={tag} className="search-filter" onClick={() => quickSearch(tag)}>
+                    <button
+                      key={tag}
+                      className="search-filter"
+                      onClick={() => quickSearch(tag)}
+                    >
                       {tag}
                     </button>
                   ))}
@@ -401,13 +466,19 @@ export default function SearchPage() {
               <div style={{ animation: "fadeSlideUp .32s ease both" }}>
                 {posters.length > 0 && (
                   <>
-                    <div className="section-header reveal" style={{ marginBottom: 14 }}>
+                    <div
+                      className="section-header reveal"
+                      style={{ marginBottom: 14 }}
+                    >
                       <div>
                         <div className="section-label">Poster Items</div>
                         <h2 className="section-title">Movies, games, books</h2>
                       </div>
                     </div>
-                    <div className="grid-4 stagger" style={{ marginBottom: cards.length ? 28 : 0 }}>
+                    <div
+                      className="grid-4 stagger"
+                      style={{ marginBottom: cards.length ? 28 : 0 }}
+                    >
                       {posters.map((item) => (
                         <div className="reveal-scale" key={item.id}>
                           <PosterCard item={item} />
@@ -419,10 +490,15 @@ export default function SearchPage() {
 
                 {cards.length > 0 && (
                   <>
-                    <div className="section-header reveal" style={{ marginBottom: 14 }}>
+                    <div
+                      className="section-header reveal"
+                      style={{ marginBottom: 14 }}
+                    >
                       <div>
                         <div className="section-label">Tool Items</div>
-                        <h2 className="section-title">Apps, services, resources</h2>
+                        <h2 className="section-title">
+                          Apps, services, resources
+                        </h2>
                       </div>
                     </div>
                     <div className="grid-3 stagger">
@@ -451,7 +527,11 @@ export default function SearchPage() {
 
             {trending.length > 0 ? (
               <>
-                <Carousel items={trending} id="search-trending-carousel" width="170px" />
+                <Carousel
+                  items={trending}
+                  id="search-trending-carousel"
+                  width="170px"
+                />
                 <CarouselNav id="search-trending-carousel" />
               </>
             ) : (

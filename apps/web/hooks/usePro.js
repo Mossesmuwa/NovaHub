@@ -7,7 +7,7 @@
 //   if (!can('vibeDialUnlimited')) return <ProGate feature="vibeDialUnlimited" />;
 
 import { useState, useEffect } from "react";
-import { supabase, getCurrentUser } from "../lib/supabase";
+import { supabase, getCurrentUser } from "shared/lib/supabase";
 
 // ─── Feature access map ───────────────────────────────────────────────────────
 // Defines exactly what free vs pro users can do.

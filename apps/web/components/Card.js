@@ -1,6 +1,6 @@
 import Link from "next/link";
 import NovaScore from "./NovaScore";
-import { esc } from "../lib/helpers";
+import { esc } from "shared/lib/helpers";
 
 export function PosterCard({ item }) {
   if (!item) return null;

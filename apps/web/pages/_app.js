@@ -4,7 +4,7 @@ import "../styles/components.css";
 import "../styles/ai-interface.css";
 import { useEffect } from "react";
 import { ToastProvider } from "../components/Toast";
-import { SupabaseProvider } from "../lib/SupabaseContext";
+import { SupabaseProvider } from "shared/lib/SupabaseContext";
 
 export default function App({ Component, pageProps }) {
   // Theme initialization — runs before paint equivalent

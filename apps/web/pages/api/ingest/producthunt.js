@@ -1,8 +1,8 @@
 // pages/api/ingest/producthunt.js
 // Vercel Cron: 0 5 * * * (5am UTC)
 
-import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
-import { ProductHuntProvider } from "../../../lib/pipeline/ProductHuntProvider.js";
+import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
+import { ProductHuntProvider } from "shared/lib/pipeline/ProductHuntProvider.js";
 
 export const config = { maxDuration: 60 };
 
@@ -27,3 +27,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

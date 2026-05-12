@@ -1,8 +1,8 @@
 // pages/api/ingest/hackernews.js
 // Vercel Cron: 0 8 * * * (8am UTC daily)
 
-import { SyncEngine }           from '../../../lib/pipeline/SyncEngine.js';
-import { HackerNewsProvider }   from '../../../lib/pipeline/HackerNewsProvider.js';
+import { SyncEngine }           from 'shared/lib/pipeline/SyncEngine.js';
+import { HackerNewsProvider }   from 'shared/lib/pipeline/HackerNewsProvider.js';
 
 export const config = { maxDuration: 60 };
 
@@ -20,3 +20,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

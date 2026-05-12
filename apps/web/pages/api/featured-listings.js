@@ -16,8 +16,8 @@
 //   4. On payment → status: active, starts_at / ends_at set
 //   5. GET endpoint returns only active listings
 
-import { getSupabase } from "../../lib/supabaseClient";
-import { supabaseAdmin } from "../../lib/supabaseAdmin";
+import { getSupabase } from "shared/lib/supabaseClient";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
 // ─── Listing plans ────────────────────────────────────────────────────────────
 const PLANS = {

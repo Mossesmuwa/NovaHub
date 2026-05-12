@@ -4,7 +4,7 @@
 // Pro users only — shows upgrade prompt for free users.
 
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 export default function AddToList({ itemId, itemName }) {
   const [open, setOpen] = useState(false);

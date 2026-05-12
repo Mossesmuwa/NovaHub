@@ -1,6 +1,6 @@
-// components/admin/ProvidersTab.js
+﻿// components/admin/ProvidersTab.js
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 const GOLD = {
   primary: "#C9A84C",

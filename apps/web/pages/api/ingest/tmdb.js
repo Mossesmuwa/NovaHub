@@ -2,8 +2,8 @@
 // Vercel Cron: 0 2 * * * (2am UTC)
 // Also accepts POST from admin trigger UI
 
-import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
-import { TMDBProvider } from "../../../lib/pipeline/TMDBProvider.js";
+import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
+import { TMDBProvider } from "shared/lib/pipeline/TMDBProvider.js";
 
 export const config = { maxDuration: 60 };
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import SEO from "../../components/SEO";
 import Link from "next/link";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 export default function ProfilePage() {
   const router = useRouter();

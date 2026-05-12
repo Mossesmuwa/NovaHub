@@ -1,9 +1,9 @@
-// pages/admin/trigger.js
+﻿// pages/admin/trigger.js
 // Nova Admin Panel — Gold theme, full features
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 const GOLD = {
   primary: "#C9A84C",

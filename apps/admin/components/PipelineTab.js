@@ -1,6 +1,6 @@
-// components/admin/PipelineTab.js
+﻿// components/admin/PipelineTab.js
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 const G = {
   bg: "#09090C",

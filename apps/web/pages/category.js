@@ -1,4 +1,4 @@
-// pages/category.js
+﻿// pages/category.js
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
@@ -6,8 +6,8 @@ import SEO from "../components/SEO";
 import { PosterCard, ToolCard, CardGrid } from "../components/Card";
 import useScrollReveal from "../hooks/useScrollReveal";
 import Link from "next/link";
-import * as Items from "../lib/items";
-import { getCategoryInfo, getAllCategories } from "../lib/helpers";
+import * as Items from "shared/lib/items";
+import { getCategoryInfo, getAllCategories } from "shared/lib/helpers";
 
 const SORT_OPTIONS = [
   { id: "trending", label: "🔥 Trending" },
@@ -398,3 +398,4 @@ export default function CategoryPage() {
     </Layout>
   );
 }
+

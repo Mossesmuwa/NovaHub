@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "shared/lib/supabase";
 
 const FEATURES = [
   { free: "10 saves", pro: "Unlimited saves", icon: "◆" },

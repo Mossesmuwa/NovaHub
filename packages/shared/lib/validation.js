@@ -1,4 +1,4 @@
-// lib/validation.js
+// packages/shared/lib/validation.js
 // NovaHub — Input Validation Utilities
 // Provides comprehensive input validation and sanitization
 

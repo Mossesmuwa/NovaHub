@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { setCookie } from "../lib/cookies";
+import { setCookie } from "shared/lib/cookies";
 
 export default function UpgradeModal({
   open,
@@ -31,8 +31,8 @@ export default function UpgradeModal({
         <div style={iconStyle}>✦</div>
         <h2 style={titleStyle}>Join NovaHub</h2>
         <p style={copyStyle}>
-          Create a free account to save your favorites, post comments, and
-          get personalised AI recommendations — it only takes a moment.
+          Create a free account to save your favorites, post comments, and get
+          personalised AI recommendations — it only takes a moment.
         </p>
         {message && <p style={messageStyle}>{message}</p>}
         <div style={buttonRowStyle}>

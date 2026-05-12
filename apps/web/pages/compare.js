@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import SEO from "../components/SEO";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import * as Items from "../lib/items";
+import * as Items from "shared/lib/items";
 
 const G = {
   bg: "#09090C",

@@ -2,8 +2,8 @@
 // Opens the Stripe Customer Portal for managing/cancelling Pro subscription.
 // Called from dashboard settings tab.
 
-import { getStripe } from "../../../lib/stripe";
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { getStripe } from "shared/lib/stripe";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
@@ -58,3 +58,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+

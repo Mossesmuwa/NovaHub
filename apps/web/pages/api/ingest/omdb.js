@@ -2,7 +2,7 @@
 // Vercel Cron: 0 7 * * * (7am UTC daily)
 // Enriches existing movies with IMDB, RT, Metacritic scores.
 
-import { enrichMovies } from '../../../lib/pipeline/OMDBEnricher.js';
+import { enrichMovies } from 'shared/lib/pipeline/OMDBEnricher.js';
 
 export const config = { maxDuration: 120 };
 
@@ -18,3 +18,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

@@ -1,8 +1,8 @@
 // pages/api/ingest/github.js
 // Vercel Cron: 0 1 * * * (1am UTC daily)
 
-import { SyncEngine }      from '../../../lib/pipeline/SyncEngine.js';
-import { GitHubProvider }  from '../../../lib/pipeline/GitHubProvider.js';
+import { SyncEngine }      from 'shared/lib/pipeline/SyncEngine.js';
+import { GitHubProvider }  from 'shared/lib/pipeline/GitHubProvider.js';
 
 export const config = { maxDuration: 60 };
 
@@ -20,3 +20,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

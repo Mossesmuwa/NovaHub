@@ -2,7 +2,7 @@
 // Endpoint to track item views server-side (prevents cheating)
 // Called from frontend after fetching item details
 
-import { supabaseAdmin } from "../../lib/supabaseAdmin";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

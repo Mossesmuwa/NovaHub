@@ -3,8 +3,8 @@
 // GET  /api/lists       → get current user's lists
 // POST /api/lists       → create a new list (Pro only)
 
-import { supabase } from "../../../lib/supabase";
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { supabase } from "shared/lib/supabase";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
 async function getVerifiedUser(req) {
   const token = req.headers.authorization?.replace("Bearer ", "");

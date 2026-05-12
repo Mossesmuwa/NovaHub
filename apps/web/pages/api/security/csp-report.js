@@ -2,7 +2,7 @@
 // NovaHub — CSP Violation Reporting Endpoint
 // Logs Content Security Policy violations for security monitoring
 
-import { securityLogger } from "../../../lib/securityLogger";
+import { securityLogger } from "shared/lib/securityLogger";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

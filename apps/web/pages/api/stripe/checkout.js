@@ -2,14 +2,14 @@
 // Creates a Stripe Checkout session for Nova Pro subscription.
 // Called from pages/pro/index.js
 
-import { getStripe, PRICES } from "../../../lib/stripe";
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { getStripe, PRICES } from "shared/lib/stripe";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  // ── Verify user session ────────────────────────────────────────────────────
+  // -- Verify user session ----------------------------------------------------
   const token = req.headers.authorization?.replace("Bearer ", "").trim();
   if (!token) return res.status(401).json({ error: "Not authenticated" });
 
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   } = await userClient.auth.getUser();
   if (error || !user) return res.status(401).json({ error: "Invalid session" });
 
-  // ── Check if already Pro ──────────────────────────────────────────────────
+  // -- Check if already Pro --------------------------------------------------
   const admin = supabaseAdmin;
   const { data: profile } = await admin
     .from("profiles")
@@ -87,3 +87,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+

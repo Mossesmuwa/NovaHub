@@ -2,9 +2,9 @@
 // NovaHub — RAWG Games Ingestion Cron
 // Runs daily at 3am UTC via Vercel Cron.
 
-import { SyncEngine } from "../../../lib/pipeline/SyncEngine.js";
-import { RAWGProvider } from "../../../lib/pipeline/RAWGProvider.js";
-import { isAuthorizedCron } from "../../../lib/helpers.js";
+import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
+import { RAWGProvider } from "shared/lib/pipeline/RAWGProvider.js";
+import { isAuthorizedCron } from "shared/lib/helpers.js";
 
 export const config = { maxDuration: 60 };
 

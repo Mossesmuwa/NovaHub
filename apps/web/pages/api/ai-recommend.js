@@ -3,10 +3,10 @@
 // Use this for: server-side rendering, prefetch, non-realtime surfaces.
 // For realtime streaming UI use pages/api/ai-stream.js instead.
 
-import { createRateLimit } from "../../lib/rateLimit";
-import { validateRequest } from "../../lib/validation";
-import { getSupabase } from "../../lib/supabaseClient";
-import { getEnvCredential } from "../../lib/helpers";
+import { createRateLimit } from "shared/lib/rateLimit";
+import { validateRequest } from "shared/lib/validation";
+import { getSupabase } from "shared/lib/supabaseClient";
+import { getEnvCredential } from "shared/lib/helpers";
 import Anthropic from "@anthropic-ai/sdk";
 import crypto from "crypto";
 

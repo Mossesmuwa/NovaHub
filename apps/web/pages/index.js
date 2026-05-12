@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
 import Link from "next/link";
-import * as Items from "../lib/items";
-import { useSupabase } from "../lib/SupabaseContext";
+import * as Items from "shared/lib/items";
+import { useSupabase } from "shared/lib/SupabaseContext";
 
 const G = {
   bg: "#09090C",
@@ -1075,7 +1075,7 @@ export async function getServerSideProps() {
     }
 
     // Get stats
-    const { supabaseAdmin } = await import("../lib/supabaseAdmin");
+    const { supabaseAdmin } = await import("shared/lib/supabaseAdmin");
     const [itemsCount, todayCount, trendingCount] = await Promise.all([
       supabaseAdmin.from("items").select("id", { count: "exact", head: true }),
       supabaseAdmin

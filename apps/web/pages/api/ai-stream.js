@@ -19,9 +19,9 @@
 //   source.addEventListener('error', (e) => { console.error(e.data); source.close(); });
 
 import Anthropic from "@anthropic-ai/sdk";
-import { getSupabase } from "../../lib/supabaseClient";
+import { getSupabase } from "shared/lib/supabaseClient";
 import crypto from "crypto";
-import { getEnvCredential } from "../../lib/helpers";
+import { getEnvCredential } from "shared/lib/helpers";
 
 export const config = { maxDuration: 60 };
 

@@ -1,5 +1,5 @@
 // pages/api/admin/trigger.js
-import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 export const config = { maxDuration: 120 };
 
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
 }
 
 async function se() {
-  const { SyncEngine } = await import("../../../lib/pipeline/SyncEngine.js");
+  const { SyncEngine } = await import("shared/lib/pipeline/SyncEngine.js");
   return SyncEngine;
 }
 
@@ -74,7 +74,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "tmdb", async () => {
       const SE = await se();
       const { TMDBProvider } =
-        await import("../../../lib/pipeline/TMDBProvider.js");
+        await import("shared/lib/pipeline/TMDBProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new TMDBProvider({ pages: 3 }),
       );
@@ -83,7 +83,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "producthunt", async () => {
       const SE = await se();
       const { ProductHuntProvider } =
-        await import("../../../lib/pipeline/ProductHuntProvider.js");
+        await import("shared/lib/pipeline/ProductHuntProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new ProductHuntProvider({ limit: 50 }),
       );
@@ -92,7 +92,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "rawg", async () => {
       const SE = await se();
       const { RAWGProvider } =
-        await import("../../../lib/pipeline/RAWGProvider.js");
+        await import("shared/lib/pipeline/RAWGProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new RAWGProvider({ limit: 40 }),
       );
@@ -101,7 +101,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "books", async () => {
       const SE = await se();
       const { BooksProvider } =
-        await import("../../../lib/pipeline/BooksProvider.js");
+        await import("shared/lib/pipeline/BooksProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new BooksProvider({ limitPerQuery: 5 }),
       );
@@ -110,7 +110,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "github", async () => {
       const SE = await se();
       const { GitHubProvider } =
-        await import("../../../lib/pipeline/GitHubProvider.js");
+        await import("shared/lib/pipeline/GitHubProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new GitHubProvider({ limit: 30 }),
       );
@@ -119,7 +119,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "hackernews", async () => {
       const SE = await se();
       const { HackerNewsProvider } =
-        await import("../../../lib/pipeline/HackerNewsProvider.js");
+        await import("shared/lib/pipeline/HackerNewsProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new HackerNewsProvider({ limit: 30 }),
       );
@@ -128,7 +128,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "steam", async () => {
       const SE = await se();
       const { SteamProvider } =
-        await import("../../../lib/pipeline/SteamProvider.js");
+        await import("shared/lib/pipeline/SteamProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new SteamProvider({ limit: 40 }),
       );
@@ -137,7 +137,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "arxiv", async () => {
       const SE = await se();
       const { ArxivProvider } =
-        await import("../../../lib/pipeline/ArxivProvider.js");
+        await import("shared/lib/pipeline/ArxivProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new ArxivProvider({ limit: 30 }),
       );
@@ -146,7 +146,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "reddit", async () => {
       const SE = await se();
       const { RedditProvider } =
-        await import("../../../lib/pipeline/RedditProvider.js");
+        await import("shared/lib/pipeline/RedditProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new RedditProvider({ postsPerSub: 5 }),
       );
@@ -155,7 +155,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "devto", async () => {
       const SE = await se();
       const { DevToProvider } =
-        await import("../../../lib/pipeline/DevToProvider.js");
+        await import("shared/lib/pipeline/DevToProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new DevToProvider({ perTag: 8 }),
       );
@@ -164,7 +164,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "openlibrary", async () => {
       const SE = await se();
       const { OpenLibraryProvider } =
-        await import("../../../lib/pipeline/OpenLibraryProvider.js");
+        await import("shared/lib/pipeline/OpenLibraryProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new OpenLibraryProvider({ limit: 8 }),
       );
@@ -173,7 +173,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "courses", async () => {
       const SE = await se();
       const { CoursesProvider } =
-        await import("../../../lib/pipeline/CoursesProvider.js");
+        await import("shared/lib/pipeline/CoursesProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new CoursesProvider({ limit: 30 }),
       );
@@ -182,7 +182,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "spotify", async () => {
       const SE = await se();
       const { SpotifyProvider } =
-        await import("../../../lib/pipeline/SpotifyProvider.js");
+        await import("shared/lib/pipeline/SpotifyProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new SpotifyProvider({ limit: 40 }),
       );
@@ -191,14 +191,14 @@ async function runProviders(req, res, authAs) {
     await run(results, "nyt", async () => {
       const SE = await se();
       const { NYTBooksProvider } =
-        await import("../../../lib/pipeline/NYTBooksProvider.js");
+        await import("shared/lib/pipeline/NYTBooksProvider.js");
       return new SE({ skipAI: true }).syncProvider(new NYTBooksProvider());
     });
   if (all || p === "youtube")
     await run(results, "youtube", async () => {
       const SE = await se();
       const { YouTubeProvider } =
-        await import("../../../lib/pipeline/YouTubeProvider.js");
+        await import("shared/lib/pipeline/YouTubeProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new YouTubeProvider({ limit: 10 }),
       );
@@ -207,7 +207,7 @@ async function runProviders(req, res, authAs) {
     await run(results, "igdb", async () => {
       const SE = await se();
       const { IGDBProvider } =
-        await import("../../../lib/pipeline/IGDBProvider.js");
+        await import("shared/lib/pipeline/IGDBProvider.js");
       return new SE({ skipAI: true }).syncProvider(
         new IGDBProvider({ limit: 40 }),
       );
@@ -217,21 +217,22 @@ async function runProviders(req, res, authAs) {
   if (all || p === "omdb")
     await run(results, "omdb", async () => {
       const { enrichMovies } =
-        await import("../../../lib/pipeline/OMDBEnricher.js");
+        await import("shared/lib/pipeline/OMDBEnricher.js");
       return enrichMovies();
     });
   if (all || p === "wikipedia")
     await run(results, "wikipedia", async () => {
       const { enrichWithWikipedia } =
-        await import("../../../lib/pipeline/WikipediaEnricher.js");
+        await import("shared/lib/pipeline/WikipediaEnricher.js");
       return enrichWithWikipedia();
     });
   if (all || p === "justwatch")
     await run(results, "justwatch", async () => {
       const { enrichWithStreaming } =
-        await import("../../../lib/pipeline/JustWatchEnricher.js");
+        await import("shared/lib/pipeline/JustWatchEnricher.js");
       return enrichWithStreaming("US");
     });
 
   return res.status(200).json({ success: true, auth_as: authAs, results });
 }
+
