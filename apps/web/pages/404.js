@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 export default function UltimateAdaptive404() {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -334,3 +334,4 @@ export default function UltimateAdaptive404() {
     </div>
   );
 }
+

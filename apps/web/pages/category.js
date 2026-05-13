@@ -1,4 +1,4 @@
-﻿// pages/category.js
+﻿// apps/web/pages/category.js
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
@@ -398,4 +398,3 @@ export default function CategoryPage() {
     </Layout>
   );
 }
-

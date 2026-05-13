@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { motion } from "framer-motion";
-import { supabase } from "../shared/lib/supabase";
-import { colors } from "../lib/design"; // Ensure this matches Home Page colors
+import { supabase } from "shared/lib/supabase";
+import { colors } from "shared/lib/design"; // Ensure this matches Home Page colors
 import Navbar from "../components/Navbar";
 
 export default function WeeklyPage({ latestIssue, archive }) {

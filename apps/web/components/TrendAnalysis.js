@@ -1,7 +1,7 @@
-// components/TrendAnalysis.js
+﻿// components/TrendAnalysis.js
 // Premium trend analysis with icons, animations, and visual timeline
 import { useState } from "react";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 const reasonIcons = {
   launch: "🚀",

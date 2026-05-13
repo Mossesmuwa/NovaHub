@@ -13,7 +13,7 @@ import {
   ArrowRight,
   BarChart3,
 } from "lucide-react";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 import Navbar from "../components/Navbar";
 
 export default function HomePage() {
@@ -318,3 +318,4 @@ export default function HomePage() {
     </>
   );
 }
+

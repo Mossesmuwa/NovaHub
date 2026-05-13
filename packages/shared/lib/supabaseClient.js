@@ -1,114 +1,100 @@
 import { createClient } from "@supabase/supabase-js";
 
+// ======================================================
+// ENVIRONMENT VARIABLES
+// ======================================================
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Validate env early (fail fast in dev)
 if (!supabaseUrl || !supabaseAnonKey) {
   if (process.env.NODE_ENV !== "production") {
     console.error(
-      "MISSING SUPABASE ENV VARS: Check your .env.local file. " +
-        "Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.",
+      "[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
     );
   }
 }
 
-// ─── True singleton: only created ONCE per process ──────────────────────────
-// This solves React Strict Mode double initialization + multiple instances
-let supabaseInstance = null;
+// ======================================================
+// SINGLETON CLIENT
+// ======================================================
+let supabaseClient = null;
 
-function getSupabaseClient() {
-  if (supabaseInstance) {
-    return supabaseInstance;
-  }
+export function getSupabase() {
+  if (supabaseClient) return supabaseClient;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error(
-      "[Supabase] Cannot create client: missing environment variables",
-    );
-    return null;
+    throw new Error("[Supabase] Cannot initialize client: missing env vars");
   }
 
-  try {
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-      },
-    });
-  } catch (e) {
-    console.error("Failed to create Supabase client:", e.message);
-    supabaseInstance = null;
-  }
-
-  return supabaseInstance;
-}
-
-// Export lazy-initialized singleton
-export const supabase = new Proxy(
-  {},
-  {
-    get(_, prop) {
-      const client = getSupabaseClient();
-      if (!client) {
-        throw new Error(
-          "[Supabase] Client not initialized. Check environment variables.",
-        );
-      }
-      return client[prop];
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
     },
-  },
-);
+  });
 
-// Direct reference for when you need the actual client object
-export function getSupabase() {
-  return getSupabaseClient();
+  return supabaseClient;
 }
+
+// ======================================================
+// MAIN CLIENT EXPORT (STANDARD USAGE)
+// ======================================================
+export const supabase = getSupabase();
+
+// ======================================================
+// HELPERS
+// ======================================================
 
 export async function getCurrentUser() {
-  const client = getSupabase();
-  if (!client) return null;
   try {
     const {
       data: { user },
       error,
-    } = await client.auth.getUser();
-    if (error) throw error;
+    } = await supabase.auth.getUser();
+
+    if (error) return null;
+
     return user;
   } catch (err) {
-    console.error("Error fetching user:", err.message);
+    console.error("[Supabase] getCurrentUser error:", err);
     return null;
   }
 }
 
 export async function getCurrentSession() {
-  const client = getSupabase();
-  if (!client) return null;
-  const {
-    data: { session },
-    error,
-  } = await client.auth.getSession();
-  if (error) {
-    console.error("Error fetching session:", error.message);
+  try {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) return null;
+
+    return session;
+  } catch (err) {
+    console.error("[Supabase] getCurrentSession error:", err);
     return null;
   }
-  return session;
 }
 
 export async function getUserProfile(uid, fields = "*") {
-  const client = getSupabase();
-  if (!client || !uid) return null;
+  if (!uid) return null;
+
   try {
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from("profiles")
       .select(fields)
       .eq("id", uid)
       .single();
 
-    if (error) throw error;
+    if (error) return null;
+
     return data;
   } catch (err) {
-    console.error(`Error fetching profile for ${uid}:`, err.message);
+    console.error("[Supabase] getUserProfile error:", err);
+
     return null;
   }
 }

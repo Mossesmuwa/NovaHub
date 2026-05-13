@@ -1,8 +1,8 @@
-// components/ScoreGauge.js
+﻿// components/ScoreGauge.js
 // Premium Nova Score display with smooth animations and micro-interactions
 import { useState, useEffect } from "react";
-import { colors } from "../lib/design";
-import { formatTrend } from "../lib/formatters";
+import { colors } from "shared/lib/design";
+import { formatTrend } from "shared/lib/formatters";
 
 export default function ScoreGauge({
   score = 91, // 0-100

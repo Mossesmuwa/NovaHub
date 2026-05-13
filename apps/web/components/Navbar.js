@@ -1,9 +1,9 @@
-// components/Navbar.js
+﻿// components/Navbar.js
 // Premium responsive navbar with smooth animations and mobile-first design
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -3,15 +3,14 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
-import { colors } from "../../lib/design";
+import { supabase } from "shared/lib/supabase";
+import { colors } from "shared/lib/design";
 
 // Import premium components
 import ScoreGauge from "../../components/ScoreGauge";
 import ScoreBreakdown from "../../components/ScoreBreakdown";
 import TrendAnalysis from "../../components/TrendAnalysis";
 import TrustBadge from "../../components/TrustBadge";
-import DataSources from "../../components/DataSources";
 import AuditTrail from "../../components/AuditTrail";
 import CompareButton from "../../components/CompareButton";
 

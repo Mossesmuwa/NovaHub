@@ -1,79 +1,151 @@
-// packages/shared/lib/SupabaseContext.js
-// Single source of truth for auth state across all pages.
-// Wrap app in <SupabaseProvider> (_app.js already does this).
-// Read state with useSupabase() — instant, no async, no flash.
-// Uses the shared singleton from supabaseClient.js (no double initialization).
+// ======================================================
+// FILE: packages/shared/lib/SupabaseContext.js
+// PURPOSE:
+// Global auth + profile state for ALL apps (web + admin)
+//
+// FEATURES:
+// - Single auth state source
+// - Auto session sync
+// - Profile hydration
+// - Strict Mode safe
+// - Race-condition safe
+// ======================================================
 
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { getSupabase } from "./supabaseClient";
 
-const Ctx = createContext({
-  user: null,
-  profile: null,
-  loading: true,
-  supabase: null,
-  setProfile: () => {},
-});
+const SupabaseContext = createContext(null);
 
+// ======================================================
+// PROVIDER
+// ======================================================
 export function SupabaseProvider({ children }) {
+  const supabase = useMemo(() => getSupabase(), []);
+
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Memoize the stable singleton reference to prevent effect re-runs in React Strict Mode
-  const supabase = useMemo(() => getSupabase(), []);
+  // Prevent race conditions
+  const activeUserId = useRef(null);
 
+  // ------------------------------------------------------
+  // Fetch profile safely
+  // ------------------------------------------------------
   async function fetchProfile(userId) {
-    if (!supabase) {
-      setProfile(null);
-      return;
-    }
+    if (!supabase || !userId) return;
+
+    activeUserId.current = userId;
+
     try {
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
+
+      // Ignore stale responses
+      if (activeUserId.current !== userId) return;
+
       setProfile(data || null);
     } catch {
-      setProfile(null);
+      if (activeUserId.current === userId) {
+        setProfile(null);
+      }
     }
   }
 
+  // ------------------------------------------------------
+  // INITIAL AUTH LOAD
+  // ------------------------------------------------------
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
+    let mounted = true;
+
+    async function init() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+
+      // Authoritative user fetch
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+
+      setUser(user ?? null);
+
+      if (user) {
+        await fetchProfile(user.id);
+      }
+
+      if (mounted) setLoading(false);
     }
 
-    // Immediately resolve from cached session — no network round-trip
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) fetchProfile(u.id).finally(() => setLoading(false));
-      else setLoading(false);
-    });
+    init();
 
-    // Keep in sync when auth changes (login, logout, token refresh)
+    // --------------------------------------------------
+    // AUTH STATE LISTENER
+    // --------------------------------------------------
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const u = session?.user ?? null;
+
       setUser(u);
-      if (u) fetchProfile(u.id);
-      else setProfile(null);
+
+      if (u) {
+        fetchProfile(u.id);
+      } else {
+        setProfile(null);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
+  // ------------------------------------------------------
+  // CONTEXT VALUE (stable)
+  // ------------------------------------------------------
+  const value = useMemo(
+    () => ({
+      user,
+      profile,
+      loading,
+      supabase,
+      setProfile,
+    }),
+    [user, profile, loading, supabase],
+  );
+
   return (
-    <Ctx.Provider value={{ user, profile, loading, supabase, setProfile }}>
+    <SupabaseContext.Provider value={value}>
       {children}
-    </Ctx.Provider>
+    </SupabaseContext.Provider>
   );
 }
 
+// ======================================================
+// HOOK
+// ======================================================
 export function useSupabase() {
-  return useContext(Ctx);
+  const ctx = useContext(SupabaseContext);
+
+  if (!ctx) {
+    throw new Error("useSupabase must be used within SupabaseProvider");
+  }
+
+  return ctx;
 }

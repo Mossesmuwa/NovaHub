@@ -1,39 +1,61 @@
-// pages/account/login.js - Admin app login redirect
+// ======================================================
+// FILE: apps/admin/pages/account/login.js
+// PURPOSE:
+// Redirect admin users to the centralized web login.
+// ======================================================
+
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 
-export default function AdminLogin() {
-  const router = useRouter();
-
+export default function AdminLoginRedirect() {
   useEffect(() => {
-    // Redirect to web app login with return URL pointing back to admin
-    const returnUrl = encodeURIComponent("http://localhost:3002/dashboard");
-    window.location.href = `http://localhost:3000/account/login?returnTo=${returnUrl}`;
-  }, [router]);
+    void => {
+      const webAppUrl =
+        process.env.NEXT_PUBLIC_WEB_APP_URL;
+
+      const adminAppUrl =
+        process.env.NEXT_PUBLIC_ADMIN_URL;
+
+      // Ensure required env vars exist
+      if (!webAppUrl || !adminAppUrl) {
+        console.error(
+          "Missing NEXT_PUBLIC_WEB_APP_URL or NEXT_PUBLIC_ADMIN_URL"
+        );
+
+        return;
+      }
+
+      // After successful login,
+      // return user to admin dashboard
+      const returnTo = encodeURIComponent(
+        `${adminAppUrl}/dashboard`
+      );
+
+      // Redirect to centralized login page
+      window.location.replace(
+        `${webAppUrl}/account/login?returnTo=${returnTo}`
+      );
+    })();
+  }, []);
 
   return (
     <div
       style={{
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100vh",
         backgroundColor: "#09090C",
         color: "#F2F2F7",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
     >
       <div style={{ textAlign: "center" }}>
-        <h1>Redirecting to Login...</h1>
+        <h1>Redirecting...</h1>
+
         <p>
-          Please log in via the web app. Redirecting to{" "}
-          <a
-            href="http://localhost:3000/account/login"
-            style={{ color: "#C9A84C" }}
-          >
-            web login
-          </a>
-          .
+          Please wait while we redirect you
+          securely to login.
         </p>
       </div>
     </div>

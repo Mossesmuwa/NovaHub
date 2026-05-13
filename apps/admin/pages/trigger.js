@@ -1,4 +1,4 @@
-﻿// pages/admin/trigger.js
+﻿// apps/admin/pages/trigger.js
 // Nova Admin Panel — Gold theme, full features
 
 import { useState, useEffect, useRef } from "react";

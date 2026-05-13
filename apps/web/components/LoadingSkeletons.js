@@ -1,5 +1,5 @@
-// components/LoadingSkeletons.js
-import { colors } from "../lib/design";
+﻿// components/LoadingSkeletons.js
+import { colors } from "shared/lib/design";
 
 /**
  * 🛰️ THE UPGRADE: Holographic Base Skeleton
