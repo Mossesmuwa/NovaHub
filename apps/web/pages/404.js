@@ -1,337 +1,314 @@
 // pages/404.js
-import { useState, useEffect, useRef } from "react";
+// Premium 404 error page with animations and helpful navigation
 import Head from "next/head";
 import Link from "next/link";
-import { colors } from "shared/lib/design";
+import { useState } from "react";
+import { colors } from "../lib/design";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
-export default function UltimateAdaptive404() {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef(null);
+export default function NotFound() {
+  const [hovered, setHovered] = useState(null);
 
-  useEffect(() => {
-    // 1. Device Detection
-    const checkDevice = () => setIsMobile(window.innerWidth < 768);
-    checkDevice();
-    window.addEventListener("resize", checkDevice);
-
-    // 2. Interaction Tracking
-    const handleMove = (e) => {
-      const { clientX, clientY } = e.touches ? e.touches[0] : e;
-      if (!containerRef.current) return;
-
-      const { left, top, width, height } =
-        containerRef.current.getBoundingClientRect();
-      // Normalized coordinates (-0.5 to 0.5)
-      const x = (clientX - left) / width - 0.5;
-      const y = (clientY - top) / height - 0.5;
-      setCoords({ x, y });
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove);
-
-    return () => {
-      window.removeEventListener("resize", checkDevice);
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("touchmove", handleMove);
-    };
-  }, []);
-
-  // Calculate dynamic styles based on movement
-  const rotationStyle = {
-    transform: isMobile
-      ? `perspective(1000px) rotateX(${coords.y * 5}deg) rotateY(${coords.x * 5}deg)`
-      : `perspective(1000px) rotateX(${coords.y * -15}deg) rotateY(${coords.x * 15}deg)`,
-    transition: isMobile ? "none" : "transform 0.1s ease-out",
-  };
+  const suggestions = [
+    { emoji: "🔍", label: "Discover Tools", href: "/discover" },
+    { emoji: "📈", label: "See Trending", href: "/trending" },
+    { emoji: "⚔️", label: "Compare Tools", href: "/compare" },
+    { emoji: "🏠", label: "Go Home", href: "/" },
+  ];
 
   return (
-    <div className="super-root">
+    <>
       <Head>
-        <title>404 // Protocol Interrupted</title>
+        <title>404 - Page Not Found</title>
+        <meta
+          name="description"
+          content="This page doesn't exist, but we have plenty of intelligence to discover."
+        />
       </Head>
 
-      {/* DYNAMIC ATMOSPHERE */}
+      <Navbar />
+
       <div
-        className="ambient-glow"
         style={{
-          background: `radial-gradient(circle at ${coords.x * 100 + 50}% ${coords.y * 100 + 50}%, ${colors.gold}15, transparent 50%)`,
+          minHeight: "calc(100vh - 200px)",
+          background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg2} 100%)`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "60px 24px",
+          position: "relative",
+          overflow: "hidden",
         }}
-      />
-
-      <div className="scanline-overlay" />
-
-      <main
-        ref={containerRef}
-        className="intelligence-shell"
-        style={rotationStyle}
       >
-        {/* HEADER: System Metadata */}
-        <div className="meta-row">
-          <div className="node-id">NODE_LOST_0x404</div>
-          <div className="security-tag">LEVEL_7_ACCESS</div>
-        </div>
+        {/* Background decoration */}
+        <div
+          style={{
+            position: "absolute",
+            top: -100,
+            right: -100,
+            width: 400,
+            height: 400,
+            background: `radial-gradient(circle, ${colors.gold}08, transparent)`,
+            borderRadius: "50%",
+            pointerEvents: "none",
+            animation: "float 6s ease-in-out infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -50,
+            left: -50,
+            width: 300,
+            height: 300,
+            background: `radial-gradient(circle, ${colors.gold}08, transparent)`,
+            borderRadius: "50%",
+            pointerEvents: "none",
+            animation: "float 8s ease-in-out infinite reverse",
+          }}
+        />
 
-        {/* HERO: The Glitch Nucleus */}
-        <div className="nucleus">
-          <h1 className="glitch-num" data-text="404">
+        <div
+          style={{
+            textAlign: "center",
+            maxWidth: 600,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {/* Large 404 */}
+          <div
+            style={{
+              fontSize: "clamp(80px, 25vw, 200px)",
+              fontWeight: 900,
+              margin: 0,
+              marginBottom: 16,
+              background: `linear-gradient(135deg, ${colors.gold}, ${colors.gold}80)`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "-0.05em",
+              lineHeight: 1,
+              animation: "slideDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
+          >
             404
-          </h1>
-          <div className="orbit-ring" />
-        </div>
+          </div>
 
-        {/* CONTENT: Intelligent Recovery */}
-        <div className="recovery-zone">
-          <h2 className="title">Neural Path Severed</h2>
-          <p className="desc">
-            The data packet you requested has been purged or moved to a
-            restricted sector. Initiate recovery protocol.
+          {/* Animated emoji */}
+          <div
+            style={{
+              fontSize: 80,
+              margin: "20px 0",
+              animation: "bounce 1s ease-in-out infinite",
+            }}
+          >
+            🔍
+          </div>
+
+          {/* Heading */}
+          <h1
+            style={{
+              fontSize: "clamp(24px, 6vw, 40px)",
+              fontWeight: 900,
+              margin: 0,
+              marginBottom: 12,
+              color: colors.t1,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Page Not Found
+          </h1>
+
+          {/* Description */}
+          <p
+            style={{
+              fontSize: 16,
+              color: colors.t2,
+              margin: 0,
+              marginBottom: 40,
+              lineHeight: 1.6,
+            }}
+          >
+            The intelligence you're looking for doesn't exist at this location.
+            But don't worry, there's plenty to discover elsewhere.
           </p>
 
-          <div className="cta-stack">
-            <Link href="/" className="btn-main">
-              <span className="btn-label">RE-INITIALIZE CORE</span>
-              <span className="btn-sub">RETURN TO HOME</span>
-            </Link>
+          {/* Suggestions */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: 12,
+              marginBottom: 40,
+            }}
+          >
+            {suggestions.map((item, idx) => (
+              <Link key={item.href} href={item.href}>
+                <a
+                  onMouseEnter={() => setHovered(idx)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    padding: 20,
+                    background: hovered === idx ? colors.bg3 : colors.bg2,
+                    border: `1px solid ${hovered === idx ? colors.gold + "40" : colors.bg3}`,
+                    borderRadius: 12,
+                    textDecoration: "none",
+                    color: colors.t1,
+                    transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    transform:
+                      hovered === idx ? "translateY(-8px)" : "translateY(0)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 8,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 28,
+                      animation: hovered === idx ? "bounce 0.6s ease" : "none",
+                    }}
+                  >
+                    {item.emoji}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: hovered === idx ? colors.gold : colors.t2,
+                      transition: "color 0.2s ease",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </a>
+              </Link>
+            ))}
+          </div>
 
-            <div className="btn-group">
-              <Link href="/discover" className="btn-ghost">
-                DISCOVER
-              </Link>
-              <Link href="/trending" className="btn-ghost">
-                TRENDING
-              </Link>
+          {/* Error details */}
+          <div
+            style={{
+              padding: 16,
+              background: colors.bg3,
+              borderRadius: 12,
+              border: `1px solid ${colors.bg4}`,
+              fontSize: 12,
+              color: colors.t3,
+              fontFamily: "monospace",
+              marginTop: 40,
+              textAlign: "left",
+            }}
+          >
+            <div style={{ fontWeight: 700, marginBottom: 8, color: colors.t2 }}>
+              Error Details:
             </div>
+            <div>
+              GET{" "}
+              {typeof window !== "undefined" ? window.location.pathname : "/"}{" "}
+              404
+            </div>
+            <div>No matching route found</div>
           </div>
-        </div>
 
-        {/* FOOTER: Live Telemetry */}
-        <div className="telemetry">
-          <div className="stat">
-            <span>LOC:</span>{" "}
-            {typeof window !== "undefined"
-              ? window.location.pathname.substring(0, 15)
-              : "root"}
-          </div>
-          <div className="stat">
-            <span>SIGNAL:</span> ENCRYPTED
-          </div>
-          <div className="stat hide-m">
-            <span>PING:</span> 12ms
-          </div>
+          {/* Quick search */}
+          <form
+            style={{
+              marginTop: 40,
+              display: "flex",
+              gap: 8,
+              justifyContent: "center",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search for something..."
+              style={{
+                padding: "12px 16px",
+                borderRadius: 10,
+                border: `1px solid ${colors.bg3}`,
+                background: colors.bg2,
+                color: colors.t1,
+                fontSize: 14,
+                minWidth: 280,
+                outline: "none",
+                transition: "all 0.3s ease",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = colors.gold;
+                e.currentTarget.style.boxShadow = `0 0 12px ${colors.gold}20`;
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = colors.bg3;
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: "12px 24px",
+                background: colors.gold,
+                color: "#000",
+                border: "none",
+                borderRadius: 10,
+                fontWeight: 800,
+                fontSize: 14,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = `0 8px 16px ${colors.gold}40`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              Search
+            </button>
+          </form>
         </div>
-      </main>
+      </div>
 
+      <Footer />
+
+      {/* CSS animations */}
       <style jsx>{`
-        .super-root {
-          min-height: 100vh;
-          background: #000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .ambient-glow {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          z-index: 1;
-        }
-
-        .scanline-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            to bottom,
-            transparent 50%,
-            rgba(0, 0, 0, 0.5) 51%
-          );
-          background-size: 100% 4px;
-          pointer-events: none;
-          z-index: 2;
-          opacity: 0.1;
-        }
-
-        .intelligence-shell {
-          position: relative;
-          z-index: 10;
-          width: 100%;
-          max-width: 650px;
-          background: rgba(10, 10, 10, 0.9);
-          border: 1px solid rgba(201, 168, 76, 0.2);
-          border-radius: 32px;
-          padding: 40px;
-          backdrop-filter: blur(25px);
-          box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
-          text-align: center;
-        }
-
-        .meta-row {
-          display: flex;
-          justify-content: space-between;
-          font-family: monospace;
-          font-size: 10px;
-          letter-spacing: 2px;
-          color: ${colors.gold};
-          opacity: 0.5;
-          margin-bottom: 40px;
-        }
-
-        .nucleus {
-          position: relative;
-          display: inline-block;
-          margin-bottom: 30px;
-        }
-
-        .glitch-num {
-          font-size: clamp(80px, 18vw, 160px);
-          font-weight: 900;
-          margin: 0;
-          color: white;
-          position: relative;
-        }
-
-        .glitch-num::before,
-        .glitch-num::after {
-          content: attr(data-text);
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-        }
-
-        .glitch-num::before {
-          color: #0ff;
-          left: -2px;
-          z-index: -1;
-          animation: glitch 0.4s infinite;
-          opacity: 0.5;
-        }
-        .glitch-num::after {
-          color: #f0f;
-          left: 2px;
-          z-index: -2;
-          animation: glitch 0.4s infinite reverse;
-          opacity: 0.5;
-        }
-
-        .title {
-          font-size: clamp(24px, 5vw, 36px);
-          font-weight: 800;
-          color: white;
-          margin-bottom: 12px;
-        }
-
-        .desc {
-          color: #888;
-          font-size: 16px;
-          line-height: 1.6;
-          margin-bottom: 40px;
-          max-width: 440px;
-          margin-inline: auto;
-        }
-
-        .cta-stack {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .btn-main {
-          background: ${colors.gold};
-          padding: 16px;
-          border-radius: 16px;
-          text-decoration: none;
-          color: black;
-          transition: 0.3s;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .btn-label {
-          font-weight: 900;
-          font-size: 14px;
-          letter-spacing: 1px;
-        }
-        .btn-sub {
-          font-size: 10px;
-          font-weight: 700;
-          opacity: 0.6;
-        }
-
-        .btn-group {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-
-        .btn-ghost {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 14px;
-          border-radius: 16px;
-          color: white;
-          text-decoration: none;
-          font-weight: 700;
-          font-size: 12px;
-          transition: 0.3s;
-        }
-
-        .btn-ghost:hover {
-          border-color: ${colors.gold};
-          background: rgba(201, 168, 76, 0.05);
-        }
-
-        .telemetry {
-          margin-top: 50px;
-          display: flex;
-          justify-content: space-between;
-          font-family: monospace;
-          font-size: 9px;
-          color: #444;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
-          padding-top: 20px;
-        }
-
-        .telemetry span {
-          color: ${colors.gold};
-        }
-
-        @keyframes glitch {
-          0% {
-            transform: translate(0);
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-40px);
           }
-          25% {
-            transform: translate(-2px, 1px);
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes bounce {
+          0%,
+          100% {
+            transform: translateY(0);
           }
           50% {
-            transform: translate(2px, -1px);
-          }
-          75% {
-            transform: translate(-1px, -1px);
-          }
-          100% {
-            transform: translate(0);
+            transform: translateY(-20px);
           }
         }
 
-        @media (max-width: 768px) {
-          .intelligence-shell {
-            padding: 30px 20px;
-            margin: 10px;
-            border-radius: 24px;
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
           }
-          .hide-m {
-            display: none;
+          50% {
+            transform: translateY(20px);
           }
         }
       `}</style>
-    </div>
+    </>
   );
 }
-
