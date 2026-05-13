@@ -20,6 +20,7 @@
     "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {
+    "tsup": "^8.5.1",
     "turbo": "^2.0.0"
   },
   "engines": {
