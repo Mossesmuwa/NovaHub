@@ -1,6 +1,6 @@
 ﻿// components/Footer.js
 import Link from "next/link";
-import { colors } from 'shared/lib/design";
+import { colors } from "shared/lib/design";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
