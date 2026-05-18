@@ -124,12 +124,28 @@ export default function TrustBadge({
   // Get overall trust level
   const getTrustLevel = (score) => {
     if (score >= 95)
-      return { label: "Highly Trusted", color: colors.green, emoji: "✓" };
+      return { 
+        label: "Highly Trusted", 
+        color: colors.green, 
+        icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.green} strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+      };
     if (score >= 80)
-      return { label: "Trusted", color: colors.gold, emoji: "✓" };
+      return { 
+        label: "Trusted", 
+        color: colors.gold, 
+        icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+      };
     if (score >= 60)
-      return { label: "Moderate", color: colors.orange, emoji: "⚠" };
-    return { label: "Low", color: colors.red, emoji: "✗" };
+      return { 
+        label: "Moderate", 
+        color: colors.orange, 
+        icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.orange} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05l-8.47-14.14a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+      };
+    return { 
+      label: "Low", 
+      color: colors.red, 
+      icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.red} strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+    };
   };
 
   const trustLevel = getTrustLevel(overallScore);
@@ -190,11 +206,10 @@ export default function TrustBadge({
         >
           <div
             style={{
-              fontSize: 32,
               marginBottom: 4,
             }}
           >
-            {trustLevel.emoji}
+            {trustLevel.icon}
           </div>
           <div
             style={{

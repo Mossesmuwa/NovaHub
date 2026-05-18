@@ -576,7 +576,7 @@ export default function Dashboard() {
                             color: "var(--t3)",
                           }}
                         >
-                          {l.is_public ? "🌍 Public" : "🔒 Private"}
+                          {l.is_public ? ("Public") : ("Private")}
                         </span>
                       </div>
                       <div className="card-title">{l.name}</div>

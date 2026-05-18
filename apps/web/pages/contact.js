@@ -145,8 +145,8 @@ export default function ContactPage() {
                 <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 14 }}>Other ways to reach us</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {[
-                    { icon: '📸', label: 'Instagram', val: '@mosses.muwa', href: 'https://www.instagram.com/mosses.muwa/' },
-                    { icon: '💻', label: 'GitHub',    val: 'Mossesmuwa',   href: 'https://github.com/Mossesmuwa' },
+                    { icon: 'instagram', label: 'Instagram', val: '@mosses.muwa', href: 'https://www.instagram.com/mosses.muwa/' },
+                    { icon: 'github', label: 'GitHub',    val: 'Mossesmuwa',   href: 'https://github.com/Mossesmuwa' },
                   ].map(l => (
                     <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg3)', borderRadius: 'var(--rsm)', textDecoration: 'none', color: 'var(--t1)', transition: 'var(--ease)' }}

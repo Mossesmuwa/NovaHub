@@ -9,11 +9,27 @@ const THEME = {
   text2: "#A1A1A1",
 };
 
-function getRankEmoji(rank) {
-  if (rank === 0) return "🥇";
-  if (rank === 1) return "🥈";
-  if (rank === 2) return "🥉";
-  return `#${rank + 1}`;
+function getRankMedal(rank) {
+  const medals = [
+    { color: "#FFD700", label: "1st" },
+    { color: "#C0C0C0", label: "2nd" },
+    { color: "#CD7F32", label: "3rd" },
+  ];
+  
+  if (rank < 3) {
+    const medal = medals[rank];
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill={medal.color} stroke={medal.color} strokeWidth="1">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M6 12h12v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8z"></path>
+          <line x1="6" y1="12" x2="3" y2="18"></line>
+          <line x1="18" y1="12" x2="21" y2="18"></line>
+        </svg>
+      </div>
+    );
+  }
+  return <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>#{rank + 1}</div>;
 }
 
 export default function PremiumTrending({ items = [] }) {
@@ -66,7 +82,7 @@ export default function PremiumTrending({ items = [] }) {
         <div style={styles.grid}>
           {/* HERO CARD */}
           <motion.div whileHover={{ scale: 1.01 }} style={styles.hero}>
-            <div style={{ fontSize: 60 }}>{getRankEmoji(0)}</div>
+            {getRankMedal(0)}
 
             <h2 style={styles.heroTitle}>{hero.name}</h2>
 
@@ -104,7 +120,7 @@ export default function PremiumTrending({ items = [] }) {
                     borderColor: hovered === i ? THEME.gold : THEME.border,
                   }}
                 >
-                  <div style={styles.rank}>{getRankEmoji(i + 1)}</div>
+                  <div style={styles.rank}>{getRankMedal(i + 1)}</div>
 
                   <img src={item.image} alt="" style={styles.img} />
 

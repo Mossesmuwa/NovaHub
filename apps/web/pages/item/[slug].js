@@ -268,7 +268,7 @@ export default function ItemDetail({
                   color: colors.t1,
                 }}
               >
-                📊 Intelligence Analysis
+                Intelligence Analysis
               </h2>
               <p
                 style={{
