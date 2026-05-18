@@ -1,9 +1,13 @@
 ﻿// apps/admin/pages/trigger.js
 // Nova Admin Panel — Gold theme, full features
+// ======================================================
+// PROTECTED: Admin-only page with role verification
+// ======================================================
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "shared/lib/supabase";
+import { checkAuth } from "shared/lib/checkAuth";
 
 const GOLD = {
   primary: "#C9A84C",
@@ -228,29 +232,31 @@ export default function AdminPanel() {
   const [filter, setFilter] = useState("all"); // all | content | enricher | needsKey
   const logsRef = useRef(null);
 
+  // --------------------------------------------------
+  // CHECK ADMIN ACCESS ON MOUNT
+  // --------------------------------------------------
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        router.replace("/account/login");
-        return;
-      }
-      setUser(user);
-      supabase
-        .from("profiles")
-        .select("is_admin,display_name,avatar_url")
-        .eq("id", user.id)
-        .single()
-        .then(({ data }) => {
-          if (!data?.is_admin) {
-            router.replace("/");
-            return;
-          }
-          setProfile(data);
-          setAuthLoading(false);
-          loadStats();
-        });
-    });
+    verifyAdminAccess();
   }, []);
+
+  async function verifyAdminAccess() {
+    const { authenticated, profile } = await checkAuth();
+
+    if (!authenticated) {
+      router.replace("/account/login");
+      return;
+    }
+
+    if (!profile?.is_admin) {
+      router.replace("/");
+      return;
+    }
+
+    setUser(profile);
+    setProfile(profile);
+    setAuthLoading(false);
+    loadStats();
+  }
 
   useEffect(() => {
     if (logsRef.current)

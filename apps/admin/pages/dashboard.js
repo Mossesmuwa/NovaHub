@@ -1,6 +1,12 @@
 ﻿// apps/admin/pages/dashboard.js - Main Admin Dashboard
+// ======================================================
+// PROTECTED: Admin-only page with full auth checks
+// ======================================================
+
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { supabase } from "shared/lib/supabase";
+import { checkAuth } from "shared/lib/checkAuth";
 import Head from "next/head";
 import OverviewTab from "../components/OverviewTab";
 import PipelineTab from "../components/PipelineTab";
@@ -114,6 +120,7 @@ const Icon = {
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [tab, setTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -127,28 +134,23 @@ export default function AdminDashboard() {
     onConfirm: null,
   });
 
+  // --------------------------------------------------
+  // CHECK AUTH ON MOUNT
+  // --------------------------------------------------
   useEffect(() => {
-    checkAuth();
+    verifyAdminAccess();
   }, []);
 
-  async function checkAuth() {
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-    if (!authUser) {
-      window.location.href = "/account/login";
+  async function verifyAdminAccess() {
+    const { authenticated, profile } = await checkAuth();
+
+    if (!authenticated) {
+      router.replace("/account/login");
       return;
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authUser.id)
-      .single();
-
     if (!profile?.is_admin) {
-      alert("Admin access required");
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 

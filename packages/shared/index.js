@@ -6,6 +6,7 @@ export * from "./types/index.js";
 
 // Export shared library functions
 export * from "./lib/auth.js";
+export * from "./lib/checkAuth.js";
 export * from "./lib/comments.js";
 export * from "./lib/cookies.js";
 export * from "./lib/email.js";

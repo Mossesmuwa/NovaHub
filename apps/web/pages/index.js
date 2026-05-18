@@ -1,527 +1,1117 @@
-// pages/index.js
-// Premium homepage with hero, featured items, trending carousel
-import Head from 'next/head';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState } from 'react';
-import { colors } from '../lib/design';
-import Navbar from '../components/Navbar';
+// pages/index.js - Nova Intelligence Layer Homepage
+import { useState, useEffect } from "react";
+import Layout from "../components/Layout";
+import SEO from "../components/SEO";
+import Link from "next/link";
+import * as Items from "shared/lib/items";
+import { useSupabase } from "shared/lib/SupabaseContext";
 
-export default function HomePage({ featuredItems = [], trendingItems = [] }) {
-  const [emailInput, setEmailInput] = useState('');
-  const [emailSubscribed, setEmailSubscribed] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
+const G = {
+  bg: "#09090C",
+  bg2: "#0F0F14",
+  bg3: "#16161E",
+  bg4: "#1C1C26",
+  gold: "#C9A84C",
+  goldL: "#E8C97A",
+  border: "rgba(255,255,255,0.06)",
+  borderG: "rgba(201,168,76,0.20)",
+  t1: "#F2F2F7",
+  t2: "#AEAEB2",
+  t3: "#636366",
+  green: "#30D158",
+  red: "#FF453A",
+  orange: "#FF9F0A",
+  blue: "#0A84FF",
+};
 
-  const handleEmailSignup = async (e) => {
-    e.preventDefault();
-    // TODO: Subscribe to newsletter
-    setEmailSubscribed(true);
-    setEmailInput('');
-    setTimeout(() => setEmailSubscribed(false), 3000);
-  };
+// SVG Icons (NO EMOJIS)
+const Icon = {
+  trending: () => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+      <polyline points="17 6 23 6 23 12" />
+    </svg>
+  ),
+  compare: () => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </svg>
+  ),
+  sparkle: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+    </svg>
+  ),
+  chart: () => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <line x1="12" y1="20" x2="12" y2="10" />
+      <line x1="18" y1="20" x2="18" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="16" />
+    </svg>
+  ),
+  shield: () => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+  arrow: () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  ),
+};
+
+// Stat Counter Component
+function StatCounter({ value, label, suffix = "", delay = 0 }) {
+  const [count, setCount] = useState(0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!visible) return;
+    let start = 0;
+    const duration = 1200;
+    const increment = value / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [visible, value]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setVisible(true), delay);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    const element = document.getElementById(`stat-${label}`);
+    if (element) observer.observe(element);
+    return () => observer.disconnect();
+  }, [delay, label]);
 
   return (
-    <>
-      <Head>
-        <title>Intelligence Platform | Decision Intelligence for Tech</title>
-        <meta name="description" content="Ranked, explainable intelligence for decision-makers. Discover what's best, what's trending, and why it matters." />
-        <meta property="og:title" content="Intelligence Platform" />
-        <meta property="og:description" content="Decision intelligence for fast-moving tech markets" />
-      </Head>
+    <div id={`stat-${label}`} style={{ textAlign: "center" }}>
+      <div
+        style={{
+          fontSize: 48,
+          fontWeight: 900,
+          color: G.gold,
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "-0.04em",
+          marginBottom: 8,
+        }}
+      >
+        {count.toLocaleString()}
+        {suffix}
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          color: G.t3,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
 
-      <Navbar />
+// Nova Score Badge
+function NovaScoreBadge({ score, breakdown, size = "default" }) {
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
-      <div style={{ background: colors.bg, minHeight: '100vh' }}>
-        {/* Hero Section */}
-        <section style={{
-          padding: '80px 24px',
-          background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg2} 100%)`,
-          position: 'relative',
-          overflow: 'hidden',
-          borderBottom: `1px solid ${colors.bg3}`,
-        }}>
-          {/* Background elements */}
+  const sz =
+    size === "large" ? { badge: 80, text: 32 } : { badge: 48, text: 18 };
+
+  return (
+    <div style={{ position: "relative", display: "inline-block" }}>
+      <div
+        onClick={() => setShowBreakdown(!showBreakdown)}
+        style={{
+          width: sz.badge,
+          height: sz.badge,
+          borderRadius: "50%",
+          background: `conic-gradient(${G.gold} ${score * 3.6}deg, ${G.bg3} 0deg)`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: breakdown ? "pointer" : "default",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            width: sz.badge - 8,
+            height: sz.badge - 8,
+            borderRadius: "50%",
+            background: G.bg2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: sz.text,
+            fontWeight: 900,
+            color: G.gold,
+          }}
+        >
+          {score}
+        </div>
+      </div>
+
+      {showBreakdown && breakdown && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            marginTop: 12,
+            padding: 12,
+            background: G.bg2,
+            border: `1px solid ${G.border}`,
+            borderRadius: 8,
+            minWidth: 200,
+            zIndex: 10,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          }}
+        >
           <div
             style={{
-              position: 'absolute',
-              top: -100,
-              right: -100,
-              width: 400,
-              height: 400,
-              background: `radial-gradient(circle, ${colors.gold}08, transparent)`,
-              borderRadius: '50%',
-              pointerEvents: 'none',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: -50,
-              left: -50,
-              width: 300,
-              height: 300,
-              background: `radial-gradient(circle, ${colors.gold}08, transparent)`,
-              borderRadius: '50%',
-              pointerEvents: 'none',
-            }}
-          />
-
-          <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-            {/* Hero content */}
-            <div style={{
-              textAlign: 'center',
-              marginBottom: 60,
-            }}>
-              <h1 style={{
-                fontSize: 'clamp(32px, 8vw, 64px)',
-                fontWeight: 900,
-                margin: 0,
-                marginBottom: 16,
-                letterSpacing: '-0.02em',
-                color: colors.t1,
-                lineHeight: 1.1,
-              }}>
-                Intelligence for<br />
-                <span style={{ color: colors.gold }}>What Matters</span>
-              </h1>
-
-              <p style={{
-                fontSize: 'clamp(16px, 3vw, 20px)',
-                color: colors.t2,
-                margin: 0,
-                marginBottom: 32,
-                maxWidth: 600,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                lineHeight: 1.6,
-              }}>
-                Ranked, explainable decisions for fast-moving tech markets. Discover what's best, what's trending, and why it actually matters.
-              </p>
-
-              {/* CTA Buttons */}
-              <div style={{
-                display: 'flex',
-                gap: 12,
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginBottom: 40,
-              }}>
-                <Link href="/discover">
-                  <a style={{
-                    padding: '14px 32px',
-                    background: colors.gold,
-                    color: '#000',
-                    borderRadius: 10,
-                    fontWeight: 800,
-                    fontSize: 15,
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'inline-block',
-                  }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = `0 12px 32px ${colors.gold}40`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    🔍 Explore Now
-                  </a>
-                </Link>
-
-                <Link href="/trending">
-                  <a style={{
-                    padding: '14px 32px',
-                    background: colors.bg3,
-                    color: colors.t1,
-                    border: `1px solid ${colors.bg4}`,
-                    borderRadius: 10,
-                    fontWeight: 800,
-                    fontSize: 15,
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'inline-block',
-                  }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = colors.gold;
-                      e.currentTarget.style.color = colors.gold;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = colors.bg4;
-                      e.currentTarget.style.color = colors.t1;
-                    }}
-                  >
-                    📈 What's Trending
-                  </a>
-                </Link>
-              </div>
-
-              {/* Social proof */}
-              <div style={{
-                fontSize: 13,
-                color: colors.t3,
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 24,
-                alignItems: 'center',
-              }}>
-                <span>⭐ Trusted by 10K+ makers</span>
-                <span>•</span>
-                <span>📊 1,000+ items ranked</span>
-                <span>•</span>
-                <span>✓ Daily updates</span>
-              </div>
-            </div>
-
-            {/* Featured comparison card */}
-            <div style={{
-              padding: 24,
-              background: colors.bg2,
-              borderRadius: 16,
-              border: `1px solid ${colors.bg3}`,
-              maxWidth: 700,
-              margin: '0 auto',
-              textAlign: 'center',
-            }}>
-              <span style={{ fontSize: 28, marginBottom: 12, display: 'block' }}>⚔️</span>
-              <h3 style={{ fontSize: 18, fontWeight: 900, margin: 0, marginBottom: 8, color: colors.t1 }}>
-                Compare Anything
-              </h3>
-              <p style={{ fontSize: 14, color: colors.t3, margin: 0, marginBottom: 16 }}>
-                See how tools stack up side-by-side with complete data transparency
-              </p>
-              <Link href="/compare">
-                <a style={{
-                  color: colors.gold,
-                  textDecoration: 'none',
-                  fontWeight: 700,
-                  fontSize: 14,
-                  display: 'inline-block',
-                }}>
-                  Try Comparisons →
-                </a>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured items section */}
-        <section style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ marginBottom: 40 }}>
-            <h2 style={{
-              fontSize: 32,
-              fontWeight: 900,
-              margin: 0,
+              fontSize: 11,
+              fontWeight: 800,
+              color: G.t3,
               marginBottom: 8,
-              color: colors.t1,
-            }}>
-              🌟 Featured Today
+              textTransform: "uppercase",
+            }}
+          >
+            Score Breakdown
+          </div>
+          {Object.entries(breakdown).map(([key, val]) => (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: 12,
+                marginBottom: 4,
+              }}
+            >
+              <span style={{ color: G.t2 }}>{key}:</span>
+              <span style={{ color: G.gold, fontWeight: 700 }}>{val}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Trending Item Card
+function TrendingCard({ item, rank }) {
+  const trendingPercent = item.trending_score || 0;
+  const isRising = trendingPercent > 0;
+
+  return (
+    <Link
+      href={`/item/${item.slug}`}
+      style={{
+        display: "block",
+        padding: 16,
+        background: G.bg2,
+        border: `1px solid ${rank <= 3 ? G.borderG : G.border}`,
+        borderRadius: 12,
+        textDecoration: "none",
+        transition: "all 0.2s ease",
+        position: "relative",
+        overflow: "hidden",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = G.gold;
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = rank <= 3 ? G.borderG : G.border;
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
+    >
+      {/* Rank Badge */}
+      <div
+        style={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          background: rank <= 3 ? G.gold : G.bg3,
+          color: rank <= 3 ? "#000" : G.t2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          fontWeight: 900,
+          zIndex: 2,
+        }}
+      >
+        {rank}
+      </div>
+
+      <div style={{ display: "flex", gap: 16, marginLeft: 48 }}>
+        {/* Image */}
+        {item.image && (
+          <div
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 8,
+              backgroundImage: `url(${item.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              flexShrink: 0,
+            }}
+          />
+        )}
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: G.t1,
+              marginBottom: 4,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.name}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              color: G.t2,
+              marginBottom: 8,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {item.short_desc || "No description available"}
+          </div>
+
+          {/* Metrics */}
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <NovaScoreBadge score={item.rating || 85} size="small" />
+
+            {isRising && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "4px 8px",
+                  background: G.green + "15",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  color: G.green,
+                  fontWeight: 700,
+                }}
+              >
+                <Icon.trending />+{trendingPercent}%
+              </div>
+            )}
+
+            {item.save_count > 0 && (
+              <div style={{ fontSize: 11, color: G.t3 }}>
+                {item.save_count} saves
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// Compare Preview Card
+function ComparePreviewCard({ item1, item2 }) {
+  return (
+    <Link
+      href={`/compare?items=${item1.slug},${item2.slug}`}
+      style={{
+        display: "block",
+        padding: 20,
+        background: G.bg2,
+        border: `1px solid ${G.border}`,
+        borderRadius: 12,
+        textDecoration: "none",
+        transition: "all 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = G.gold;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = G.border;
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ color: G.gold }}>
+          <Icon.compare />
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: G.t1 }}>
+          Popular Comparison
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
+          gap: 12,
+          alignItems: "center",
+        }}
+      >
+        {/* Item 1 */}
+        <div style={{ textAlign: "center" }}>
+          {item1.image && (
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 8,
+                backgroundImage: `url(${item1.image})`,
+                backgroundSize: "cover",
+                margin: "0 auto 8px",
+              }}
+            />
+          )}
+          <div style={{ fontSize: 13, fontWeight: 700, color: G.t1 }}>
+            {item1.name}
+          </div>
+        </div>
+
+        {/* VS */}
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: G.t3,
+            padding: "4px 8px",
+            background: G.bg3,
+            borderRadius: 6,
+          }}
+        >
+          VS
+        </div>
+
+        {/* Item 2 */}
+        <div style={{ textAlign: "center" }}>
+          {item2.image && (
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 8,
+                backgroundImage: `url(${item2.image})`,
+                backgroundSize: "cover",
+                margin: "0 auto 8px",
+              }}
+            />
+          )}
+          <div style={{ fontSize: 13, fontWeight: 700, color: G.t1 }}>
+            {item2.name}
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          textAlign: "center",
+          fontSize: 12,
+          color: G.gold,
+        }}
+      >
+        View Comparison <Icon.arrow />
+      </div>
+    </Link>
+  );
+}
+
+export default function Home({
+  stats,
+  trendingItems,
+  recentItems,
+  compareExamples,
+}) {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  async function handleSubscribe(e) {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setSubscribed(true);
+        setEmail("");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  return (
+    <Layout>
+      <SEO
+        title="Nova - Intelligence Layer for Tech & Culture"
+        description="Real-time intelligence on trending tools, products, and content. Compare, analyze, and stay ahead with Nova's AI-powered insights."
+      />
+
+      {/* HERO SECTION */}
+      <section
+        style={{
+          padding: "80px 24px 60px",
+          background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${G.gold}08 0%, transparent 60%)`,
+          borderBottom: `1px solid ${G.border}`,
+        }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
+          {/* Badge */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              background: G.gold + "15",
+              border: `1px solid ${G.borderG}`,
+              borderRadius: 99,
+              fontSize: 11,
+              fontWeight: 800,
+              color: G.gold,
+              marginBottom: 24,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+            }}
+          >
+            <Icon.sparkle />
+            Intelligence Platform
+          </div>
+
+          {/* Main Heading */}
+          <h1
+            style={{
+              fontSize: "clamp(36px, 6vw, 72px)",
+              fontWeight: 900,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              marginBottom: 24,
+              background: `linear-gradient(135deg, ${G.t1} 0%, ${G.goldL} 100%)`,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Track What's Next in Tech
+          </h1>
+
+          {/* Subheading */}
+          <p
+            style={{
+              fontSize: "clamp(16px, 2vw, 20px)",
+              color: G.t2,
+              maxWidth: 680,
+              margin: "0 auto 40px",
+              lineHeight: 1.6,
+            }}
+          >
+            Real-time intelligence on AI tools, SaaS products, and emerging
+            tech. Compare features, track momentum, make informed decisions.
+          </p>
+
+          {/* CTA Buttons */}
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href="/trending"
+              style={{
+                padding: "14px 28px",
+                background: G.gold,
+                color: "#000",
+                borderRadius: 10,
+                fontSize: 15,
+                fontWeight: 800,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                transition: "transform 0.2s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "translateY(-2px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
+            >
+              <Icon.trending />
+              See What's Trending
+            </Link>
+
+            <Link
+              href="/compare"
+              style={{
+                padding: "14px 28px",
+                background: "transparent",
+                color: G.t1,
+                border: `1px solid ${G.border}`,
+                borderRadius: 10,
+                fontSize: 15,
+                fontWeight: 800,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = G.gold;
+                e.currentTarget.style.background = G.gold + "10";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = G.border;
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <Icon.compare />
+              Compare Tools
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: 32,
+              maxWidth: 600,
+              margin: "60px auto 0",
+              padding: "32px 0",
+              borderTop: `1px solid ${G.border}`,
+            }}
+          >
+            <StatCounter
+              value={stats.totalItems}
+              label="Tools Tracked"
+              delay={0}
+            />
+            <StatCounter
+              value={stats.totalUpdates}
+              label="Updates Today"
+              delay={200}
+            />
+            <StatCounter
+              value={stats.totalTrending}
+              label="Trending Now"
+              delay={400}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* TRENDING SECTION */}
+      <section
+        style={{ padding: "60px 24px", borderBottom: `1px solid ${G.border}` }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ marginBottom: 32 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 11,
+                fontWeight: 800,
+                color: G.gold,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: 8,
+              }}
+            >
+              <Icon.trending />
+              Trending
+            </div>
+            <h2
+              style={{
+                fontSize: 32,
+                fontWeight: 900,
+                letterSpacing: "-0.03em",
+                marginBottom: 8,
+              }}
+            >
+              Rising This Week
             </h2>
-            <p style={{ fontSize: 14, color: colors.t3, margin: 0 }}>
-              Hand-picked tools making waves
+            <p style={{ fontSize: 15, color: G.t2 }}>
+              Fastest-growing tools based on GitHub stars, Product Hunt votes,
+              and community saves
             </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 20,
-          }}>
-            {[1, 2, 3, 4].map(i => (
-              <div
-                key={i}
-                onMouseEnter={() => setHoveredItem(`featured-${i}`)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  padding: 24,
-                  background: hoveredItem === `featured-${i}` ? colors.bg3 : colors.bg2,
-                  borderRadius: 16,
-                  border: `1px solid ${hoveredItem === `featured-${i}` ? colors.gold + '40' : colors.bg3}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  transform: hoveredItem === `featured-${i}` ? 'translateY(-8px)' : 'translateY(0)',
-                }}
-              >
-                <div style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 12,
-                  background: colors.gold + '15',
-                  marginBottom: 16,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 28,
-                }}>
-                  {['🚀', '⚡', '🎯', '🔥'][i - 1]}
-                </div>
-                <h3 style={{ fontSize: 16, fontWeight: 900, margin: 0, marginBottom: 8, color: colors.t1 }}>
-                  Tool Name {i}
-                </h3>
-                <p style={{ fontSize: 13, color: colors.t3, margin: 0, marginBottom: 12 }}>
-                  Short description of this amazing tool
-                </p>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  paddingTop: 12,
-                  borderTop: `1px solid ${colors.bg3}`,
-                }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: colors.gold }}>
-                    ⭐ {88 + i}/100
-                  </span>
-                  <span style={{ fontSize: 12, color: colors.t3 }}>
-                    {2 + i}K saves
-                  </span>
-                </div>
-              </div>
+          <div style={{ display: "grid", gap: 12 }}>
+            {trendingItems.map((item, i) => (
+              <TrendingCard key={item.id} item={item} rank={i + 1} />
             ))}
           </div>
-        </section>
 
-        {/* Trending section */}
-        <section style={{
-          padding: '80px 24px',
-          background: colors.bg2,
-          borderTop: `1px solid ${colors.bg3}`,
-          borderBottom: `1px solid ${colors.bg3}`,
-        }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ marginBottom: 40 }}>
-              <h2 style={{
-                fontSize: 32,
-                fontWeight: 900,
-                margin: 0,
-                marginBottom: 8,
-                color: colors.t1,
-              }}>
-                📈 Trending This Week
-              </h2>
-              <p style={{ fontSize: 14, color: colors.t3, margin: 0 }}>
-                What's gaining momentum
-              </p>
-            </div>
-
-            {/* Trending carousel */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: 16,
-            }}>
-              {[1, 2, 3, 4, 5].map(i => (
-                <div
-                  key={i}
-                  onMouseEnter={() => setHoveredItem(`trending-${i}`)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                  style={{
-                    padding: 16,
-                    background: colors.bg,
-                    borderRadius: 12,
-                    border: `1px solid ${colors.bg3}`,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
-                  }}
-                >
-                  {/* Trending badge */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    padding: '4px 8px',
-                    background: colors.red,
-                    color: '#fff',
-                    borderRadius: 4,
-                    fontSize: 10,
-                    fontWeight: 800,
-                    animation: hoveredItem === `trending-${i}` ? 'bounce 0.6s ease' : 'none',
-                  }}>
-                    {500 + i * 10}% ↑
-                  </div>
-
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>
-                    {['🤖', '⚙️', '📱', '🔐', '🌍'][i - 1]}
-                  </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 800, margin: 0, marginBottom: 4, color: colors.t1 }}>
-                    Trending Tool {i}
-                  </h4>
-                  <p style={{ fontSize: 11, color: colors.t3, margin: 0 }}>
-                    +{2 + i}K stars this week
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <Link
+              href="/trending"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "12px 24px",
+                border: `1px solid ${G.border}`,
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 700,
+                color: G.t1,
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = G.gold;
+                e.currentTarget.style.color = G.gold;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = G.border;
+                e.currentTarget.style.color = G.t1;
+              }}
+            >
+              View All Trending Tools <Icon.arrow />
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Newsletter section */}
-        <section style({ padding: '80px 24px', maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{
-            padding: 48,
-            background: `linear-gradient(135deg, ${colors.gold}10, ${colors.gold}05)`,
-            borderRadius: 20,
-            border: `2px solid ${colors.gold}20`,
-            textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            {/* Background accent */}
+      {/* COMPARE ENGINE PREVIEW */}
+      <section
+        style={{
+          padding: "60px 24px",
+          background: G.bg2,
+          borderBottom: `1px solid ${G.border}`,
+        }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ marginBottom: 32 }}>
             <div
               style={{
-                position: 'absolute',
-                top: -50,
-                right: -50,
-                width: 200,
-                height: 200,
-                background: `radial-gradient(circle, ${colors.gold}15, transparent)`,
-                borderRadius: '50%',
-                pointerEvents: 'none',
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 11,
+                fontWeight: 800,
+                color: G.gold,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: 8,
+              }}
+            >
+              <Icon.compare />
+              Compare
+            </div>
+            <h2
+              style={{
+                fontSize: 32,
+                fontWeight: 900,
+                letterSpacing: "-0.03em",
+                marginBottom: 8,
+              }}
+            >
+              Side-by-Side Analysis
+            </h2>
+            <p style={{ fontSize: 15, color: G.t2 }}>
+              Make informed decisions with detailed feature comparisons
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {compareExamples.map((example, i) => (
+              <ComparePreviewCard
+                key={i}
+                item1={example[0]}
+                item2={example[1]}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* RECENTLY ADDED */}
+      <section
+        style={{ padding: "60px 24px", borderBottom: `1px solid ${G.border}` }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ marginBottom: 32 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 11,
+                fontWeight: 800,
+                color: G.gold,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: 8,
+              }}
+            >
+              <Icon.sparkle />
+              New
+            </div>
+            <h2
+              style={{
+                fontSize: 32,
+                fontWeight: 900,
+                letterSpacing: "-0.03em",
+                marginBottom: 8,
+              }}
+            >
+              Recently Added
+            </h2>
+            <p style={{ fontSize: 15, color: G.t2 }}>
+              Latest tools and products tracked by Nova
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {recentItems.map((item) => (
+              <Link
+                key={item.id}
+                href={`/item/${item.slug}`}
+                style={{
+                  display: "block",
+                  padding: 16,
+                  background: G.bg2,
+                  border: `1px solid ${G.border}`,
+                  borderRadius: 12,
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = G.gold;
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = G.border;
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                {item.image && (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: 140,
+                      borderRadius: 8,
+                      backgroundImage: `url(${item.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      marginBottom: 12,
+                    }}
+                  />
+                )}
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 800,
+                    color: G.t1,
+                    marginBottom: 6,
+                  }}
+                >
+                  {item.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: G.t2,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {item.short_desc}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER CTA */}
+      <section style={{ padding: "80px 24px" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+          <div
+            style={{
+              padding: "40px 32px",
+              background: G.bg2,
+              border: `1px solid ${G.border}`,
+              borderRadius: 16,
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `radial-gradient(ellipse 60% 80% at 50% -20%, ${G.gold}10 0%, transparent 70%)`,
+                pointerEvents: "none",
               }}
             />
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <h2 style={{
-                fontSize: 32,
-                fontWeight: 900,
-                margin: 0,
-                marginBottom: 12,
-                color: colors.t1,
-              }}>
-                📬 Weekly Intelligence
-              </h2>
-              <p style={{
-                fontSize: 16,
-                color: colors.t2,
-                margin: 0,
-                marginBottom: 32,
-                maxWidth: 600,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }}>
-                Get hand-curated insights on what's trending, why it matters, and what to watch next
-              </p>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                background: G.gold + "15",
+                border: `1px solid ${G.borderG}`,
+                borderRadius: 99,
+                fontSize: 10,
+                fontWeight: 800,
+                color: G.gold,
+                marginBottom: 20,
+                textTransform: "uppercase",
+              }}
+            >
+              <Icon.sparkle />
+              Weekly Intelligence Report
+            </div>
 
-              {/* Newsletter form */}
-              <form onSubmit={handleEmailSignup} style={{
-                display: 'flex',
-                gap: 8,
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginBottom: 16,
-              }}>
+            <h3 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>
+              Never Miss What's Trending
+            </h3>
+            <p style={{ fontSize: 15, color: G.t2, marginBottom: 28 }}>
+              Get the top 10 tools, products, and insights delivered every
+              Monday. Zero spam, always useful.
+            </p>
+
+            {subscribed ? (
+              <div
+                style={{
+                  padding: "14px 24px",
+                  background: G.green + "15",
+                  border: `1px solid ${G.green}40`,
+                  borderRadius: 10,
+                  color: G.green,
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                You're subscribed! Check your inbox.
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubscribe}
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  maxWidth: 400,
+                  margin: "0 auto",
+                }}
+              >
                 <input
                   type="email"
                   placeholder="your@email.com"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   style={{
-                    padding: '12px 16px',
+                    flex: 1,
+                    padding: "14px 18px",
+                    background: G.bg3,
+                    border: `1px solid ${G.border}`,
                     borderRadius: 10,
-                    border: `1px solid ${colors.gold}40`,
-                    background: colors.bg,
-                    color: colors.t1,
+                    color: G.t1,
                     fontSize: 14,
-                    minWidth: 280,
-                    outline: 'none',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = colors.gold;
-                    e.currentTarget.style.boxShadow = `0 0 12px ${colors.gold}20`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = colors.gold + '40';
-                    e.currentTarget.style.boxShadow = 'none';
+                    outline: "none",
                   }}
                 />
                 <button
                   type="submit"
                   style={{
-                    padding: '12px 24px',
-                    background: colors.gold,
-                    color: '#000',
-                    border: 'none',
+                    padding: "14px 24px",
+                    background: G.gold,
+                    color: "#000",
+                    border: "none",
                     borderRadius: 10,
-                    fontWeight: 800,
                     fontSize: 14,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = `0 8px 16px ${colors.gold}40`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Subscribe
                 </button>
               </form>
-
-              {emailSubscribed && (
-                <div style={{
-                  color: colors.green,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  animation: 'slideUp 0.3s ease',
-                }}>
-                  ✓ Thanks for subscribing!
-                </div>
-              )}
-
-              <p style={{
-                fontSize: 11,
-                color: colors.t3,
-                margin: 0,
-              }}>
-                🔒 No spam, unsubscribe anytime
-              </p>
-            </div>
+            )}
           </div>
-        </section>
-      </div>
-
-      {/* CSS animations */}
-      <style jsx>{`
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-4px);
-          }
-        }
-
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-    </>
+        </div>
+      </section>
+    </Layout>
   );
 }
 
-export async function getStaticProps() {
-  // TODO: Fetch featured and trending items from database
-  return {
-    props: {
-      featuredItems: [],
-      trendingItems: [],
-    },
-    revalidate: 3600,
-  };
+export async function getServerSideProps() {
+  try {
+    // Get trending items (AI Tools category)
+    const trending = await Items.getItems({
+      category: "ai-tools",
+      limit: 10,
+      orderBy: "trending_score",
+    });
+
+    // Get recent items
+    const recent = await Items.getItems({
+      category: "ai-tools",
+      limit: 12,
+      orderBy: "created_at",
+    });
+
+    // Get compare examples (manually selected popular comparisons)
+    const compareItems = await Items.getItems({
+      category: "ai-tools",
+      limit: 6,
+    });
+
+    const compareExamples = [];
+    for (let i = 0; i < compareItems.length - 1; i += 2) {
+      compareExamples.push([compareItems[i], compareItems[i + 1]]);
+    }
+
+    // Get stats
+    const { supabaseAdmin } = await import("shared/lib/supabaseAdmin");
+    const [itemsCount, todayCount, trendingCount] = await Promise.all([
+      supabaseAdmin.from("items").select("id", { count: "exact", head: true }),
+      supabaseAdmin
+        .from("items")
+        .select("id", { count: "exact", head: true })
+        .gte(
+          "created_at",
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        ),
+      supabaseAdmin
+        .from("items")
+        .select("id", { count: "exact", head: true })
+        .eq("trending", true),
+    ]);
+
+    return {
+      props: {
+        stats: {
+          totalItems: itemsCount.count || 0,
+          totalUpdates: todayCount.count || 0,
+          totalTrending: trendingCount.count || 0,
+        },
+        trendingItems: trending || [],
+        recentItems: recent || [],
+        compareExamples: compareExamples || [],
+      },
+    };
+  } catch (err) {
+    console.error("Homepage data fetch error:", err);
+    return {
+      props: {
+        stats: { totalItems: 0, totalUpdates: 0, totalTrending: 0 },
+        trendingItems: [],
+        recentItems: [],
+        compareExamples: [],
+      },
+    };
+  }
 }
