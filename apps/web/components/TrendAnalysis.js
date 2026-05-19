@@ -1,7 +1,7 @@
 ﻿// components/TrendAnalysis.js
-// Premium trend analysis with SVG icons, animations, and visual timeline
+// Premium trend analysis with icons, animations, and visual timeline
 import { useState } from "react";
-import { colors } from "shared/lib/design";
+import { colors } from "../lib/design";
 
 const reasonIcons = {
   launch: "🚀",
@@ -11,108 +11,6 @@ const reasonIcons = {
   viral: "🔥",
   update: "⚡",
   default: "→",
-};
-
-// SVG Icon renderer for reasons
-const getReasonIconSVG = (icon) => {
-  const iconMap = {
-    "🚀": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.gold}
-        strokeWidth="2"
-      >
-        <path d="M4 17l12-12" />
-        <path d="M20 4L8 16" />
-        <path d="M7 7L3.5 10.5" />
-        <path d="M21 3v6h-6" />
-      </svg>
-    ),
-    "💰": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.gold}
-        strokeWidth="2"
-      >
-        <circle cx="12" cy="12" r="8" />
-        <line x1="12" y1="8" x2="12" y2="16" />
-        <line x1="9.5" y1="11" x2="14.5" y2="13" />
-      </svg>
-    ),
-    "🏆": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.gold}
-        strokeWidth="2"
-      >
-        <path d="M6 9c0-1 .5-2 1.5-2h9c1 0 1.5 1 1.5 2v3c0 2-1 3-3 3h-6c-2 0-3-1-3-3V9z" />
-        <rect x="8" y="15" width="8" height="4" />
-        <line x1="10" y1="15" x2="10" y2="12" />
-        <line x1="14" y1="15" x2="14" y2="12" />
-      </svg>
-    ),
-    "📰": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.orange}
-        strokeWidth="2"
-      >
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <line x1="6" y1="9" x2="18" y2="9" />
-        <line x1="6" y1="13" x2="16" y2="13" />
-      </svg>
-    ),
-    "🔥": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.red}
-        strokeWidth="2"
-      >
-        <path d="M8 21s-.5-7 2-10c1-1.5 2-3 2-5 0-2-1-4-3-4-3 0-5 2-5 6 0 2 1 4 2 6-1 1-2 3-2 5 0 2 1 3 4 3z" />
-      </svg>
-    ),
-    "⚡": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.blue}
-        strokeWidth="2"
-      >
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-      </svg>
-    ),
-    "→": (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.t2}
-        strokeWidth="2"
-      >
-        <line x1="5" y1="12" x2="19" y2="12" />
-        <polyline points="12 5 19 12 12 19" />
-      </svg>
-    ),
-  };
-  return iconMap[icon] || iconMap["→"];
 };
 
 export default function TrendAnalysis({
@@ -167,50 +65,7 @@ export default function TrendAnalysis({
 
   const trendColor =
     trend === "up" ? colors.green : trend === "down" ? colors.red : colors.t3;
-
-  const TrendIcon = () => {
-    if (trend === "up") {
-      return (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={colors.green}
-          strokeWidth="2"
-        >
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-      );
-    } else if (trend === "down") {
-      return (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={colors.red}
-          strokeWidth="2"
-        >
-          <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-          <polyline points="17 18 23 18 23 12" />
-        </svg>
-      );
-    }
-    return (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={colors.t2}
-        strokeWidth="2"
-      >
-        <line x1="3" y1="12" x2="21" y2="12" />
-      </svg>
-    );
-  };
+  const trendEmoji = trend === "up" ? "📈" : trend === "down" ? "📉" : "→";
 
   return (
     <div
@@ -245,7 +100,7 @@ export default function TrendAnalysis({
             marginBottom: 8,
           }}
         >
-          <TrendIcon />
+          <span style={{ fontSize: 24 }}>{trendEmoji}</span>
           <h3
             style={{
               fontSize: 16,
@@ -317,16 +172,15 @@ export default function TrendAnalysis({
               }}
             >
               {/* Icon with animation */}
-              <div
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
+                  fontSize: 20,
                   animation: isExpanded ? "bounce 0.6s ease" : "none",
                   flexShrink: 0,
                 }}
               >
-                {getReasonIconSVG(icon)}
-              </div>
+                {icon}
+              </span>
 
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -463,4 +317,3 @@ export default function TrendAnalysis({
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 ﻿// pages/api/items/search.js
 // Search items by query with ranking by Nova Score
-import { supabase } from "shared/lib/supabase";
+import { supabase } from "../../../lib/supabase";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -77,5 +77,3 @@ export default async function handler(req, res) {
     });
   }
 }
-
-

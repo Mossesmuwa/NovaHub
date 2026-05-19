@@ -1,249 +1,241 @@
 ﻿// components/LoadingSkeletons.js
-import { colors } from "shared/lib/design";
+// Premium loading skeletons with smooth pulsing animations
+import { colors } from "../lib/design";
 
-/**
- * 🛰️ THE UPGRADE: Holographic Base Skeleton
- * Uses a sharper, high-contrast shimmer to mimic "data loading."
- */
-function Skeleton({
-  height = "1rem",
-  width = "100%",
-  borderRadius = "8px",
-  marginBottom = "0",
-}) {
+// Base skeleton component
+function Skeleton({ height = "1rem", width = "100%", borderRadius = "8px" }) {
   return (
     <div
-      className="skeleton-base"
       style={{
         height,
         width,
         borderRadius,
-        marginBottom,
-        position: "relative",
-        overflow: "hidden",
-        background: colors.bg3, // Base dark layer
+        background: `linear-gradient(90deg, ${colors.bg3} 0%, ${colors.bg4} 50%, ${colors.bg3} 100%)`,
+        backgroundSize: "200% 100%",
+        animation: "shimmer 1.5s infinite",
       }}
     />
   );
 }
 
-// 🗂️ Item card skeleton - Optimized for the "NovaHub" Feed
+// Item card skeleton
 export function ItemCardSkeleton() {
   return (
     <div
       style={{
-        padding: "20px",
-        background: `${colors.bg2}80`,
-        borderRadius: "20px",
+        padding: 16,
+        background: colors.bg2,
+        borderRadius: 12,
         border: `1px solid ${colors.bg3}`,
         display: "flex",
         flexDirection: "column",
-        gap: "16px",
-        backdropFilter: "blur(10px)",
+        gap: 12,
       }}
     >
-      <Skeleton height="180px" width="100%" borderRadius="14px" />
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <Skeleton height="22px" width="70%" />
+      {/* Image skeleton */}
+      <Skeleton height="200px" width="100%" borderRadius="8px" />
+
+      {/* Content skeleton */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <Skeleton height="20px" width="80%" />
         <Skeleton height="14px" width="100%" />
-        <Skeleton height="14px" width="40%" />
+        <Skeleton height="14px" width="90%" />
       </div>
+
+      {/* Footer skeleton */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginTop: "10px",
-          alignItems: "center",
+          gap: 8,
+          marginTop: 8,
         }}
       >
-        <Skeleton height="32px" width="32px" borderRadius="50%" />
-        <Skeleton height="24px" width="80px" borderRadius="99px" />
+        <Skeleton height="16px" width="30%" />
+        <Skeleton height="16px" width="40%" />
       </div>
     </div>
   );
 }
 
-// 🎯 Intelligence Score Gauge Skeleton
-export function ScoreGaugeSkeleton({ size = 180 }) {
+// Score gauge skeleton
+export function ScoreGaugeSkeleton({ size = 160 }) {
   return (
     <div
       style={{
-        padding: "30px",
-        background: `linear-gradient(180deg, ${colors.bg2}, transparent)`,
-        borderRadius: "24px",
+        padding: 24,
+        background: colors.bg2,
+        borderRadius: 16,
         border: `1px solid ${colors.bg3}`,
+        textAlign: "center",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "20px",
+        gap: 16,
       }}
     >
+      {/* Circular skeleton */}
       <div
         style={{
           width: size,
           height: size,
           borderRadius: "50%",
-          border: `4px solid ${colors.bg3}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
+          background: `linear-gradient(90deg, ${colors.bg3} 0%, ${colors.bg4} 50%, ${colors.bg3} 100%)`,
+          backgroundSize: "200% 100%",
+          animation: "shimmer 1.5s infinite",
         }}
-      >
-        <Skeleton height="40px" width="60px" />
-        {/* Decorative orbit ring */}
-        <div className="skeleton-orbit" />
-      </div>
-      <Skeleton height="18px" width="120px" />
+      />
+
+      {/* Text skeleton */}
+      <Skeleton height="16px" width="60%" />
+      <Skeleton height="12px" width="80%" />
     </div>
   );
 }
 
-// 🏛️ Item detail page skeleton - The "Full Terminal" look
+// Item detail page skeleton
 export function ItemDetailSkeleton() {
   return (
-    <div style={{ padding: "40px 24px", maxWidth: "1000px", margin: "0 auto" }}>
-      <div className="detail-header-grid">
-        <Skeleton height="160px" width="160px" borderRadius="24px" />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            flex: 1,
-          }}
-        >
-          <Skeleton height="40px" width="60%" />
-          <Skeleton height="20px" width="90%" />
-          <div style={{ display: "flex", gap: "12px" }}>
-            <Skeleton height="45px" width="140px" borderRadius="12px" />
-            <Skeleton height="45px" width="140px" borderRadius="12px" />
-          </div>
-        </div>
-      </div>
-
+    <div style={{ padding: "40px 24px", maxWidth: 1200, margin: "0 auto" }}>
+      {/* Header */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "30px",
-          marginTop: "60px",
+          gridTemplateColumns: "140px 1fr",
+          gap: 32,
+          marginBottom: 40,
         }}
       >
-        <ScoreGaugeSkeleton />
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} height="100px" width="100%" borderRadius="16px" />
-          ))}
+        <Skeleton height="140px" width="140px" borderRadius="12px" />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <Skeleton height="20px" width="60%" />
+          <Skeleton height="36px" width="80%" />
+          <Skeleton height="16px" width="100%" />
+          <div style={{ display: "flex", gap: 8 }}>
+            <Skeleton height="40px" width="120px" borderRadius="10px" />
+            <Skeleton height="40px" width="120px" borderRadius="10px" />
+            <Skeleton height="40px" width="120px" borderRadius="10px" />
+          </div>
         </div>
       </div>
 
-      <style jsx>{`
-        .detail-header-grid {
-          display: flex;
-          gap: 40px;
-          flex-wrap: wrap;
-        }
-        @media (max-width: 600px) {
-          .detail-header-grid {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// 📦 Global Switcher
-export default function LoadingState({ type = "grid", count = 6 }) {
-  const content = () => {
-    switch (type) {
-      case "card":
-        return <ItemCardSkeleton />;
-      case "gauge":
-        return <ScoreGaugeSkeleton />;
-      case "detail":
-        return <ItemDetailSkeleton />;
-      case "grid":
-        return (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: "24px",
-            }}
-          >
-            {Array.from({ length: count }).map((_, i) => (
-              <ItemCardSkeleton key={i} />
+      {/* Score section */}
+      <div style={{ marginBottom: 40 }}>
+        <Skeleton height="24px" width="30%" marginBottom="20px" />
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}
+        >
+          <ScoreGaugeSkeleton />
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton
+                key={i}
+                height="80px"
+                width="100%"
+                borderRadius="10px"
+              />
             ))}
           </div>
-        );
-      default:
-        return <ItemCardSkeleton />;
-    }
-  };
+        </div>
+      </div>
 
-  return (
-    <div className="loading-fade-in">
-      {content()}
-      <style jsx global>{`
-        .loading-fade-in {
-          animation: fadeIn 0.5s ease-out;
-        }
-
-        .skeleton-base::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          transform: translateX(-100%);
-          background: linear-gradient(
-            90deg,
-            transparent,
-            ${colors.gold}10,
-            /* Subtle Gold Shimmer */ ${colors.gold}25,
-            /* Brighter Center */ ${colors.gold}10,
-            transparent
-          );
-          animation: shimmer-stream 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .skeleton-orbit {
-          position: absolute;
-          inset: -10px;
-          border: 1px dashed ${colors.bg4};
-          border-radius: 50%;
-          animation: rotate 10s linear infinite;
-        }
-
-        @keyframes shimmer-stream {
-          100% {
-            transform: translateX(100%);
-          }
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes rotate {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
+      {/* Content sections */}
+      {[1, 2, 3].map((section) => (
+        <div key={section} style={{ marginBottom: 40 }}>
+          <Skeleton height="24px" width="40%" marginBottom="20px" />
+          <Skeleton height="200px" width="100%" borderRadius="12px" />
+        </div>
+      ))}
     </div>
   );
 }
 
+// Grid of items skeleton
+export function ItemGridSkeleton({ count = 6 }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        gap: 20,
+      }}
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <ItemCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
+
+// Search results skeleton
+export function SearchResultsSkeleton() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            padding: 16,
+            background: colors.bg2,
+            borderRadius: 12,
+            border: `1px solid ${colors.bg3}`,
+            display: "flex",
+            gap: 16,
+            alignItems: "center",
+          }}
+        >
+          <Skeleton height="60px" width="60px" borderRadius="8px" />
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <Skeleton height="18px" width="40%" />
+            <Skeleton height="14px" width="70%" />
+            <Skeleton height="14px" width="60%" />
+          </div>
+          <Skeleton height="32px" width="80px" borderRadius="8px" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Export main component
+export default function LoadingState({ type = "item", count = 6 }) {
+  switch (type) {
+    case "card":
+      return <ItemCardSkeleton />;
+    case "gauge":
+      return <ScoreGaugeSkeleton />;
+    case "detail":
+      return <ItemDetailSkeleton />;
+    case "grid":
+      return <ItemGridSkeleton count={count} />;
+    case "search":
+      return <SearchResultsSkeleton />;
+    default:
+      return <ItemCardSkeleton />;
+  }
+}
+
+// CSS for shimmer animation
+const styles = `
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+`;
+
+if (typeof document !== "undefined") {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = styles;
+  document.head.appendChild(styleSheet);
+}

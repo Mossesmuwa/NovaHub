@@ -1,7 +1,7 @@
 ﻿// components/ScoreBreakdown.js
 // Premium score breakdown with smooth animations and interactive tooltips
 import { useState } from "react";
-import { colors } from "shared/lib/design";
+import { colors } from "../lib/design";
 
 const componentInfo = {
   github: {
@@ -223,4 +223,3 @@ export default function ScoreBreakdown({
     </div>
   );
 }
-
