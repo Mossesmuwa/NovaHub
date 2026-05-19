@@ -70,3 +70,6 @@ pids/
 *.seed
 *.pid.lock
 coverage/
+
+
+ARCHITECTURE.md

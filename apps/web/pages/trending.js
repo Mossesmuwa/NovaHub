@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+﻿import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState } from "react";
 
 const THEME = {
@@ -15,12 +15,19 @@ function getRankMedal(rank) {
     { color: "#C0C0C0", label: "2nd" },
     { color: "#CD7F32", label: "3rd" },
   ];
-  
+
   if (rank < 3) {
     const medal = medals[rank];
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill={medal.color} stroke={medal.color} strokeWidth="1">
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill={medal.color}
+          stroke={medal.color}
+          strokeWidth="1"
+        >
           <circle cx="12" cy="8" r="4"></circle>
           <path d="M6 12h12v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8z"></path>
           <line x1="6" y1="12" x2="3" y2="18"></line>
@@ -29,7 +36,11 @@ function getRankMedal(rank) {
       </div>
     );
   }
-  return <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>#{rank + 1}</div>;
+  return (
+    <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>
+      #{rank + 1}
+    </div>
+  );
 }
 
 export default function PremiumTrending({ items = [] }) {
@@ -73,7 +84,7 @@ export default function PremiumTrending({ items = [] }) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div style={styles.kicker}>GLOBAL TREND ENGINE</div>
             <h1 style={styles.title}>
-              What’s <span style={{ color: THEME.gold }}>Exploding</span> Now
+              Whatâ€™s <span style={{ color: THEME.gold }}>Exploding</span> Now
             </h1>
           </motion.div>
         </header>
@@ -284,3 +295,4 @@ const styles = {
     fontWeight: 800,
   },
 };
+

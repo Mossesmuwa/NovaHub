@@ -1,4 +1,4 @@
-// pages/api/ingest/omdb.js
+﻿// pages/api/ingest/omdb.js
 // Vercel Cron: 0 7 * * * (7am UTC daily)
 // Enriches existing movies with IMDB, RT, Metacritic scores.
 
@@ -18,4 +18,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+
 

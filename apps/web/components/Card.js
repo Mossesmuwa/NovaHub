@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import NovaScore from "./NovaScore";
 import { esc } from "shared/lib/helpers";
 
@@ -13,9 +13,9 @@ export function PosterCard({ item }) {
         className="bg-zoom"
         style={{ backgroundImage: `url('${item.image || ""}')` }}
       ></div>
-      {item.trending && <span className="badge badge-trending">🔥 Hot</span>}
+      {item.trending && <span className="badge badge-trending">ðŸ”¥ Hot</span>}
       {!item.trending && item.daily_pick && (
-        <span className="badge badge-pick">⭐ Pick</span>
+        <span className="badge badge-pick">â­ Pick</span>
       )}
       <div className="card-poster-content">
         <div className="card-poster-title">{item.name}</div>
@@ -164,7 +164,7 @@ export function ToolCard({ item }) {
           style={{ fontSize: "12px", padding: "7px 14px" }}
           onClick={(e) => e.stopPropagation()}
         >
-          Get →
+          Get â†’
         </a>
       </div>
     </div>
@@ -182,7 +182,7 @@ export function CardGrid({ items, gridClass = "grid-4 stagger" }) {
   if (!items || !items.length) {
     return (
       <div className="empty-state">
-        <span className="empty-state-icon">📭</span>
+        <span className="empty-state-icon">ðŸ“­</span>
         <p>Nothing here yet.</p>
       </div>
     );
@@ -219,11 +219,12 @@ export function CarouselNav({ id }) {
   return (
     <div className="carousel-nav">
       <button className="carousel-btn" onClick={() => scroll(-1)}>
-        ←
+        â†
       </button>
       <button className="carousel-btn" onClick={() => scroll(1)}>
-        →
+        â†’
       </button>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-// pages/index.js - Nova Intelligence Layer Homepage
+﻿// pages/index.js - Nova Intelligence Layer Homepage
 import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
@@ -1115,3 +1115,4 @@ export async function getServerSideProps() {
     };
   }
 }
+

@@ -1,5 +1,5 @@
-// hooks/usePro.js
-// NovaHub — Pro Status Hook
+﻿// hooks/usePro.js
+// NovaHub â€” Pro Status Hook
 // Returns the current user's pro status, days remaining, and feature access map.
 //
 // Usage:
@@ -9,9 +9,9 @@
 import { useState, useEffect } from "react";
 import { supabase, getCurrentUser } from "shared/lib/supabase";
 
-// ─── Feature access map ───────────────────────────────────────────────────────
+// â”€â”€â”€ Feature access map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Defines exactly what free vs pro users can do.
-// Add new features here — ProGate + usePro read from this single source of truth.
+// Add new features here â€” ProGate + usePro read from this single source of truth.
 export const FEATURES = {
   // Saves
   savesUnlimited: { pro: true, free: false, label: "Unlimited saves" },
@@ -59,7 +59,7 @@ export const FEATURES = {
   },
 };
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function usePro() {
   const [isPro, setIsPro] = useState(false);
   const [daysLeft, setDaysLeft] = useState(null);
@@ -172,3 +172,4 @@ export function usePro() {
 
   return { isPro, daysLeft, can, limit, loading, userId };
 }
+

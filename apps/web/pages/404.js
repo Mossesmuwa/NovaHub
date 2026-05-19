@@ -1,4 +1,4 @@
-// pages/404.js
+﻿// pages/404.js
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -334,3 +334,4 @@ export default function UltimateAdaptive404() {
     </div>
   );
 }
+

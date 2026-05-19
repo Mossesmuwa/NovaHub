@@ -1,4 +1,4 @@
-// ======================================================
+﻿// ======================================================
 // FILE: apps/web/pages/account/login.js
 // PURPOSE:
 // Central authentication page for NovaHub (WEB APP).
@@ -105,7 +105,7 @@ export default function LoginPage() {
   // --------------------------------------------------
   return (
     <>
-      <SEO title="Sign In — NovaHub" />
+      <SEO title="Sign In â€” NovaHub" />
 
       <div className="page-wrap">
         <div className="auth-card">
@@ -163,3 +163,4 @@ export default function LoginPage() {
     </>
   );
 }
+

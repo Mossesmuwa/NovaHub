@@ -1,4 +1,4 @@
-// pages/account/profile.js
+﻿// pages/account/profile.js
 // Public user profile page with lists showcase
 
 import { useState, useEffect } from "react";
@@ -103,7 +103,7 @@ export default function ProfilePage() {
               display: "inline-block",
             }}
           >
-            ← Back to Discover
+            â† Back to Discover
           </Link>
         </div>
       </Layout>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                   fontSize: "48px",
                 }}
               >
-                ◆
+                â—†
               </div>
             )}
           </div>
@@ -211,7 +211,7 @@ export default function ProfilePage() {
                     letterSpacing: "0.5px",
                   }}
                 >
-                  PRO ✦
+                  PRO âœ¦
                 </span>
               )}
             </div>
@@ -334,3 +334,4 @@ export default function ProfilePage() {
     </Layout>
   );
 }
+

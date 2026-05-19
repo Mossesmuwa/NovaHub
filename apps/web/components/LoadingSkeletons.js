@@ -246,3 +246,4 @@ export default function LoadingState({ type = "grid", count = 6 }) {
     </div>
   );
 }
+

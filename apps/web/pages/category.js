@@ -398,3 +398,4 @@ export default function CategoryPage() {
     </Layout>
   );
 }
+

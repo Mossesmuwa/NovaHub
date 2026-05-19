@@ -1,4 +1,4 @@
-// pages/account/dashboard.js
+﻿// pages/account/dashboard.js
 import { useState, useEffect, useRef } from "react";
 import Layout from "../../components/Layout";
 import SEO from "../../components/SEO";
@@ -8,40 +8,40 @@ import { useSupabase } from "shared/lib/SupabaseContext";
 import * as Auth from "shared/lib/auth";
 import * as Favorites from "shared/lib/favorites";
 
-// ─── Nova Rank system ────────────────────────────────────────────────────────
+// â”€â”€â”€ Nova Rank system â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RANKS = [
   {
     min: 50,
     rank: "Nova Master",
-    icon: "✦",
+    icon: "âœ¦",
     color: "#C9A84C",
     desc: "Elite discoverer",
   },
   {
     min: 20,
     rank: "Archivist",
-    icon: "◈",
+    icon: "â—ˆ",
     color: "#7F77DD",
     desc: "Serious collector",
   },
   {
     min: 10,
     rank: "Curator",
-    icon: "◉",
+    icon: "â—‰",
     color: "#1D9E75",
     desc: "Building taste",
   },
   {
     min: 3,
     rank: "Explorer",
-    icon: "◎",
+    icon: "â—Ž",
     color: "#3B8BD4",
     desc: "Finding your vibe",
   },
   {
     min: 0,
     rank: "Newcomer",
-    icon: "○",
+    icon: "â—‹",
     color: "#636366",
     desc: "Just getting started",
   },
@@ -50,7 +50,7 @@ function getNovaRank(n) {
   return RANKS.find((r) => n >= r.min) || RANKS[RANKS.length - 1];
 }
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Animated counter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Counter({ value, duration = 700 }) {
   const [n, setN] = useState(0);
   useEffect(() => {
@@ -69,12 +69,12 @@ function Counter({ value, duration = 700 }) {
   return <>{n}</>;
 }
 
-// ─── Tabs ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TABS = [
-  { key: "saved", icon: "♥", label: "Saved" },
-  { key: "lists", icon: "◫", label: "Lists" },
-  { key: "taste", icon: "✦", label: "Taste DNA" },
-  { key: "settings", icon: "⊙", label: "Settings" },
+  { key: "saved", icon: "â™¥", label: "Saved" },
+  { key: "lists", icon: "â—«", label: "Lists" },
+  { key: "taste", icon: "âœ¦", label: "Taste DNA" },
+  { key: "settings", icon: "âŠ™", label: "Settings" },
 ];
 
 export default function Dashboard() {
@@ -156,7 +156,7 @@ export default function Dashboard() {
       .eq("id", user.id);
     if (!error)
       setProfile({ ...profile, display_name: sName, bio: sBio, website: sWeb });
-    setPMsg(error ? "Error saving." : "✦ Saved!");
+    setPMsg(error ? "Error saving." : "âœ¦ Saved!");
     setTimeout(() => setPMsg(""), 3000);
   }
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
       return;
     }
     const { error } = await supabase.auth.updateUser({ password: pw });
-    setPwMsg(error ? error.message : "✦ Password updated!");
+    setPwMsg(error ? error.message : "âœ¦ Password updated!");
     if (!error) setPw("");
     setTimeout(() => setPwMsg(""), 3000);
   }
@@ -191,7 +191,7 @@ export default function Dashboard() {
   if (!user || loading)
     return (
       <Layout>
-        <SEO title="Dashboard — NovaHub" />
+        <SEO title="Dashboard â€” NovaHub" />
         <div
           style={{
             display: "flex",
@@ -213,7 +213,7 @@ export default function Dashboard() {
             }}
           />
           <span style={{ color: "var(--t3)", fontSize: 14 }}>
-            Loading your space…
+            Loading your spaceâ€¦
           </span>
         </div>
       </Layout>
@@ -221,7 +221,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <SEO title={`${displayName} — NovaHub`} />
+      <SEO title={`${displayName} â€” NovaHub`} />
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
@@ -240,7 +240,7 @@ export default function Dashboard() {
         .fav-card-wrap:hover .fav-remove { opacity:1; }
       `}</style>
 
-      {/* ── HERO HEADER ── */}
+      {/* â”€â”€ HERO HEADER â”€â”€ */}
       <div
         style={{
           background:
@@ -379,9 +379,9 @@ export default function Dashboard() {
             }}
           >
             {[
-              { value: favs.length, label: "Saved", icon: "♥" },
-              { value: lists.length, label: "Lists", icon: "◫" },
-              { value: daysMember, label: "Days exploring", icon: "◎" },
+              { value: favs.length, label: "Saved", icon: "â™¥" },
+              { value: lists.length, label: "Lists", icon: "â—«" },
+              { value: daysMember, label: "Days exploring", icon: "â—Ž" },
             ].map((s) => (
               <div
                 key={s.label}
@@ -442,15 +442,15 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── CONTENT ── */}
+      {/* â”€â”€ CONTENT â”€â”€ */}
       <div style={{ padding: "32px 0 80px" }}>
         <div className="container">
-          {/* ── SAVED ── */}
+          {/* â”€â”€ SAVED â”€â”€ */}
           {tab === "saved" && (
             <div>
               {favs.length === 0 ? (
                 <div className="empty-state">
-                  <span className="empty-icon">♡</span>
+                  <span className="empty-icon">â™¡</span>
                   <h3>Nothing saved yet</h3>
                   <p>
                     Tap the heart on anything you discover and it'll live here.
@@ -476,7 +476,7 @@ export default function Dashboard() {
                       saved item{favs.length !== 1 ? "s" : ""}
                       {favs.length >= 10 && (
                         <span style={{ color: "#7F77DD", marginLeft: 8 }}>
-                          · {rank.rank} tier
+                          Â· {rank.rank} tier
                         </span>
                       )}
                     </p>
@@ -489,7 +489,7 @@ export default function Dashboard() {
                         textDecoration: "none",
                       }}
                     >
-                      View all →
+                      View all â†’
                     </Link>
                   </div>
                   <div
@@ -515,7 +515,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ── LISTS ── */}
+          {/* â”€â”€ LISTS â”€â”€ */}
           {tab === "lists" && (
             <div>
               <div
@@ -546,7 +546,7 @@ export default function Dashboard() {
               </div>
               {lists.length === 0 ? (
                 <div className="empty-state">
-                  <span className="empty-icon">◫</span>
+                  <span className="empty-icon">â—«</span>
                   <h3>No lists yet</h3>
                   <p>Group your discoveries into shareable collections.</p>
                   <button className="btn-primary" onClick={createList}>
@@ -565,7 +565,7 @@ export default function Dashboard() {
                           marginBottom: 10,
                         }}
                       >
-                        <div style={{ fontSize: 22, lineHeight: 1 }}>◫</div>
+                        <div style={{ fontSize: 22, lineHeight: 1 }}>â—«</div>
                         <span
                           style={{
                             fontSize: 10,
@@ -576,12 +576,12 @@ export default function Dashboard() {
                             color: "var(--t3)",
                           }}
                         >
-                          {l.is_public ? ("Public") : ("Private")}
+                          {l.is_public ? "Public" : "Private"}
                         </span>
                       </div>
                       <div className="card-title">{l.name}</div>
                       <p className="card-desc">
-                        {l.description || "No description"} ·{" "}
+                        {l.description || "No description"} Â·{" "}
                         {l.item_count || 0} items
                       </p>
                     </div>
@@ -591,7 +591,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ── TASTE DNA ── */}
+          {/* â”€â”€ TASTE DNA â”€â”€ */}
           {tab === "taste" && (
             <div style={{ maxWidth: 640 }}>
               <div style={{ marginBottom: 32 }}>
@@ -610,7 +610,7 @@ export default function Dashboard() {
                     marginBottom: 12,
                   }}
                 >
-                  ✦ Your Taste Profile
+                  âœ¦ Your Taste Profile
                 </div>
                 <h2
                   style={{
@@ -629,7 +629,7 @@ export default function Dashboard() {
 
               {!taste ? (
                 <div className="empty-state">
-                  <span className="empty-icon">✦</span>
+                  <span className="empty-icon">âœ¦</span>
                   <h3>No taste profile yet</h3>
                   <p>
                     Complete the onboarding quiz to generate your Taste DNA.
@@ -776,7 +776,7 @@ export default function Dashboard() {
                               color: "var(--gold)",
                             }}
                           >
-                            ♥ {item}
+                            â™¥ {item}
                           </span>
                         ))}
                       </div>
@@ -792,7 +792,7 @@ export default function Dashboard() {
                         textDecoration: "none",
                       }}
                     >
-                      ↺ Retake taste quiz
+                      â†º Retake taste quiz
                     </Link>
                   </div>
                 </>
@@ -800,7 +800,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ── SETTINGS ── */}
+          {/* â”€â”€ SETTINGS â”€â”€ */}
           {tab === "settings" && (
             <div style={{ maxWidth: 560 }}>
               {/* Profile section */}
@@ -842,7 +842,7 @@ export default function Dashboard() {
                       {displayName}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--t3)" }}>
-                      {rank.icon} {rank.rank} · {daysMember} days
+                      {rank.icon} {rank.rank} Â· {daysMember} days
                     </div>
                   </div>
                 </div>
@@ -944,7 +944,7 @@ export default function Dashboard() {
                     style={{
                       marginTop: 10,
                       fontSize: 13,
-                      color: pwMsg.includes("✦") ? "#30D158" : "#FF453A",
+                      color: pwMsg.includes("âœ¦") ? "#30D158" : "#FF453A",
                     }}
                   >
                     {pwMsg}
@@ -1027,12 +1027,12 @@ function FavCard({ item, onRemove, router }) {
           <div className="card-poster-content">
             <div className="card-poster-title">{item.name}</div>
             {item.rating && (
-              <div className="card-poster-rating">★ {item.rating}</div>
+              <div className="card-poster-rating">â˜… {item.rating}</div>
             )}
           </div>
         </Link>
         <button className="fav-remove" onClick={() => onRemove(item.id)}>
-          ✕
+          âœ•
         </button>
       </div>
     );
@@ -1051,7 +1051,7 @@ function FavCard({ item, onRemove, router }) {
           onRemove(item.id);
         }}
       >
-        ✕
+        âœ•
       </button>
       <div className="card-icon">{(item.name || "?").charAt(0)}</div>
       <div className="card-title">{item.name}</div>
@@ -1067,3 +1067,4 @@ function FavCard({ item, onRemove, router }) {
     </div>
   );
 }
+

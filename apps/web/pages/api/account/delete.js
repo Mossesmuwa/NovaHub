@@ -1,7 +1,7 @@
-// pages/api/account/delete.js
+﻿// pages/api/account/delete.js
 // Permanently deletes a user account and all associated data.
 // Requires: SUPABASE_SERVICE_ROLE_KEY (to delete from auth.users)
-// Called from dashboard settings → danger zone
+// Called from dashboard settings â†’ danger zone
 
 import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
@@ -10,7 +10,7 @@ import Stripe from "stripe";
 export default async function handler(req, res) {
   if (req.method !== "DELETE") return res.status(405).end();
 
-  // ── Verify session ────────────────────────────────────────────────────────
+  // â”€â”€ Verify session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const token = req.headers.authorization?.replace("Bearer ", "").trim();
   if (!token) return res.status(401).json({ error: "Not authenticated" });
 
@@ -32,14 +32,14 @@ export default async function handler(req, res) {
   const admin = supabaseAdmin;
 
   try {
-    // ── 1. Get profile for Stripe customer ID ────────────────────────────────
+    // â”€â”€ 1. Get profile for Stripe customer ID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const { data: profile } = await admin
       .from("profiles")
       .select("stripe_customer_id, stripe_subscription_id, is_pro")
       .eq("id", user.id)
       .single();
 
-    // ── 2. Cancel Stripe subscription if active ───────────────────────────────
+    // â”€â”€ 2. Cancel Stripe subscription if active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (profile?.stripe_subscription_id && process.env.STRIPE_SECRET_KEY) {
       try {
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         await stripe.subscriptions.cancel(profile.stripe_subscription_id);
         console.log("[account/delete] Stripe subscription cancelled");
       } catch (stripeErr) {
-        // Non-fatal — log and continue with deletion
+        // Non-fatal â€” log and continue with deletion
         console.warn(
           "[account/delete] Stripe cancel failed:",
           stripeErr.message,
@@ -56,13 +56,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // ── 3. Delete user data (cascade handles most via FK constraints) ─────────
+    // â”€â”€ 3. Delete user data (cascade handles most via FK constraints) â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Explicit deletes for tables without CASCADE
     await admin.from("comment_likes").delete().eq("user_id", user.id);
     await admin.from("ratings").delete().eq("user_id", user.id);
     await admin.from("history").delete().eq("user_id", user.id);
 
-    // ── 4. Delete from auth.users (cascades to profiles via trigger) ──────────
+    // â”€â”€ 4. Delete from auth.users (cascades to profiles via trigger) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const { error: deleteErr } = await admin.auth.admin.deleteUser(user.id);
     if (deleteErr) {
       console.error(
@@ -83,3 +83,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+

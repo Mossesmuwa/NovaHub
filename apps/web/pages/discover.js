@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
@@ -13,7 +13,7 @@ const THEME = {
   default: "#D4AF37",
 };
 
-// ─── Visual Component: Premium Glass Card ────────────────────────────────────
+// â”€â”€â”€ Visual Component: Premium Glass Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function DiscoveryCard({ item, index }) {
   const accent = THEME[item.type] || THEME.default;
 
@@ -96,7 +96,7 @@ function DiscoveryCard({ item, index }) {
             gap: "5px",
           }}
         >
-          Explore Analysis <span style={{ color: accent }}>→</span>
+          Explore Analysis <span style={{ color: accent }}>â†’</span>
         </div>
       </Link>
     </motion.div>
@@ -146,9 +146,9 @@ export default function DiscoverPage() {
 
   return (
     <Layout activePage="discover">
-      <SEO title="Neural Discovery — NovaHub" />
+      <SEO title="Neural Discovery â€” NovaHub" />
 
-      {/* ── CINEMATIC HEADER ── */}
+      {/* â”€â”€ CINEMATIC HEADER â”€â”€ */}
       <div
         style={{
           height: "80vh",
@@ -196,7 +196,7 @@ export default function DiscoverPage() {
           mind.
         </p>
 
-        {/* ── THE INTERFACE (The Wow Part) ── */}
+        {/* â”€â”€ THE INTERFACE (The Wow Part) â”€â”€ */}
         <div style={{ marginTop: "60px", width: "100%", maxWidth: "400px" }}>
           {/* Custom Slider 1 */}
           <div style={{ marginBottom: "40px" }}>
@@ -253,7 +253,7 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* ── RESULTS ── */}
+      {/* â”€â”€ RESULTS â”€â”€ */}
       <div className="container" style={{ paddingBottom: "100px" }}>
         <div
           style={{

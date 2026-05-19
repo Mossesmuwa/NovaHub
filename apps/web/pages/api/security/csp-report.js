@@ -1,5 +1,5 @@
-// pages/api/security/csp-report.js
-// NovaHub — CSP Violation Reporting Endpoint
+﻿// pages/api/security/csp-report.js
+// NovaHub â€” CSP Violation Reporting Endpoint
 // Logs Content Security Policy violations for security monitoring
 
 import { securityLogger } from "shared/lib/securityLogger";
@@ -25,3 +25,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+

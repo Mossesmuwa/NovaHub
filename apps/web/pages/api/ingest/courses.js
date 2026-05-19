@@ -1,4 +1,4 @@
-// pages/api/ingest/courses.js
+﻿// pages/api/ingest/courses.js
 import { SyncEngine } from 'shared/lib/pipeline/SyncEngine.js';
 import { CoursesProvider } from 'shared/lib/pipeline/CoursesProvider.js';
 export const config = { maxDuration: 60 };
@@ -9,4 +9,5 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, ...result });
   } catch (err) { return res.status(500).json({ success: false, error: err.message }); }
 }
+
 

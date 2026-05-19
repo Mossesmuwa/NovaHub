@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function JoinClubModal({
   open,
@@ -12,9 +12,9 @@ export default function JoinClubModal({
     <div style={overlayStyle} onClick={onClose}>
       <div style={cardStyle} onClick={(e) => e.stopPropagation()}>
         <button style={closeStyle} onClick={onClose} aria-label="Close">
-          ×
+          Ã—
         </button>
-        <div style={iconStyle}>✦</div>
+        <div style={iconStyle}>âœ¦</div>
         <h2 style={titleStyle}>Join the Club</h2>
         <p style={copyStyle}>
           Sync your favorites across devices with a free account, and go further
@@ -138,3 +138,4 @@ const secondaryButtonStyle = {
   color: "#f8fafc",
   cursor: "pointer",
 };
+

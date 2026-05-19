@@ -1,4 +1,4 @@
-// pages/api/stripe/checkout.js
+﻿// pages/api/stripe/checkout.js
 // Creates a Stripe Checkout session for Nova Pro subscription.
 // Called from pages/pro/index.js
 
@@ -87,4 +87,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 

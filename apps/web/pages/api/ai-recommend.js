@@ -1,5 +1,5 @@
-// pages/api/ai-recommend.js
-// NovaHub — AI Recommendation Endpoint (JSON, non-streaming)
+﻿// pages/api/ai-recommend.js
+// NovaHub â€” AI Recommendation Endpoint (JSON, non-streaming)
 // Use this for: server-side rendering, prefetch, non-realtime surfaces.
 // For realtime streaming UI use pages/api/ai-stream.js instead.
 
@@ -18,7 +18,7 @@ const anthropicKey = getEnvCredential(
 );
 const anthropic = new Anthropic({ apiKey: anthropicKey });
 
-// ─── Cache ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 function makeCacheKey(mode, params) {
@@ -64,7 +64,7 @@ async function setCache(cacheKey, mode, response) {
   );
 }
 
-// ─── Vibe labels ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Vibe labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function vibeLabel(value, low, high) {
   if (value < 25) return low;
   if (value < 50) return `leaning ${low}`;
@@ -72,16 +72,16 @@ function vibeLabel(value, low, high) {
   return high;
 }
 
-// ─── System prompt ────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are NovaHub's discovery curator — a taste-forward AI that recommends niche, 
+// â”€â”€â”€ System prompt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const SYSTEM_PROMPT = `You are NovaHub's discovery curator â€” a taste-forward AI that recommends niche, 
 genuinely interesting content. NovaHub covers: movies, TV shows, books, games, AI tools, productivity 
 tools, music, courses, videos, podcasts, design tools, security tools, science resources, finance tools.
 
-Your recommendations should feel like advice from a knowledgeable friend — specific, opinionated, and 
+Your recommendations should feel like advice from a knowledgeable friend â€” specific, opinionated, and 
 non-obvious. Avoid mainstream blockbusters unless they're genuinely the best fit. Favour cult classics, 
 indie gems, niche tools, and underrated picks.
 
-CRITICAL: You must respond ONLY with a valid JSON array — no preamble, no markdown, no explanation.
+CRITICAL: You must respond ONLY with a valid JSON array â€” no preamble, no markdown, no explanation.
 No \`\`\`json fences. Just the raw JSON array.
 
 Each item must have exactly:
@@ -97,7 +97,7 @@ Each item must have exactly:
 
 Return exactly the number of items requested. No duplicates.`;
 
-// ─── Prompt builders ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Prompt builders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildPrompt(mode, body) {
   const count = body.limit || 6;
   switch (mode) {
@@ -126,7 +126,7 @@ Return JSON array of ${count} alternatives.`;
     }
     case "vibe": {
       const { mood = 50, energy = 50, focus = 50 } = body;
-      return `Recommend ${count} items for vibe — Mood: ${vibeLabel(mood, "chill", "intense")} (${mood}/100), Energy: ${vibeLabel(energy, "relaxed", "energetic")} (${energy}/100), Focus: ${vibeLabel(focus, "casual", "deep-focus")} (${focus}/100). Set type="discovery", similarity_score=0. Return JSON array.`;
+      return `Recommend ${count} items for vibe â€” Mood: ${vibeLabel(mood, "chill", "intense")} (${mood}/100), Energy: ${vibeLabel(energy, "relaxed", "energetic")} (${energy}/100), Focus: ${vibeLabel(focus, "casual", "deep-focus")} (${focus}/100). Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     case "related": {
       const { item } = body;
@@ -136,17 +136,17 @@ Return JSON array of ${count} alternatives.`;
     case "taste": {
       const { taste } = body;
       if (!taste) throw new Error("mode=taste requires a taste object");
-      return `Recommend ${count} personalised picks — likes: ${taste.cats?.join(", ") || "general"}, loved: ${taste.loved?.join(", ") || "none"}, goal: ${taste.mood || "explore"}. Mix types. Set type="discovery", similarity_score=0. Return JSON array.`;
+      return `Recommend ${count} personalised picks â€” likes: ${taste.cats?.join(", ") || "general"}, loved: ${taste.loved?.join(", ") || "none"}, goal: ${taste.mood || "explore"}. Mix types. Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     case "surprise": {
-      return `Return ${count} "surprise me" recommendations — mix of hidden gems, underrated tools, and slightly unexpected but useful items. Focus on quality over randomness. Set type="discovery", similarity_score=0. Return JSON array.`;
+      return `Return ${count} "surprise me" recommendations â€” mix of hidden gems, underrated tools, and slightly unexpected but useful items. Focus on quality over randomness. Set type="discovery", similarity_score=0. Return JSON array.`;
     }
     default:
       throw new Error(`Unknown mode: "${mode}"`);
   }
 }
 
-// ─── Output verification ──────────────────────────────────────────────────────
+// â”€â”€â”€ Output verification â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function crossReference(suggestions) {
   if (!suggestions?.length) return [];
   const slugs = suggestions.map((s) => s.slug_hint).filter(Boolean);
@@ -203,14 +203,14 @@ function parseClaudeJSON(text) {
   return JSON.parse(clean.slice(start, end + 1));
 }
 
-// ─── Rate limiting ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Rate limiting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const rateLimit = createRateLimit({
   windowMs: 60000, // 1 minute
   maxRequests: 20, // 20 requests per minute
   progressiveDelay: true,
 });
 
-// ─── Validation schema ──────────────────────────────────────────────────────
+// â”€â”€â”€ Validation schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const validationSchema = {
   mode: {
     required: false,
@@ -251,7 +251,7 @@ const validationSchema = {
   },
 };
 
-// ─── Handler ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default async function handler(req, res) {
   // Apply rate limiting
   await new Promise((resolve, reject) => {
@@ -292,7 +292,7 @@ export default async function handler(req, res) {
       error: `Invalid mode. Use: ${VALID_MODES.join(" | ")}`,
     });
 
-  // ─── Cache check ─────────────────────────────────────────────────────────
+  // â”€â”€â”€ Cache check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const cacheKey = makeCacheKey(mode, body);
   const cached = await getCached(cacheKey);
   if (cached) {
@@ -343,7 +343,8 @@ export default async function handler(req, res) {
       success: false,
       error: isUserError
         ? err.message
-        : "AI recommendation failed — please try again",
+        : "AI recommendation failed â€” please try again",
     });
   }
 }
+

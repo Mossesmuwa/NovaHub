@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { setCookie } from "shared/lib/cookies";
 
 export default function UpgradeModal({
@@ -26,13 +26,13 @@ export default function UpgradeModal({
         onClick={(e) => e.stopPropagation()}
       >
         <button style={closeStyle} onClick={handleClose} aria-label="Close">
-          ×
+          Ã—
         </button>
-        <div style={iconStyle}>✦</div>
+        <div style={iconStyle}>âœ¦</div>
         <h2 style={titleStyle}>Join NovaHub</h2>
         <p style={copyStyle}>
           Create a free account to save your favorites, post comments, and get
-          personalised AI recommendations — it only takes a moment.
+          personalised AI recommendations â€” it only takes a moment.
         </p>
         {message && <p style={messageStyle}>{message}</p>}
         <div style={buttonRowStyle}>
@@ -152,3 +152,4 @@ const secondaryButtonStyle = {
   color: "#f8fafc",
   cursor: "pointer",
 };
+

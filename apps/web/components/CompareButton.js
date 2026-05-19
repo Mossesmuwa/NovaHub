@@ -439,3 +439,4 @@ export default function CompareButton({ currentItem, onClose }) {
     </>
   );
 }
+

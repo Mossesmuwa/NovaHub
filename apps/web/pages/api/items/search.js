@@ -1,4 +1,4 @@
-// pages/api/items/search.js
+﻿// pages/api/items/search.js
 // Search items by query with ranking by Nova Score
 import { supabase } from "shared/lib/supabase";
 
@@ -77,4 +77,5 @@ export default async function handler(req, res) {
     });
   }
 }
+
 

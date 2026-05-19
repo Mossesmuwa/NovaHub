@@ -1,6 +1,6 @@
-// pages/api/ai-stream.js
-// NovaHub — Streaming AI Recommendations (Server-Sent Events)
-// Users see cards appear one-by-one as Claude generates them —
+﻿// pages/api/ai-stream.js
+// NovaHub â€” Streaming AI Recommendations (Server-Sent Events)
+// Users see cards appear one-by-one as Claude generates them â€”
 // no loading spinner, no waiting for the full response.
 //
 // How it works:
@@ -31,13 +31,13 @@ const anthropicKey = getEnvCredential(
 );
 const anthropic = new Anthropic({ apiKey: anthropicKey });
 
-// ─── SSE helpers ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ SSE helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function sendEvent(res, event, data) {
   res.write(`event: ${event}\n`);
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
-// ─── Cache helpers (same logic as ai-recommend.js) ───────────────────────────
+// â”€â”€â”€ Cache helpers (same logic as ai-recommend.js) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 function makeCacheKey(mode, params) {
@@ -86,7 +86,7 @@ async function setCache(cacheKey, mode, response) {
   );
 }
 
-// ─── Same prompt builders as ai-recommend.js (kept in sync) ──────────────────
+// â”€â”€â”€ Same prompt builders as ai-recommend.js (kept in sync) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function vibeLabel(v, low, high) {
   if (v < 25) return low;
   if (v < 50) return `leaning ${low}`;
@@ -109,7 +109,7 @@ function buildPrompt(mode, params) {
     case "query":
       return `Recommend ${count} items for: "${params.query}". ${params.taste?.cats?.length ? `User likes: ${params.taste.cats.join(", ")}.` : ""} Output one JSON object per line.`;
     case "vibe":
-      return `Recommend ${count} items for vibe — Mood: ${vibeLabel(params.mood, "chill", "intense")}, Energy: ${vibeLabel(params.energy, "relaxed", "energetic")}, Focus: ${vibeLabel(params.focus, "casual", "deep-focus")}. Output one JSON object per line.`;
+      return `Recommend ${count} items for vibe â€” Mood: ${vibeLabel(params.mood, "chill", "intense")}, Energy: ${vibeLabel(params.energy, "relaxed", "energetic")}, Focus: ${vibeLabel(params.focus, "casual", "deep-focus")}. Output one JSON object per line.`;
     case "related":
       return `Recommend ${count} items related to "${params.item?.name}" (${params.item?.type}, tags: ${params.item?.tags?.join(", ")}). Output one JSON object per line.`;
     case "taste":
@@ -119,7 +119,7 @@ function buildPrompt(mode, params) {
   }
 }
 
-// ─── Output verification — cross-check each item against Supabase ─────────────
+// â”€â”€â”€ Output verification â€” cross-check each item against Supabase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function verifyItem(item) {
   try {
     const supabase = getSupabase();
@@ -143,7 +143,7 @@ async function verifyItem(item) {
     }
   } catch {}
 
-  // Not in DB — return as suggestion with is_suggestion flag
+  // Not in DB â€” return as suggestion with is_suggestion flag
   return {
     ...item,
     slug: item.slug_hint,
@@ -152,7 +152,7 @@ async function verifyItem(item) {
   };
 }
 
-// ─── Main SSE handler ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Main SSE handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).end();
 
@@ -188,14 +188,14 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "AI service not configured" });
   }
 
-  // ─── Set SSE headers ────────────────────────────────────────────────────────
+  // â”€â”€â”€ Set SSE headers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no"); // disable nginx buffering on Vercel
   res.flushHeaders();
 
-  // ─── Check DB cache first — if hit, stream all items immediately ────────────
+  // â”€â”€â”€ Check DB cache first â€” if hit, stream all items immediately â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const cacheKey = makeCacheKey(mode, params);
   const cached = await getCached(cacheKey);
 
@@ -207,7 +207,7 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  // ─── No cache — stream from Claude ─────────────────────────────────────────
+  // â”€â”€â”€ No cache â€” stream from Claude â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let userPrompt;
   try {
     userPrompt = buildPrompt(mode, params);
@@ -253,7 +253,7 @@ export default async function handler(req, res) {
             allItems.push(verified);
             sendEvent(res, "item", verified);
           } catch {
-            // Incomplete JSON line — skip, keep buffering
+            // Incomplete JSON line â€” skip, keep buffering
           }
         }
       }
@@ -280,8 +280,9 @@ export default async function handler(req, res) {
     sendEvent(res, "done", { count: allItems.length, cached: false });
   } catch (err) {
     console.error("[ai-stream] Claude error:", err.message);
-    sendEvent(res, "error", { message: "AI stream failed — please try again" });
+    sendEvent(res, "error", { message: "AI stream failed â€” please try again" });
   }
 
   res.end();
 }
+

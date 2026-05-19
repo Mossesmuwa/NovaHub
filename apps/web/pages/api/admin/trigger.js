@@ -1,4 +1,4 @@
-// pages/api/admin/trigger.js
+﻿// pages/api/admin/trigger.js
 import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 export const config = { maxDuration: 120 };
@@ -235,4 +235,5 @@ async function runProviders(req, res, authAs) {
 
   return res.status(200).json({ success: true, auth_as: authAs, results });
 }
+
 

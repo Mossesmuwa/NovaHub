@@ -1,5 +1,5 @@
-// pages/api/admin/env-check.js
-// TEMPORARY diagnostic — delete after confirming env vars are correct.
+﻿// pages/api/admin/env-check.js
+// TEMPORARY diagnostic â€” delete after confirming env vars are correct.
 // Visit: https://yoursite.vercel.app/api/admin/env-check
 // This writes nothing to the DB. Safe to run.
 
@@ -49,3 +49,4 @@ export default function handler(req, res) {
     },
   });
 }
+

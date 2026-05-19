@@ -1,4 +1,4 @@
-// pages/api/stripe/portal.js
+﻿// pages/api/stripe/portal.js
 // Opens the Stripe Customer Portal for managing/cancelling Pro subscription.
 // Called from dashboard settings tab.
 
@@ -58,4 +58,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 

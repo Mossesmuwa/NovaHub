@@ -1,4 +1,4 @@
-// pages/privacy.js
+﻿// pages/privacy.js
 import Layout from '../components/Layout';
 import SEO from '../components/SEO';
 import Link from 'next/link';
@@ -6,16 +6,16 @@ import Link from 'next/link';
 const SECTIONS = [
   {
     title: 'Information we collect',
-    icon: '◈',
+    icon: 'â—ˆ',
     content: [
-      { strong: 'Account info', text: '— Name, email, and profile picture when you register.' },
-      { strong: 'Usage data', text: '— Browser type, IP address, and pages visited (anonymised).' },
-      { strong: 'Taste preferences', text: '— Your onboarding quiz results, stored locally until you sign up.' },
+      { strong: 'Account info', text: 'â€” Name, email, and profile picture when you register.' },
+      { strong: 'Usage data', text: 'â€” Browser type, IP address, and pages visited (anonymised).' },
+      { strong: 'Taste preferences', text: 'â€” Your onboarding quiz results, stored locally until you sign up.' },
     ],
   },
   {
     title: 'How we use your data',
-    icon: '◎',
+    icon: 'â—Ž',
     content: [
       { text: 'Personalise the content you see on NovaHub based on your taste profile.' },
       { text: 'Provide, maintain, and improve our services.' },
@@ -25,17 +25,17 @@ const SECTIONS = [
   },
   {
     title: 'Authentication and security',
-    icon: '◉',
-    body: 'Authentication is powered by Supabase with industry-standard encryption and JWT tokens. We never store your password — it\'s hashed and managed by Supabase Auth. All data is encrypted in transit via HTTPS.',
+    icon: 'â—‰',
+    body: 'Authentication is powered by Supabase with industry-standard encryption and JWT tokens. We never store your password â€” it\'s hashed and managed by Supabase Auth. All data is encrypted in transit via HTTPS.',
   },
   {
     title: 'Cookies and local storage',
-    icon: '◫',
+    icon: 'â—«',
     body: 'We use localStorage to persist your theme preference and taste profile only. Authentication sessions are managed entirely by Supabase using secure cookies. You can clear these at any time in your browser settings.',
   },
   {
     title: 'Changes to this policy',
-    icon: '◐',
+    icon: 'â—',
     body: "We may update this policy as the platform grows. We'll post the updated policy here and revise the date below. Major changes will be communicated via the Weekly Digest.",
   },
 ];
@@ -43,7 +43,7 @@ const SECTIONS = [
 export default function PrivacyPage() {
   return (
     <Layout>
-      <SEO title="Privacy Policy — NovaHub" />
+      <SEO title="Privacy Policy â€” NovaHub" />
       <StaticPage
         badge="Privacy"
         title="Privacy Policy"
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
   );
 }
 
-// Shared static page layout — used by both privacy.js and terms.js
+// Shared static page layout â€” used by both privacy.js and terms.js
 export function StaticPage({ badge, title, subtitle, sections, date, other }) {
   return (
     <>
@@ -65,7 +65,7 @@ export function StaticPage({ badge, title, subtitle, sections, date, other }) {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 100% 0%,rgba(201,168,76,.06) 0%,transparent 60%)', pointerEvents: 'none' }} />
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--gold-glow)', border: '1px solid var(--gold-glow2)', borderRadius: 99, padding: '5px 14px', fontSize: 11, fontWeight: 800, color: 'var(--gold)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 20 }}>
-            ◈ {badge}
+            â—ˆ {badge}
           </div>
           <h1 style={{ fontSize: 'clamp(28px,5vw,44px)', fontWeight: 900, letterSpacing: '-.04em', marginBottom: 10 }}>{title}</h1>
           <p style={{ fontSize: 16, color: 'var(--t2)', maxWidth: 480 }}>{subtitle}</p>
@@ -88,7 +88,7 @@ export function StaticPage({ badge, title, subtitle, sections, date, other }) {
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {s.content.map((c, j) => (
                         <li key={j} style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.65, display: 'flex', gap: 8 }}>
-                          <span style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 1 }}>·</span>
+                          <span style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 1 }}>Â·</span>
                           <span>
                             {c.strong && <strong style={{ color: 'var(--t1)', fontWeight: 700 }}>{c.strong}</strong>}
                             {c.text}
@@ -110,7 +110,7 @@ export function StaticPage({ badge, title, subtitle, sections, date, other }) {
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--t3)'}
               >
-                {other.label} →
+                {other.label} â†’
               </Link>
             )}
           </div>
@@ -119,3 +119,4 @@ export function StaticPage({ badge, title, subtitle, sections, date, other }) {
     </>
   );
 }
+

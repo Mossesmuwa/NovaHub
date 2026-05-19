@@ -1,4 +1,4 @@
-import "../styles/variables.css";
+﻿import "../styles/variables.css";
 import "../styles/style.css";
 import "../styles/components.css";
 import "../styles/ai-interface.css";
@@ -7,7 +7,7 @@ import { ToastProvider } from "../components/Toast";
 import { SupabaseProvider } from "shared/lib/SupabaseContext";
 
 export default function App({ Component, pageProps }) {
-  // Theme initialization — runs before paint equivalent
+  // Theme initialization â€” runs before paint equivalent
   useEffect(() => {
     const SUN =
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
@@ -82,3 +82,4 @@ export default function App({ Component, pageProps }) {
     </SupabaseProvider>
   );
 }
+

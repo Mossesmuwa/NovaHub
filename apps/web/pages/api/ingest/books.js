@@ -1,5 +1,5 @@
-// pages/api/ingest/books.js
-// NovaHub — Google Books Ingestion Cron
+﻿// pages/api/ingest/books.js
+// NovaHub â€” Google Books Ingestion Cron
 // Runs daily at 4am UTC via Vercel Cron.
 
 import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
@@ -24,3 +24,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

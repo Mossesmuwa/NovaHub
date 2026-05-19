@@ -1,5 +1,5 @@
-// pages/api/ingest/rawg.js
-// NovaHub — RAWG Games Ingestion Cron
+﻿// pages/api/ingest/rawg.js
+// NovaHub â€” RAWG Games Ingestion Cron
 // Runs daily at 3am UTC via Vercel Cron.
 
 import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
@@ -24,3 +24,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

@@ -1,4 +1,4 @@
-import Navbar from './Navbar';
+﻿import Navbar from './Navbar';
 import Footer from './Footer';
 import Toast from './Toast';
 
@@ -12,3 +12,4 @@ export default function Layout({ children, activePage, hideFooter }) {
     </>
   );
 }
+
