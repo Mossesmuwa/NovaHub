@@ -23,7 +23,14 @@ function getRankMedal(rank) {
     const medal = medals[rank];
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill={medal.color} stroke={medal.color} strokeWidth="1">
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill={medal.color}
+          stroke={medal.color}
+          strokeWidth="1"
+        >
           <circle cx="12" cy="8" r="4"></circle>
           <path d="M6 12h12v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8z"></path>
           <line x1="6" y1="12" x2="3" y2="18"></line>
@@ -32,7 +39,11 @@ function getRankMedal(rank) {
       </div>
     );
   }
-  return <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>#{rank + 1}</div>;
+  return (
+    <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>
+      #{rank + 1}
+    </div>
+  );
 }
 
 export async function getServerSideProps() {
@@ -40,7 +51,9 @@ export async function getServerSideProps() {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from("items")
-      .select("id, slug, name, short_desc, long_desc, image, category_id, type, trending_score")
+      .select(
+        "id, slug, name, short_desc, long_desc, image, category_id, type, trending_score",
+      )
       .eq("approved", true)
       .order("trending_score", { ascending: false })
       .limit(10);
@@ -51,7 +64,8 @@ export async function getServerSideProps() {
       id: item.id,
       slug: item.slug,
       name: item.name,
-      description: item.short_desc || item.long_desc || "No description available",
+      description:
+        item.short_desc || item.long_desc || "No description available",
       category: item.category_id || item.type || "General",
       image: item.image,
       trending_score: item.trending_score ?? 0,
@@ -70,7 +84,9 @@ export default function PremiumTrending({ items = [] }) {
   const safeItems = Array.isArray(items) ? items : [];
 
   const sorted = useMemo(() => {
-    return [...safeItems].sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
+    return [...safeItems].sort(
+      (a, b) => (b.trending_score || 0) - (a.trending_score || 0),
+    );
   }, [safeItems]);
 
   const hero = sorted[0];
@@ -81,7 +97,11 @@ export default function PremiumTrending({ items = [] }) {
       <Layout activePage="trending">
         <SEO title="Trending — NovaHub" />
         <div style={styles.center}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: "#fff", textAlign: "center" }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ color: "#fff", textAlign: "center" }}
+          >
             <h2>No trending data yet</h2>
             <p style={{ color: THEME.text2 }}>Waiting for live signals...</p>
           </motion.div>
@@ -112,7 +132,9 @@ export default function PremiumTrending({ items = [] }) {
 
               <h2 style={styles.heroTitle}>{hero.name}</h2>
 
-              <p style={styles.desc}>{hero.description || "No description available"}</p>
+              <p style={styles.desc}>
+                {hero.description || "No description available"}
+              </p>
 
               <div style={styles.metaRow}>
                 <div>
@@ -122,7 +144,9 @@ export default function PremiumTrending({ items = [] }) {
 
                 <div>
                   <div style={styles.label}>CATEGORY</div>
-                  <div style={styles.category}>{hero.category || "General"}</div>
+                  <div style={styles.category}>
+                    {hero.category || "General"}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -145,7 +169,11 @@ export default function PremiumTrending({ items = [] }) {
                   >
                     <div style={styles.rank}>{getRankMedal(i + 1)}</div>
 
-                    {item.image ? <img src={item.image} alt="" style={styles.img} /> : <div style={styles.imgPlaceholder} />}
+                    {item.image ? (
+                      <img src={item.image} alt="" style={styles.img} />
+                    ) : (
+                      <div style={styles.imgPlaceholder} />
+                    )}
 
                     <div style={{ flex: 1 }}>
                       <div style={styles.name}>{item.name}</div>
@@ -195,7 +223,8 @@ const styles = {
     transform: "translateX(-50%)",
     width: "70vw",
     height: "60vh",
-    background: "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
+    background:
+      "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
     pointerEvents: "none",
   },
 

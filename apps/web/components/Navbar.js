@@ -154,7 +154,9 @@ export default function Navbar({ activePage }) {
                   marginBottom: 4,
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)" }}>
+                <div
+                  style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)" }}
+                >
                   {displayName}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 1 }}>
@@ -174,7 +176,13 @@ export default function Navbar({ activePage }) {
                 label="Saved Items"
                 onClick={() => setDropOpen(false)}
               />
-              <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+              <div
+                style={{
+                  height: 1,
+                  background: "var(--border)",
+                  margin: "4px 0",
+                }}
+              />
               <button
                 onClick={handleLogout}
                 style={{
@@ -209,10 +217,18 @@ export default function Navbar({ activePage }) {
 
     return (
       <>
-        <Link href="/account/login" className="btn-ghost" style={{ fontSize: 13, padding: "7px 14px" }}>
+        <Link
+          href="/account/login"
+          className="btn-ghost"
+          style={{ fontSize: 13, padding: "7px 14px" }}
+        >
           Sign in
         </Link>
-        <Link href="/account/register" className="btn-primary" style={{ fontSize: 13, padding: "7px 16px" }}>
+        <Link
+          href="/account/register"
+          className="btn-primary"
+          style={{ fontSize: 13, padding: "7px 16px" }}
+        >
           Sign up
         </Link>
       </>
@@ -229,32 +245,63 @@ export default function Navbar({ activePage }) {
       <nav className={`glass-nav${scrolled ? " scrolled" : ""}`} id="main-nav">
         <div className="container nav-content">
           <Link href="/" className="logo">
-            <img src="/assets/novahub_logo.svg" alt="NovaHub" className="logo-img" />
+            <img
+              src="/assets/novahub_logo.svg"
+              alt="NovaHub"
+              className="logo-img"
+            />
           </Link>
 
           <div className="nav-links">
             <div className="search-wrap">
               <div className="search-box">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
-                <input type="text" placeholder="Search everything..." autoComplete="off" onKeyDown={handleSearch} />
+                <input
+                  type="text"
+                  placeholder="Search everything..."
+                  autoComplete="off"
+                  onKeyDown={handleSearch}
+                />
               </div>
             </div>
-            <Link href="/" className={`nav-link${activePage === "home" ? " active" : ""}`}>
+            <Link
+              href="/"
+              className={`nav-link${activePage === "home" ? " active" : ""}`}
+            >
               Home
             </Link>
-            <Link href="/category" className={`nav-link${activePage === "browse" ? " active" : ""}`}>
+            <Link
+              href="/category"
+              className={`nav-link${activePage === "browse" ? " active" : ""}`}
+            >
               Browse
             </Link>
-            <Link href="/discover" className={`nav-link${activePage === "discover" ? " active" : ""}`}>
+            <Link
+              href="/discover"
+              className={`nav-link${activePage === "discover" ? " active" : ""}`}
+            >
               Discover
             </Link>
-            <Link href="/trending" className={`nav-link${activePage === "trending" ? " active" : ""}`}>
+            <Link
+              href="/trending"
+              className={`nav-link${activePage === "trending" ? " active" : ""}`}
+            >
               Trending
             </Link>
-            <Link href="/weekly" className={`nav-link${activePage === "weekly" ? " active" : ""}`}>
+            <Link
+              href="/weekly"
+              className={`nav-link${activePage === "weekly" ? " active" : ""}`}
+            >
               Weekly
             </Link>
           </div>
@@ -263,7 +310,12 @@ export default function Navbar({ activePage }) {
             <div className="nav-auth-actions">
               <AuthSection />
             </div>
-            <button className="icon-btn" id="theme-btn" aria-label="Toggle theme" style={{ marginLeft: 4 }}>
+            <button
+              className="icon-btn"
+              id="theme-btn"
+              aria-label="Toggle theme"
+              style={{ marginLeft: 4 }}
+            >
               <span id="theme-icon" />
             </button>
             <button
@@ -281,11 +333,23 @@ export default function Navbar({ activePage }) {
 
         <div className={`mobile-menu${mobileOpen ? " open" : ""}`}>
           <div className="mobile-search">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" />
             </svg>
-            <input type="text" placeholder="Search NovaHub..." autoComplete="off" onKeyDown={handleSearch} />
+            <input
+              type="text"
+              placeholder="Search NovaHub..."
+              autoComplete="off"
+              onKeyDown={handleSearch}
+            />
           </div>
           {[
             { href: "/", label: "Home", page: "home" },
@@ -294,28 +358,55 @@ export default function Navbar({ activePage }) {
             { href: "/trending", label: "Trending", page: "trending" },
             { href: "/weekly", label: "Weekly", page: "weekly" },
           ].map(({ href, label, page }) => (
-            <Link key={page} href={href} className={`nav-link${activePage === page ? " active" : ""}`}>
+            <Link
+              key={page}
+              href={href}
+              className={`nav-link${activePage === page ? " active" : ""}`}
+            >
               {label}
             </Link>
           ))}
           {!loading && !user && (
             <>
-              <Link href="/account/login" className="nav-link" onClick={() => setMobileOpen(false)}>
+              <Link
+                href="/account/login"
+                className="nav-link"
+                onClick={() => setMobileOpen(false)}
+              >
                 Sign In
               </Link>
-              <Link href="/account/register" className="nav-link" style={{ color: "var(--gold)" }} onClick={() => setMobileOpen(false)}>
+              <Link
+                href="/account/register"
+                className="nav-link"
+                style={{ color: "var(--gold)" }}
+                onClick={() => setMobileOpen(false)}
+              >
                 Create Account
               </Link>
             </>
           )}
           {!loading && user && (
             <>
-              <Link href="/account/dashboard" className="nav-link" onClick={() => setMobileOpen(false)}>
+              <Link
+                href="/account/dashboard"
+                className="nav-link"
+                onClick={() => setMobileOpen(false)}
+              >
                 Dashboard
               </Link>
               <button
                 className="nav-link"
-                style={{ background: "none", border: "none", color: "#FF453A", cursor: "pointer", textAlign: "left", fontFamily: "var(--font)", fontSize: 15, padding: "12px 20px", width: "100%" }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#FF453A",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontFamily: "var(--font)",
+                  fontSize: 15,
+                  padding: "12px 20px",
+                  width: "100%",
+                }}
                 onClick={handleLogout}
               >
                 Sign out

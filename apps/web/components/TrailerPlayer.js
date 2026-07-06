@@ -40,27 +40,74 @@ const Icon = {
   ),
 };
 
-export default function TrailerPlayer({ tmdbId, itemName }) {
-  const [trailers, setTrailers] = useState([]);
-  const [loading, setLoading] = useState(true);
+const normalizeTrailers = (list = []) =>
+  (Array.isArray(list) ? list : [])
+    .map((trailer) => {
+      if (typeof trailer === "string") {
+        return {
+          key: trailer,
+          name: "Trailer",
+          type: "Trailer",
+          published_at: null,
+        };
+      }
+
+      if (trailer && typeof trailer === "object" && trailer.key) {
+        return trailer;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+export default function TrailerPlayer({
+  tmdbId,
+  itemName,
+  trailers: trailersProp,
+  slug,
+}) {
+  const [trailers, setTrailers] = useState(() =>
+    normalizeTrailers(trailersProp),
+  );
+  const [loading, setLoading] = useState(
+    !trailersProp || trailersProp.length === 0,
+  );
   const [selectedTrailer, setSelectedTrailer] = useState(null);
   const [showPlayer, setShowPlayer] = useState(false);
 
   useEffect(() => {
-    if (tmdbId) {
-      fetchTrailers();
+    const normalized = normalizeTrailers(trailersProp);
+
+    if (normalized.length > 0) {
+      setTrailers(normalized);
+      setSelectedTrailer(normalized[0]);
+      setLoading(false);
+      setShowPlayer(false);
+      return;
     }
-  }, [tmdbId]);
+
+    if (tmdbId || slug) {
+      fetchTrailers();
+    } else {
+      setLoading(false);
+    }
+  }, [tmdbId, slug, trailersProp]);
 
   async function fetchTrailers() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/trailers?tmdb_id=${tmdbId}`);
+      const query = new URLSearchParams({
+        tmdb_id: tmdbId || "",
+        slug: slug || "",
+      }).toString();
+
+      const res = await fetch(`/api/trailers?${query}`);
       if (res.ok) {
         const data = await res.json();
-        setTrailers(data.trailers || []);
-        if (data.trailers && data.trailers.length > 0) {
-          setSelectedTrailer(data.trailers[0]);
+        const normalized = normalizeTrailers(data.trailers || []);
+        setTrailers(normalized);
+        if (normalized.length > 0) {
+          setSelectedTrailer(normalized[0]);
         }
       }
     } catch (err) {
@@ -271,7 +318,9 @@ export default function TrailerPlayer({ tmdbId, itemName }) {
             </div>
             <div style={{ fontSize: 13, color: G.t3 }}>
               {selectedTrailer.type} ·{" "}
-              {new Date(selectedTrailer.published_at).toLocaleDateString()}
+              {selectedTrailer.published_at
+                ? new Date(selectedTrailer.published_at).toLocaleDateString()
+                : "Trailer"}
             </div>
           </div>
 

@@ -15,6 +15,7 @@ import TrendAnalysis from "../../components/TrendAnalysis";
 import TrustBadge from "../../components/TrustBadge";
 import AuditTrail from "../../components/AuditTrail";
 import CompareButton from "../../components/CompareButton";
+import TrailerPlayer from "../../components/TrailerPlayer";
 
 export default function ItemDetail({
   item,
@@ -74,7 +75,10 @@ export default function ItemDetail({
       setSaveCount((current) => current + (wasSaved ? 1 : -1));
       toast(result.error || "Couldn't update saved items.", "error");
     } else {
-      toast(wasSaved ? "Removed from saved items." : "Saved to your collection.", "success");
+      toast(
+        wasSaved ? "Removed from saved items." : "Saved to your collection.",
+        "success",
+      );
     }
 
     setSaving(false);
@@ -304,6 +308,18 @@ export default function ItemDetail({
 
         {/* Main content */}
         <div style={{ padding: "48px 24px", maxWidth: 1200, margin: "0 auto" }}>
+          {Array.isArray(item?.metadata?.trailers) &&
+            item.metadata.trailers.length > 0 && (
+              <section style={{ marginBottom: 40 }}>
+                <TrailerPlayer
+                  tmdbId={item?.metadata?.tmdb_id || item?.id}
+                  slug={item?.slug}
+                  trailers={item.metadata.trailers}
+                  itemName={item.name}
+                />
+              </section>
+            )}
+
           {/* CORE 2: RANKING - Nova Score (Hero section) */}
           <section style={{ marginBottom: 60 }}>
             <div style={{ marginBottom: 24 }}>
