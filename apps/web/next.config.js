@@ -1,11 +1,11 @@
-// apps/web/next.config.js
-// NovaHub Web App — Next.js configuration
+﻿// apps/web/next.config.js
+// NovaHub Web App â€” Next.js configuration
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
 
-  // ─── Image domains ──────────────────────────────────────────────────────────
+  // â”€â”€â”€ Image domains â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "image.tmdb.org", pathname: "/t/p/**" },
@@ -39,7 +39,7 @@ const nextConfig = {
     minimumCacheTTL: 604800,
   },
 
-  // ─── Security headers ───────────────────────────────────────────────────────
+  // â”€â”€â”€ Security headers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async headers() {
     return [
       {
@@ -71,10 +71,11 @@ const nextConfig = {
     ];
   },
 
-  // ─── Redirects ──────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Redirects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async redirects() {
     return [{ source: "/browse", destination: "/category", permanent: true }];
   },
 };
 
 module.exports = nextConfig;
+

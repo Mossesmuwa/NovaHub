@@ -1,5 +1,5 @@
-// components/NovaScore.js
-// NovaHub — NovaScore Badge (Pro feature)
+﻿// components/NovaScore.js
+// NovaHub â€” NovaScore Badge (Pro feature)
 // Shows a personalised match percentage on any item card or detail page.
 // Free users see the standard star rating instead.
 //
@@ -17,15 +17,15 @@ import { useEffect, useState } from "react";
 import { usePro } from "../hooks/usePro";
 import { calcNovaScore, getTasteFromStorage } from "shared/lib/nova-score";
 
-// ─── Colour based on score value ──────────────────────────────────────────────
+// â”€â”€â”€ Colour based on score value â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function scoreColor(value) {
-  if (value >= 80) return "var(--gold)"; // gold — great match
-  if (value >= 60) return "#4CAF82"; // green — good match
-  if (value >= 40) return "var(--t2)"; // muted — partial
-  return "var(--t3)"; // dim — low match
+  if (value >= 80) return "var(--gold)"; // gold â€” great match
+  if (value >= 60) return "#4CAF82"; // green â€” good match
+  if (value >= 40) return "var(--t2)"; // muted â€” partial
+  return "var(--t3)"; // dim â€” low match
 }
 
-// ─── Ring SVG ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Ring SVG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // A small circular progress ring showing the score visually.
 function ScoreRing({ value, size = 36 }) {
   const r = size / 2 - 3;
@@ -79,7 +79,7 @@ function ScoreRing({ value, size = 36 }) {
   );
 }
 
-// ─── Breakdown bar ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Breakdown bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function BreakdownRow({ label, value }) {
   return (
     <div style={{ marginBottom: 6 }}>
@@ -117,7 +117,7 @@ function BreakdownRow({ label, value }) {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function NovaScore({
   item,
   score: scoreProp,
@@ -145,7 +145,7 @@ export default function NovaScore({
   // Still loading auth
   if (loading) return null;
 
-  // Free users — show the plain rating badge instead
+  // Free users â€” show the plain rating badge instead
   if (!isPro) {
     const rating = parseFloat(item?.rating);
     if (!rating) return null;
@@ -154,7 +154,7 @@ export default function NovaScore({
         className="nova-score-free"
         title="Upgrade to Pro for your personal match score"
       >
-        ★ {rating.toFixed(1)}
+        â˜… {rating.toFixed(1)}
       </span>
     );
   }
@@ -167,7 +167,7 @@ export default function NovaScore({
         title="Complete your taste profile to see your match score"
         style={{ fontSize: 11, color: "var(--t3)" }}
       >
-        — Match
+        â€” Match
       </span>
     );
   }
@@ -212,7 +212,7 @@ export default function NovaScore({
               marginBottom: 10,
             }}
           >
-            ✦ Why this score?
+            âœ¦ Why this score?
           </div>
           <BreakdownRow label="Category fit" value={score.breakdown.category} />
           <BreakdownRow label="Tag overlap" value={score.breakdown.tags} />
@@ -225,7 +225,7 @@ export default function NovaScore({
   );
 }
 
-// ─── Compact inline version for card grids ────────────────────────────────────
+// â”€â”€â”€ Compact inline version for card grids â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Usage: <NovaScorePill item={item} />
 export function NovaScorePill({ item, score: scoreProp }) {
   const { isPro, loading } = usePro();
@@ -258,3 +258,4 @@ export function NovaScorePill({ item, score: scoreProp }) {
     </span>
   );
 }
+

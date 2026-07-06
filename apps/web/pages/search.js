@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Layout from "../components/Layout";
@@ -22,15 +22,15 @@ const QUICK_TAGS = [
 ];
 
 const TYPE_ICONS = {
-  movie: "🍿",
-  tv: "📺",
-  book: "📚",
-  game: "🎮",
-  tool: "✨",
-  course: "🧠",
-  podcast: "🎙",
-  security: "🔐",
-  other: "◈",
+  movie: "ðŸ¿",
+  tv: "ðŸ“º",
+  book: "ðŸ“š",
+  game: "ðŸŽ®",
+  tool: "âœ¨",
+  course: "ðŸ§ ",
+  podcast: "ðŸŽ™",
+  security: "ðŸ”",
+  other: "â—ˆ",
 };
 
 const POSTER_TYPES = ["movie", "book", "game", "tv"];
@@ -121,7 +121,7 @@ export default function SearchPage() {
   return (
     <Layout activePage="search">
       <SEO
-        title={searched ? `"${query}" — NovaHub Search` : "Search — NovaHub"}
+        title={searched ? `"${query}" â€” NovaHub Search` : "Search â€” NovaHub"}
         description="Search across movies, books, tools, games, and curated picks on NovaHub."
       />
 
@@ -439,7 +439,7 @@ export default function SearchPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="empty-state reveal">
-                <span className="empty-state-icon">🔍</span>
+                <span className="empty-state-icon">ðŸ”</span>
                 <h3 style={{ fontSize: 22, marginBottom: 8 }}>
                   No matches found
                 </h3>
@@ -521,7 +521,7 @@ export default function SearchPage() {
                 <h2 className="section-title">Trending across NovaHub</h2>
               </div>
               <Link href="/trending" className="section-more">
-                See all →
+                See all â†’
               </Link>
             </div>
 
@@ -536,7 +536,7 @@ export default function SearchPage() {
               </>
             ) : (
               <div className="empty-state">
-                <span className="empty-state-icon">◌</span>
+                <span className="empty-state-icon">â—Œ</span>
                 <p>Trending content will appear here.</p>
               </div>
             )}
@@ -546,3 +546,4 @@ export default function SearchPage() {
     </Layout>
   );
 }
+

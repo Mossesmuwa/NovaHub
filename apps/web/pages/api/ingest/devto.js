@@ -1,4 +1,4 @@
-// pages/api/ingest/devto.js
+﻿// pages/api/ingest/devto.js
 import { SyncEngine } from 'shared/lib/pipeline/SyncEngine.js';
 import { DevToProvider } from 'shared/lib/pipeline/DevToProvider.js';
 export const config = { maxDuration: 60 };
@@ -9,4 +9,5 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, ...result });
   } catch (err) { return res.status(500).json({ success: false, error: err.message }); }
 }
+
 

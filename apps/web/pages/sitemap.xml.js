@@ -1,5 +1,5 @@
-// pages/sitemap.xml.js
-// Dynamic sitemap — covers all approved items + static pages.
+﻿// pages/sitemap.xml.js
+// Dynamic sitemap â€” covers all approved items + static pages.
 // Access at: https://yoursite.vercel.app/sitemap.xml
 // Add to robots.txt: Sitemap: https://yoursite.vercel.app/sitemap.xml
 
@@ -62,7 +62,7 @@ export async function getServerSideProps({ res }) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 
-  // Fetch all approved item slugs — paginated for large datasets
+  // Fetch all approved item slugs â€” paginated for large datasets
   let items = [];
   let offset = 0;
   const PAGE = 1000;
@@ -93,3 +93,4 @@ export async function getServerSideProps({ res }) {
 
   return { props: {} };
 }
+

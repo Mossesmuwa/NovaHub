@@ -1,4 +1,4 @@
-export default function handler(req, res) {
+﻿export default function handler(req, res) {
   if (req.method !== "GET") {
     return res
       .status(405)
@@ -13,3 +13,4 @@ export default function handler(req, res) {
       message: "NovaHub API is running smoothly.",
     });
 }
+

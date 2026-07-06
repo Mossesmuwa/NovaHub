@@ -1,8 +1,8 @@
 ﻿// components/AuditTrail.js
 // Premium audit trail with expandable timeline and data verification history
 import { useState } from "react";
-import { colors } from "shared/lib/design";
-import { formatDate } from "shared/lib/formatters";
+import { colors } from "../lib/design";
+import { formatDate } from "../lib/formatters";
 
 export default function AuditTrail({
   dataSources = [
@@ -112,9 +112,8 @@ export default function AuditTrail({
         <span style={{ color: colors.green, fontWeight: 700 }}>
           Last verified {lastVerified}
         </span>
-        <span style={{ color: colors.t3, marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.green} strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-          All sources verified
+        <span style={{ color: colors.t3, marginLeft: "auto" }}>
+          ✓ All sources verified
         </span>
       </div>
 
@@ -153,12 +152,18 @@ export default function AuditTrail({
           }}
         >
           <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+            <span style={{ fontSize: 16 }}>✓</span>
             Data Sources Verified ({dataSources.length})
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.t2} strokeWidth="2" style={{ transition: "transform 0.3s ease", transform: isExpanded("sources") ? "rotate(180deg)" : "rotate(0)" }}>
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <span
+            style={{
+              fontSize: 12,
+              transition: "transform 0.3s ease",
+              transform: isExpanded("sources") ? "rotate(180deg)" : "rotate(0)",
+            }}
+          >
+            ⌄
+          </span>
         </button>
 
         {/* Expanded sources */}
@@ -218,7 +223,7 @@ export default function AuditTrail({
                         fontSize: 10,
                       }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                      ✓
                     </span>
                     <span
                       style={{

@@ -1,4 +1,4 @@
-// pages/api/track-view.js
+﻿// pages/api/track-view.js
 // Endpoint to track item views server-side (prevents cheating)
 // Called from frontend after fetching item details
 
@@ -55,3 +55,4 @@ export default async function handler(req, res) {
       .json({ error: error.message || "Failed to track view" });
   }
 }
+

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
 import SEO from "../../components/SEO";
 import Link from "next/link";
@@ -74,7 +74,7 @@ export default function FavoritesPage() {
             <div className="card-poster-content">
               <div className="card-poster-title">{item.name}</div>
               {item.rating && (
-                <div className="card-poster-rating">★ {item.rating}</div>
+                <div className="card-poster-rating">â˜… {item.rating}</div>
               )}
             </div>
           </Link>
@@ -83,7 +83,7 @@ export default function FavoritesPage() {
             onClick={() => removeItem(item.id)}
             title="Remove"
           >
-            ✕
+            âœ•
           </button>
         </div>
       );
@@ -104,7 +104,7 @@ export default function FavoritesPage() {
           }}
           title="Remove"
         >
-          ✕
+          âœ•
         </button>
         <div className="card-icon">{(item.name || "?").charAt(0)}</div>
         <div className="card-title">{item.name}</div>
@@ -124,7 +124,7 @@ export default function FavoritesPage() {
   if (loading)
     return (
       <Layout>
-        <SEO title="Saved Items — NovaHub" />
+        <SEO title="Saved Items â€” NovaHub" />
         <div
           style={{ textAlign: "center", padding: "120px", color: "var(--t3)" }}
         >
@@ -139,14 +139,14 @@ export default function FavoritesPage() {
               margin: "0 auto 10px",
             }}
           ></div>
-          Loading…
+          Loadingâ€¦
         </div>
       </Layout>
     );
 
   return (
     <Layout>
-      <SEO title="Saved Items — NovaHub" />
+      <SEO title="Saved Items â€” NovaHub" />
       <div className="fav-hero">
         <div className="fav-hero-bg"></div>
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
@@ -182,7 +182,7 @@ export default function FavoritesPage() {
           <input
             type="text"
             className="fav-search"
-            placeholder="Filter saved items…"
+            placeholder="Filter saved itemsâ€¦"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -193,7 +193,7 @@ export default function FavoritesPage() {
                 className={`sort-pill${sort === s ? " active" : ""}`}
                 onClick={() => setSort(s)}
               >
-                {s === "recent" ? "Recent" : s === "name" ? "A–Z" : "By Type"}
+                {s === "recent" ? "Recent" : s === "name" ? "Aâ€“Z" : "By Type"}
               </button>
             ))}
           </div>
@@ -238,7 +238,7 @@ export default function FavoritesPage() {
         {sorted.length === 0 ? (
           <div className="empty-state">
             <span className="empty-state-icon">
-              {search.trim() || typeFilter !== "all" ? "🔍" : "♡"}
+              {search.trim() || typeFilter !== "all" ? "ðŸ”" : "â™¡"}
             </span>
             <h3>
               {search.trim() || typeFilter !== "all"
@@ -275,3 +275,4 @@ export default function FavoritesPage() {
     </Layout>
   );
 }
+

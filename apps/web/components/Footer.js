@@ -1,314 +1,246 @@
 ﻿// components/Footer.js
+// Premium responsive footer with links, social, and newsletter
 import Link from "next/link";
-import { colors } from "shared/lib/design";
+import { colors } from "../lib/design";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    Intelligence: [
-      { label: "Market Pulse", href: "/discover" },
-      { label: "Neural Compare", href: "/compare" },
-      { label: "Signals", href: "/trending" },
-      { label: "Nova Pro", href: "/pro" },
+    Product: [
+      { label: "Discover", href: "/discover" },
+      { label: "Compare", href: "/compare" },
+      { label: "Trending", href: "/trending" },
+      { label: "Pro", href: "/pro" },
     ],
-    Network: [
-      { label: "About Node", href: "/about" },
-      { label: "Changelog", href: "/changelog" },
+    Company: [
+      { label: "About", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "Careers", href: "/careers" },
+      { label: "Contact", href: "/contact" },
+    ],
+    Resources: [
+      { label: "API Docs", href: "/api" },
+      { label: "FAQ", href: "/faq" },
       { label: "Status", href: "/status" },
-      { label: "Security", href: "/security" },
+      { label: "Changelog", href: "/changelog" },
     ],
     Legal: [
-      { label: "Privacy Protocol", href: "/privacy" },
-      { label: "Terms of Sync", href: "/terms" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Cookie Policy", href: "/cookies" },
+      { label: "Security", href: "/security" },
     ],
   };
 
   const socials = [
-    { name: "X", icon: "𝕏", href: "#" },
-    { name: "GitHub", icon: "🐙", href: "#" },
-    { name: "Discord", icon: "💬", href: "#" },
+    { name: "Twitter", icon: "𝕏", href: "https://twitter.com" },
+    { name: "LinkedIn", icon: "💼", href: "https://linkedin.com" },
+    { name: "GitHub", icon: "🐙", href: "https://github.com" },
+    { name: "Discord", icon: "💬", href: "https://discord.com" },
   ];
 
   return (
-    <footer className="footer-root">
-      <div className="footer-container">
-        {/* 1. TOP SECTION: BRAND & NEWSLETTER */}
-        <div className="top-section">
-          <div className="brand-stack">
-            <div className="logo">
-              <svg className="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="12" y1="20" x2="12" y2="10" />
-                <line x1="18" y1="20" x2="18" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="16" />
-              </svg>
-              <span className="logo-text">
-                NOVA<span className="gold">HUB</span>
-              </span>
-            </div>
-            <p className="brand-desc">
-              Next-gen decision intelligence. Processing market signals into
-              actionable growth paths.
+    <footer
+      style={{
+        background: colors.bg2,
+        borderTop: `1px solid ${colors.bg3}`,
+        padding: "60px 24px 24px",
+        color: colors.t3,
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        {/* Main footer content */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 40,
+            marginBottom: 60,
+          }}
+        >
+          {/* Brand section */}
+          <div>
+            <h3
+              style={{
+                fontSize: 24,
+                fontWeight: 900,
+                color: colors.gold,
+                margin: 0,
+                marginBottom: 12,
+                letterSpacing: "-0.02em",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <span>📊</span> Platform
+            </h3>
+            <p
+              style={{
+                fontSize: 13,
+                color: colors.t2,
+                margin: 0,
+                marginBottom: 16,
+                lineHeight: 1.6,
+              }}
+            >
+              Decision intelligence for fast-moving tech markets.
             </p>
-            <div className="social-row">
-              {socials.map((s) => (
-                <a key={s.name} href={s.href} className="social-pill">
-                  {s.icon}
+            {/* Social links */}
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+              }}
+            >
+              {socials.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={social.name}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    background: colors.bg3,
+                    border: `1px solid ${colors.bg4}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: colors.t2,
+                    fontSize: 16,
+                    textDecoration: "none",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = colors.gold;
+                    e.currentTarget.style.color = "#000";
+                    e.currentTarget.style.borderColor = colors.gold;
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = colors.bg3;
+                    e.currentTarget.style.color = colors.t2;
+                    e.currentTarget.style.borderColor = colors.bg4;
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  {social.icon}
                 </a>
               ))}
             </div>
           </div>
 
-          <div className="newsletter-box">
-            <h4>JOIN THE INTELLIGENCE FEED</h4>
-            <div className="input-group">
-              <input type="email" placeholder="agent@agency.ai" />
-              <button>SUBSCRIBE</button>
-            </div>
-            <p className="input-hint">Weekly signals. No noise. Pure data.</p>
-          </div>
-        </div>
-
-        {/* 2. MIDDLE SECTION: THE GRID */}
-        <div className="links-grid">
+          {/* Link sections */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className="link-group">
-              <h5>{category}</h5>
-              {links.map((link) => (
-                <Link key={link.label} href={link.href}>
-                  <a className="footer-link">{link.label}</a>
-                </Link>
-              ))}
+            <div key={category}>
+              <h4
+                style={{
+                  fontSize: 12,
+                  fontWeight: 900,
+                  color: colors.t1,
+                  margin: 0,
+                  marginBottom: 16,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                {category}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {links.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    <a
+                      style={{
+                        color: colors.t3,
+                        textDecoration: "none",
+                        fontSize: 13,
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = colors.gold;
+                        e.currentTarget.style.transform = "translateX(4px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = colors.t3;
+                        e.currentTarget.style.transform = "translateX(0)";
+                      }}
+                    >
+                      {link.label}
+                    </a>
+                  </Link>
+                ))}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* 3. BOTTOM SECTION: TELEMETRY */}
-        <div className="bottom-bar">
-          <div className="copyright">
-            © {currentYear} NOVAHUB CORE. ALL SYSTEMS OPERATIONAL.
-          </div>
-          <div className="status-container">
-            <div className="status-dot" />
-            <span>ENCRYPTED CONNECTION</span>
+        {/* Divider */}
+        <div
+          style={{
+            borderTop: `1px solid ${colors.bg3}`,
+            paddingTop: 24,
+            marginBottom: 24,
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+          }}
+        >
+          {/* Bottom content */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 16,
+              fontSize: 12,
+              color: colors.t3,
+            }}
+          >
+            <div>© {currentYear} Platform. All rights reserved.</div>
+
+            {/* Status indicator */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: colors.green,
+                  animation: "pulse 2s infinite",
+                }}
+              />
+              <span>All systems operational</span>
+            </div>
+
+            {/* Made with love */}
+            <div>
+              Made with <span style={{ color: colors.red }}>♥</span> for makers
+            </div>
           </div>
         </div>
       </div>
 
+      {/* CSS animations */}
       <style jsx>{`
-        .footer-root {
-          background: ${colors.bg};
-          border-top: 1px solid ${colors.bg3};
-          padding: 80px 24px 40px;
-          position: relative;
-          overflow: hidden;
-        }
-
-        /* Ambient Glow */
-        .footer-root::before {
-          content: "";
-          position: absolute;
-          top: -150px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 80%;
-          height: 300px;
-          background: radial-gradient(
-            circle,
-            ${colors.gold}08,
-            transparent 70%
-          );
-          pointer-events: none;
-        }
-
-        .footer-container {
-          max-width: 1100px;
-          margin: 0 auto;
-        }
-
-        .top-section {
-          display: grid;
-          grid-template-columns: 1.5fr 1fr;
-          gap: 60px;
-          margin-bottom: 80px;
-        }
-
-        .logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 24px;
-          font-weight: 900;
-          color: white;
-          letter-spacing: -1px;
-          margin-bottom: 16px;
-        }
-
-        .gold {
-          color: ${colors.gold};
-        }
-
-        .brand-desc {
-          color: ${colors.t2};
-          font-size: 14px;
-          max-width: 320px;
-          line-height: 1.6;
-          margin-bottom: 24px;
-        }
-
-        .social-row {
-          display: flex;
-          gap: 12px;
-        }
-        .social-pill {
-          width: 40px;
-          height: 40px;
-          border-radius: 12px;
-          background: ${colors.bg2};
-          border: 1px solid ${colors.bg3};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          text-decoration: none;
-          transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .social-pill:hover {
-          border-color: ${colors.gold};
-          transform: translateY(-3px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Newsletter Styling */
-        .newsletter-box h4 {
-          font-size: 11px;
-          letter-spacing: 2px;
-          color: ${colors.gold};
-          margin-bottom: 16px;
-        }
-
-        .input-group {
-          display: flex;
-          background: ${colors.bg2};
-          border: 1px solid ${colors.bg3};
-          padding: 6px;
-          border-radius: 14px;
-          transition: 0.3s;
-        }
-
-        .input-group:focus-within {
-          border-color: ${colors.gold}80;
-          box-shadow: 0 0 20px ${colors.gold}10;
-        }
-
-        .input-group input {
-          background: transparent;
-          border: none;
-          padding: 10px 16px;
-          color: white;
-          flex: 1;
-          outline: none;
-          font-size: 14px;
-        }
-
-        .input-group button {
-          background: ${colors.gold};
-          color: black;
-          border: none;
-          padding: 0 20px;
-          border-radius: 10px;
-          font-weight: 900;
-          font-size: 12px;
-          cursor: pointer;
-        }
-
-        .input-hint {
-          font-size: 11px;
-          color: ${colors.t3};
-          margin-top: 10px;
-        }
-
-        /* Links Grid */
-        .links-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 40px;
-          border-top: 1px solid ${colors.bg3};
-          padding-top: 60px;
-          margin-bottom: 60px;
-        }
-
-        .link-group h5 {
-          color: white;
-          font-size: 13px;
-          font-weight: 800;
-          margin-bottom: 20px;
-          text-transform: uppercase;
-        }
-
-        .footer-link {
-          display: block;
-          color: ${colors.t3};
-          text-decoration: none;
-          font-size: 14px;
-          margin-bottom: 12px;
-          transition: 0.2s;
-        }
-
-        .footer-link:hover {
-          color: ${colors.gold};
-          transform: translateX(5px);
-        }
-
-        /* Bottom Telemetry */
-        .bottom-bar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-family: monospace;
-          font-size: 10px;
-          color: #444;
-          letter-spacing: 1px;
-        }
-
-        .status-container {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .status-dot {
-          width: 6px;
-          height: 6px;
-          background: ${colors.green || "#4ade80"};
-          border-radius: 50%;
-          box-shadow: 0 0 10px ${colors.green || "#4ade80"};
-          animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
           50% {
-            opacity: 0.3;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .top-section {
-            grid-template-columns: 1fr;
-            gap: 40px;
-            text-align: center;
-          }
-          .brand-desc {
-            margin-inline: auto;
-          }
-          .social-row {
-            justify-content: center;
-          }
-          .bottom-bar {
-            flex-direction: column;
-            gap: 20px;
-            text-align: center;
+            opacity: 0.5;
           }
         }
       `}</style>

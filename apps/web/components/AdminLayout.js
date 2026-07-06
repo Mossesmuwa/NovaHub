@@ -1,4 +1,4 @@
-// components/AdminLayout.js - Shared admin layout
+﻿// components/AdminLayout.js - Shared admin layout
 import Head from "next/head";
 import Link from "next/link";
 
@@ -152,7 +152,7 @@ export default function AdminLayout({ children, profile }) {
                 fontSize: 16,
               }}
             >
-              ◆
+              â—†
             </div>
             <div>
               <div
@@ -195,3 +195,4 @@ export default function AdminLayout({ children, profile }) {
     </>
   );
 }
+

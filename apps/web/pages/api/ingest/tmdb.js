@@ -1,4 +1,4 @@
-// pages/api/ingest/tmdb.js
+﻿// pages/api/ingest/tmdb.js
 // Vercel Cron: 0 2 * * * (2am UTC)
 // Also accepts POST from admin trigger UI
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${cronSecret}`) {
     return res
       .status(401)
-      .json({ error: "Unauthorized — CRON_SECRET mismatch" });
+      .json({ error: "Unauthorized â€” CRON_SECRET mismatch" });
   }
 
   try {
@@ -34,3 +34,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

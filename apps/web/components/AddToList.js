@@ -1,7 +1,7 @@
-// components/AddToList.js
-// NovaHub — Add Item to List component
+﻿// components/AddToList.js
+// NovaHub â€” Add Item to List component
 // Shows a dropdown of the user's lists and lets them add the current item.
-// Pro users only — shows upgrade prompt for free users.
+// Pro users only â€” shows upgrade prompt for free users.
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "shared/lib/supabase";
@@ -389,3 +389,4 @@ export default function AddToList({ itemId, itemName }) {
     </div>
   );
 }
+

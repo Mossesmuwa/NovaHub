@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import SEO from "../../components/SEO";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -43,12 +43,12 @@ export default function RegisterPage() {
       setErr(result.error);
       return;
     }
-    setOk("✦ Account created! Check your email to verify it, then sign in →");
+    setOk("âœ¦ Account created! Check your email to verify it, then sign in â†’");
   }
 
   return (
     <>
-      <SEO title="Create Account — NovaHub" />
+      <SEO title="Create Account â€” NovaHub" />
       <div className="top-bar">
         <Link href="/">
           <svg
@@ -211,7 +211,7 @@ export default function RegisterPage() {
               />
             </div>
             <button className="btn-primary" type="submit" disabled={loading}>
-              {loading ? "Creating account…" : "Create Free Account"}
+              {loading ? "Creating accountâ€¦" : "Create Free Account"}
             </button>
           </form>
           <p
@@ -241,3 +241,4 @@ export default function RegisterPage() {
     </>
   );
 }
+

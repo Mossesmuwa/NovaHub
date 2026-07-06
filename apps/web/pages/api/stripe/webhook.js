@@ -1,7 +1,7 @@
-// pages/api/stripe/webhook.js
+﻿// pages/api/stripe/webhook.js
 // Handles Stripe webhook events.
 // Set STRIPE_WEBHOOK_SECRET in Vercel env vars.
-// In Stripe dashboard: Developers → Webhooks → Add endpoint
+// In Stripe dashboard: Developers â†’ Webhooks â†’ Add endpoint
 //   URL: https://yoursite.vercel.app/api/stripe/webhook
 //   Events: customer.subscription.created, updated, deleted
 
@@ -9,7 +9,7 @@ import { buffer } from "micro";
 import Stripe from "stripe";
 import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
-// Disable body parsing — Stripe needs the raw body to verify signature
+// Disable body parsing â€” Stripe needs the raw body to verify signature
 export const config = { api: { bodyParser: false } };
 
 export default async function handler(req, res) {
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
 
   try {
     switch (event.type) {
-      // ── Subscription activated ──────────────────────────────────────────────
+      // â”€â”€ Subscription activated â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const sub = event.data.object;
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         break;
       }
 
-      // ── Subscription cancelled ──────────────────────────────────────────────
+      // â”€â”€ Subscription cancelled â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case "customer.subscription.deleted": {
         const sub = event.data.object;
         const userId = await getUserId(sub);
@@ -99,14 +99,14 @@ export default async function handler(req, res) {
         break;
       }
 
-      // ── Payment failed ──────────────────────────────────────────────────────
+      // â”€â”€ Payment failed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       case "invoice.payment_failed": {
         const invoice = event.data.object;
         const sub = await stripe.subscriptions.retrieve(invoice.subscription);
         const userId = await getUserId(sub);
         if (userId) {
           console.warn(`[webhook] Payment failed for user ${userId}`);
-          // Don't revoke Pro immediately — Stripe retries automatically
+          // Don't revoke Pro immediately â€” Stripe retries automatically
           // Revocation happens when subscription.deleted fires
         }
         break;
@@ -123,3 +123,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+

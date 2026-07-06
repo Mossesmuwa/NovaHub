@@ -1,25 +1,25 @@
-// pages/api/featured-listings.js
-// NovaHub — B2B Featured Listings API
+﻿// pages/api/featured-listings.js
+// NovaHub â€” B2B Featured Listings API
 //
-// GET  /api/featured-listings?category=ai-tools   → active listings for a category
-// POST /api/featured-listings                      → create a new listing inquiry
+// GET  /api/featured-listings?category=ai-tools   â†’ active listings for a category
+// POST /api/featured-listings                      â†’ create a new listing inquiry
 //
 // Listing plans (set in Vercel env as LISTING_PLANS JSON or use defaults below):
-//   Starter   $99/mo  — "Nova Pick" badge in one category
-//   Growth    $249/mo — "Nova Pick" + featured in weekly digest
-//   Pro       $499/mo — Everything + homepage feature slot
+//   Starter   $99/mo  â€” "Nova Pick" badge in one category
+//   Growth    $249/mo â€” "Nova Pick" + featured in weekly digest
+//   Pro       $499/mo â€” Everything + homepage feature slot
 //
 // Flow:
-//   1. Company submits via POST → row created in featured_listings (status: inquiry)
-//   2. You review in admin panel, approve → status: approved
+//   1. Company submits via POST â†’ row created in featured_listings (status: inquiry)
+//   2. You review in admin panel, approve â†’ status: approved
 //   3. Stripe payment link sent manually (or via Stripe integration later)
-//   4. On payment → status: active, starts_at / ends_at set
+//   4. On payment â†’ status: active, starts_at / ends_at set
 //   5. GET endpoint returns only active listings
 
 import { getSupabase } from "shared/lib/supabaseClient";
 import { supabaseAdmin } from "shared/lib/supabaseAdmin";
 
-// ─── Listing plans ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Listing plans â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PLANS = {
   starter: {
     name: "Starter",
@@ -47,13 +47,13 @@ const PLANS = {
   },
 };
 
-// ─── Input sanitiser ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Input sanitiser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function sanitise(str, max = 200) {
   if (typeof str !== "string") return "";
   return str.replace(/[<>]/g, "").trim().slice(0, max);
 }
 
-// ─── GET: active listings (for frontend consumption) ─────────────────────────
+// â”€â”€â”€ GET: active listings (for frontend consumption) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function handleGet(req, res) {
   const supabase = getSupabase();
   const { category, limit = "6" } = req.query;
@@ -93,7 +93,7 @@ async function handleGet(req, res) {
   });
 }
 
-// ─── POST: submit a listing inquiry ──────────────────────────────────────────
+// â”€â”€â”€ POST: submit a listing inquiry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function handlePost(req, res) {
   const {
     company_name,
@@ -164,12 +164,12 @@ async function handlePost(req, res) {
   });
 }
 
-// ─── GET: plan info (for pricing page) ───────────────────────────────────────
+// â”€â”€â”€ GET: plan info (for pricing page) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function handlePlans(res) {
   return res.status(200).json({ success: true, plans: PLANS });
 }
 
-// ─── Router ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default async function handler(req, res) {
   if (req.method === "GET") {
     if (req.query.plans === "1") return handlePlans(res);
@@ -178,3 +178,4 @@ export default async function handler(req, res) {
   if (req.method === "POST") return handlePost(req, res);
   return res.status(405).json({ success: false, error: "Method not allowed" });
 }
+

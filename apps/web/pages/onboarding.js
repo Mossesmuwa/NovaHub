@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import SEO from "../components/SEO";
 import { supabase } from "shared/lib/supabase";
 import Link from "next/link";
 
 const DEFAULT_ITEMS = [
-  { name: "Dune: Part Two", type: "movie", genre: "Sci-Fi", em: "🍿" },
-  { name: "Cursor IDE", type: "tool", genre: "AI Dev", em: "✨" },
-  { name: "Atomic Habits", type: "book", genre: "Self-Help", em: "📚" },
-  { name: "Elden Ring", type: "game", genre: "Action RPG", em: "🎮" },
-  { name: "Supabase", type: "tool", genre: "Dev Tool", em: "⚡" },
-  { name: "The Last of Us", type: "tv", genre: "Drama", em: "📺" },
+  { name: "Dune: Part Two", type: "movie", genre: "Sci-Fi", em: "ðŸ¿" },
+  { name: "Cursor IDE", type: "tool", genre: "AI Dev", em: "âœ¨" },
+  { name: "Atomic Habits", type: "book", genre: "Self-Help", em: "ðŸ“š" },
+  { name: "Elden Ring", type: "game", genre: "Action RPG", em: "ðŸŽ®" },
+  { name: "Supabase", type: "tool", genre: "Dev Tool", em: "âš¡" },
+  { name: "The Last of Us", type: "tv", genre: "Drama", em: "ðŸ“º" },
 ];
 
 export default function OnboardingPage() {
@@ -33,12 +33,12 @@ export default function OnboardingPage() {
           .limit(8);
         if (data && data.length >= 6) {
           const emap = {
-            movie: "🍿",
-            book: "📚",
-            game: "🎮",
-            tool: "✨",
-            tv: "📺",
-            music: "🎵",
+            movie: "ðŸ¿",
+            book: "ðŸ“š",
+            game: "ðŸŽ®",
+            tool: "âœ¨",
+            tv: "ðŸ“º",
+            music: "ðŸŽµ",
           };
           setItems(
             data
@@ -47,7 +47,7 @@ export default function OnboardingPage() {
                 name: i.name,
                 type: i.type,
                 genre: i.genre || i.type,
-                em: emap[i.type] || "✦",
+                em: emap[i.type] || "âœ¦",
               })),
           );
         }
@@ -107,18 +107,18 @@ export default function OnboardingPage() {
   }
 
   const allCats = [
-    { id: "movies", em: "🍿", name: "Movies" },
-    { id: "tv-shows", em: "📺", name: "TV Shows" },
-    { id: "books", em: "📚", name: "Books" },
-    { id: "games", em: "🎮", name: "Games" },
-    { id: "ai-tools", em: "✨", name: "AI Tools" },
-    { id: "security", em: "🔐", name: "Security" },
-    { id: "music", em: "🎵", name: "Music" },
-    { id: "courses", em: "🧠", name: "Learning" },
-    { id: "design", em: "🎨", name: "Design" },
-    { id: "science", em: "🔬", name: "Science" },
-    { id: "productivity", em: "⚡", name: "Productivity" },
-    { id: "finance", em: "📈", name: "Finance" },
+    { id: "movies", em: "ðŸ¿", name: "Movies" },
+    { id: "tv-shows", em: "ðŸ“º", name: "TV Shows" },
+    { id: "books", em: "ðŸ“š", name: "Books" },
+    { id: "games", em: "ðŸŽ®", name: "Games" },
+    { id: "ai-tools", em: "âœ¨", name: "AI Tools" },
+    { id: "security", em: "ðŸ”", name: "Security" },
+    { id: "music", em: "ðŸŽµ", name: "Music" },
+    { id: "courses", em: "ðŸ§ ", name: "Learning" },
+    { id: "design", em: "ðŸŽ¨", name: "Design" },
+    { id: "science", em: "ðŸ”¬", name: "Science" },
+    { id: "productivity", em: "âš¡", name: "Productivity" },
+    { id: "finance", em: "ðŸ“ˆ", name: "Finance" },
   ];
 
   if (step === 3) finish();
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
   return (
     <>
       <SEO
-        title="Set Your Taste — NovaHub"
+        title="Set Your Taste â€” NovaHub"
         description="Tell NovaHub your taste for personalised recommendations."
       />
       <div className="onboard-wrap">
@@ -159,7 +159,7 @@ export default function OnboardingPage() {
                     className={`onboard-cat-tile${cats.includes(c.id) ? " selected" : ""}`}
                     onClick={() => toggleCat(c.id)}
                   >
-                    <div className="tile-check">✓</div>
+                    <div className="tile-check">âœ“</div>
                     <span className="tile-em">{c.em}</span>
                     <span className="tile-name">{c.name}</span>
                   </div>
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
                   Skip for now
                 </span>
                 <button className="btn-primary" onClick={() => next(0)}>
-                  Next →
+                  Next â†’
                 </button>
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function OnboardingPage() {
             <div className="onboard-step active">
               <div className="onboard-step-title">Quick taste check</div>
               <div className="onboard-step-sub">
-                Rate 6 picks — love it or pass. Builds your profile instantly.
+                Rate 6 picks â€” love it or pass. Builds your profile instantly.
               </div>
               {swipeIdx < items.length && (
                 <div className="swipe-area">
@@ -213,7 +213,7 @@ export default function OnboardingPage() {
                       {items[swipeIdx].name}
                     </div>
                     <div style={{ fontSize: "13px", color: "var(--t3)" }}>
-                      {items[swipeIdx].type} · {items[swipeIdx].genre}
+                      {items[swipeIdx].type} Â· {items[swipeIdx].genre}
                     </div>
                   </div>
                 </div>
@@ -227,14 +227,14 @@ export default function OnboardingPage() {
                   onClick={() => swipe("pass")}
                   title="Not for me"
                 >
-                  ✕
+                  âœ•
                 </button>
                 <button
                   className="swipe-btn love"
                   onClick={() => swipe("love")}
                   title="Love it"
                 >
-                  ♥
+                  â™¥
                 </button>
               </div>
               <div className="onboard-footer">
@@ -255,25 +255,25 @@ export default function OnboardingPage() {
                 {[
                   {
                     id: "learn",
-                    em: "🧠",
+                    em: "ðŸ§ ",
                     name: "Learn something",
                     desc: "Courses, books, tutorials, deep dives",
                   },
                   {
                     id: "entertain",
-                    em: "🎬",
+                    em: "ðŸŽ¬",
                     name: "Get entertained",
                     desc: "Movies, games, music, shows",
                   },
                   {
                     id: "tools",
-                    em: "⚡",
+                    em: "âš¡",
                     name: "Find tools",
                     desc: "AI tools, apps, dev tools, productivity",
                   },
                   {
                     id: "explore",
-                    em: "🔭",
+                    em: "ðŸ”­",
                     name: "Just explore",
                     desc: "Surprise me with something new",
                   },
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
                   Skip
                 </span>
                 <button className="btn-primary" onClick={() => next(2)}>
-                  Next →
+                  Next â†’
                 </button>
               </div>
             </div>
@@ -320,7 +320,7 @@ export default function OnboardingPage() {
               className="onboard-step active"
               style={{ textAlign: "center" }}
             >
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>✦</div>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>âœ¦</div>
               <div
                 className="onboard-step-title"
                 style={{ textAlign: "center" }}
@@ -384,7 +384,7 @@ export default function OnboardingPage() {
                   className="btn-primary"
                   style={{ fontSize: "14px" }}
                 >
-                  Create Free Account ✦
+                  Create Free Account âœ¦
                 </Link>
                 <Link
                   href="/"
@@ -401,3 +401,4 @@ export default function OnboardingPage() {
     </>
   );
 }
+

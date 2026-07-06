@@ -1,7 +1,7 @@
-// pages/api/lists/index.js
-// NovaHub — List API
-// GET  /api/lists       → get current user's lists
-// POST /api/lists       → create a new list (Pro only)
+﻿// pages/api/lists/index.js
+// NovaHub â€” List API
+// GET  /api/lists       â†’ get current user's lists
+// POST /api/lists       â†’ create a new list (Pro only)
 
 import { supabase } from "shared/lib/supabase";
 import { supabaseAdmin } from "shared/lib/supabaseAdmin";
@@ -80,3 +80,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: "Method not allowed" });
 }
+

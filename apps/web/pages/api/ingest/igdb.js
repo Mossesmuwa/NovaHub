@@ -1,4 +1,4 @@
-// pages/api/ingest/igdb.js
+﻿// pages/api/ingest/igdb.js
 import { SyncEngine } from "shared/lib/pipeline/SyncEngine.js";
 import { IGDBProvider } from "shared/lib/pipeline/IGDBProvider.js";
 export const config = { maxDuration: 60 };
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     return res
       .status(500)
       .json({
-        error: "IGDB_CLIENT_ID not set — get free credentials at dev.twitch.tv",
+        error: "IGDB_CLIENT_ID not set â€” get free credentials at dev.twitch.tv",
       });
   try {
     const result = await new SyncEngine({ skipAI: true }).syncProvider(
@@ -20,3 +20,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+

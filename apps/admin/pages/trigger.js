@@ -33,7 +33,7 @@ const PROVIDERS = [
   {
     key: "tmdb",
     label: "TMDB",
-    icon: "🎬",
+    icon: "FILM",
     desc: "Movies + TV · 500+ items · 12 endpoints",
     needsKey: false,
     group: "content",
@@ -41,7 +41,7 @@ const PROVIDERS = [
   {
     key: "producthunt",
     label: "Product Hunt",
-    icon: "🚀",
+    icon: "ROCKET",
     desc: "Trending tools · 50 posts per run",
     needsKey: false,
     group: "content",
@@ -49,7 +49,7 @@ const PROVIDERS = [
   {
     key: "github",
     label: "GitHub",
-    icon: "⚡",
+    icon: "CODE",
     desc: "Trending repos · 30 items per run",
     needsKey: false,
     group: "content",
@@ -57,7 +57,7 @@ const PROVIDERS = [
   {
     key: "hackernews",
     label: "Hacker News",
-    icon: "🔶",
+    icon: "NEWS",
     desc: "Top stories · 30 items per run",
     needsKey: false,
     group: "content",
@@ -65,7 +65,7 @@ const PROVIDERS = [
   {
     key: "books",
     label: "Google Books",
-    icon: "📚",
+    icon: "BOOK",
     desc: "Curated books · 8 rotating subjects",
     needsKey: false,
     group: "content",
@@ -73,7 +73,7 @@ const PROVIDERS = [
   {
     key: "openlibrary",
     label: "OpenLibrary",
-    icon: "📖",
+    icon: "LIBRARY",
     desc: "Community books · 10 subjects",
     needsKey: false,
     group: "content",
@@ -81,7 +81,7 @@ const PROVIDERS = [
   {
     key: "steam",
     label: "Steam",
-    icon: "🖥️",
+    icon: "GAMES",
     desc: "Top PC games · 40 items per run",
     needsKey: false,
     group: "content",
@@ -89,7 +89,7 @@ const PROVIDERS = [
   {
     key: "arxiv",
     label: "arXiv",
-    icon: "🔬",
+    icon: "RESEARCH",
     desc: "Research papers · AI + Security + Physics",
     needsKey: false,
     group: "content",
@@ -97,7 +97,7 @@ const PROVIDERS = [
   {
     key: "reddit",
     label: "Reddit",
-    icon: "🟠",
+    icon: "SOCIAL",
     desc: "Top posts · 10 subreddits curated",
     needsKey: false,
     group: "content",
@@ -105,7 +105,7 @@ const PROVIDERS = [
   {
     key: "devto",
     label: "DEV.to",
-    icon: "💻",
+    icon: "DEV",
     desc: "Dev articles · 6 technology tags",
     needsKey: false,
     group: "content",
@@ -113,7 +113,7 @@ const PROVIDERS = [
   {
     key: "courses",
     label: "Courses",
-    icon: "🧠",
+    icon: "LEARN",
     desc: "Coursera + Udemy · 30 items",
     needsKey: false,
     group: "content",

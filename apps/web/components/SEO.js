@@ -1,7 +1,7 @@
-import Head from 'next/head';
+﻿import Head from 'next/head';
 
 export default function SEO({ title, description, ogTitle, ogDesc }) {
-  const t = title || 'NovaHub — Discover Everything You Need';
+  const t = title || 'NovaHub â€” Discover Everything You Need';
   const d = description || 'AI-powered discovery for movies, books, AI tools, games, niche companies and more. Updated daily.';
   return (
     <Head>
@@ -18,3 +18,4 @@ export default function SEO({ title, description, ogTitle, ogDesc }) {
     </Head>
   );
 }
+

@@ -1,4 +1,4 @@
-// pages/api/ingest/hackernews.js
+﻿// pages/api/ingest/hackernews.js
 // Vercel Cron: 0 8 * * * (8am UTC daily)
 
 import { SyncEngine }           from 'shared/lib/pipeline/SyncEngine.js';
@@ -20,4 +20,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message });
   }
 }
+
 

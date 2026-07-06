@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import Head from "next/head";
 import { motion } from "framer-motion";
 import { supabase } from "shared/lib/supabase";
@@ -32,7 +32,7 @@ export default function WeeklyPage({ latestIssue, archive }) {
       </Head>
       <Navbar />
 
-      {/* ── PREMIUM HERO ── */}
+      {/* â”€â”€ PREMIUM HERO â”€â”€ */}
       <section
         style={{
           padding: "120px 24px 80px",
@@ -57,7 +57,7 @@ export default function WeeklyPage({ latestIssue, archive }) {
             marginBottom: "24px",
           }}
         >
-          ✦ ISSUE #{latestIssue?.issue_number} · {latestIssue?.publish_date}
+          âœ¦ ISSUE #{latestIssue?.issue_number} Â· {latestIssue?.publish_date}
         </motion.div>
         <h1
           style={{
@@ -81,7 +81,7 @@ export default function WeeklyPage({ latestIssue, archive }) {
         </p>
       </section>
 
-      {/* ── MAIN CONTENT ── */}
+      {/* â”€â”€ MAIN CONTENT â”€â”€ */}
       <main
         style={{
           maxWidth: "1100px",
@@ -184,7 +184,7 @@ export default function WeeklyPage({ latestIssue, archive }) {
                     fontSize: "13px",
                   }}
                 >
-                  ★ NOVA SCORE: {item.score}/10
+                  â˜… NOVA SCORE: {item.score}/10
                 </div>
               </div>
             </motion.div>
@@ -243,7 +243,7 @@ export default function WeeklyPage({ latestIssue, archive }) {
                   cursor: "pointer",
                 }}
               >
-                {status === "loading" ? "Joining..." : "Subscribe ✦"}
+                {status === "loading" ? "Joining..." : "Subscribe âœ¦"}
               </button>
             </form>
             {status === "success" && (
@@ -308,3 +308,4 @@ export async function getServerSideProps() {
     },
   };
 }
+

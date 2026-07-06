@@ -1,4 +1,4 @@
-// components/TrailerPlayer.js - Movie Trailer Component
+﻿// components/TrailerPlayer.js - Movie Trailer Component
 import { useState, useEffect } from "react";
 
 const G = {
@@ -317,10 +317,15 @@ export default function TrailerPlayer({
               {selectedTrailer.name}
             </div>
             <div style={{ fontSize: 13, color: G.t3 }}>
+<<<<<<< HEAD
               {selectedTrailer.type} ·{" "}
               {selectedTrailer.published_at
                 ? new Date(selectedTrailer.published_at).toLocaleDateString()
                 : "Trailer"}
+=======
+              {selectedTrailer.type} Â·{" "}
+              {new Date(selectedTrailer.published_at).toLocaleDateString()}
+>>>>>>> 50591a7c90e60952c5363e2bd4a789b18f50b8fb
             </div>
           </div>
 
@@ -421,3 +426,4 @@ export default function TrailerPlayer({
     </div>
   );
 }
+

@@ -1,7 +1,7 @@
 ﻿// components/CompareButton.js
 // Premium comparison modal with smooth search, beautiful cards, and instant comparison
 import { useState, useEffect } from "react";
-import { colors } from "shared/lib/design";
+import { colors } from "../lib/design";
 import Link from "next/link";
 
 export default function CompareButton({ currentItem, onClose }) {

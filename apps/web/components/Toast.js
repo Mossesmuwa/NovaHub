@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react';
+﻿import { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react';
 
 const ToastContext = createContext(null);
 
@@ -30,7 +30,7 @@ export function ToastProvider({ children }) {
 
 function ToastItem({ message, type }) {
   const colors = { success: 'var(--gold)', error: '#FF453A', warning: '#FF9F0A', info: 'var(--t2)' };
-  const icons = { success: '✦', error: '✕', warning: '⚠', info: '◆' };
+  const icons = { success: 'âœ¦', error: 'âœ•', warning: 'âš ', info: 'â—†' };
   return (
     <div className="nova-toast">
       <span style={{ color: colors[type] || colors.info, fontSize: '15px', flexShrink: 0 }}>{icons[type] || icons.info}</span>
@@ -43,3 +43,4 @@ export default function Toast() {
   // This is a no-op placeholder; the actual toasts render via ToastProvider
   return null;
 }
+

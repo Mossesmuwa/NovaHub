@@ -1,4 +1,4 @@
-// apps/web/pages/compare.js - Nova Compare Engine
+﻿// apps/web/pages/compare.js - Nova Compare Engine
 import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import SEO from "../components/SEO";
@@ -173,7 +173,7 @@ function ComparisonRow({ label, value1, value2, type = "text" }) {
         </div>
       );
     }
-    return <div style={{ color: G.t1 }}>{val || "—"}</div>;
+    return <div style={{ color: G.t1 }}>{val || "â€”"}</div>;
   };
 
   return (
@@ -767,3 +767,4 @@ export async function getServerSideProps({ query }) {
     return { props: { initialItems: [] } };
   }
 }
+

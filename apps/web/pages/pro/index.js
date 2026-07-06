@@ -1,19 +1,19 @@
-// pages/pro/index.js
-// NovaHub — Pro Upgrade Page
+﻿// pages/pro/index.js
+// NovaHub â€” Pro Upgrade Page
 
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { supabase } from "shared/lib/supabase";
 
 const FEATURES = [
-  { free: "10 saves", pro: "Unlimited saves", icon: "◆" },
-  { free: "Basic feed", pro: "Personalised feed", icon: "◆" },
-  { free: "—", pro: "Nova Score on every item", icon: "◆" },
-  { free: "3 Vibe searches/day", pro: "Unlimited AI search", icon: "◆" },
-  { free: "—", pro: "Create & share lists", icon: "◆" },
-  { free: "Weekly digest", pro: "Curated personal digest", icon: "◆" },
-  { free: "—", pro: "Early access to features", icon: "◆" },
-  { free: "—", pro: "Pro badge on profile", icon: "◆" },
+  { free: "10 saves", pro: "Unlimited saves", icon: "â—†" },
+  { free: "Basic feed", pro: "Personalised feed", icon: "â—†" },
+  { free: "â€”", pro: "Nova Score on every item", icon: "â—†" },
+  { free: "3 Vibe searches/day", pro: "Unlimited AI search", icon: "â—†" },
+  { free: "â€”", pro: "Create & share lists", icon: "â—†" },
+  { free: "Weekly digest", pro: "Curated personal digest", icon: "â—†" },
+  { free: "â€”", pro: "Early access to features", icon: "â—†" },
+  { free: "â€”", pro: "Pro badge on profile", icon: "â—†" },
 ];
 
 export default function ProPage() {
@@ -73,7 +73,7 @@ export default function ProPage() {
   return (
     <>
       <Head>
-        <title>Nova Pro — NovaHub</title>
+        <title>Nova Pro â€” NovaHub</title>
         <meta
           name="description"
           content="Unlock unlimited discovery with Nova Pro."
@@ -108,7 +108,7 @@ export default function ProPage() {
             {FEATURES.map((f, i) => (
               <>
                 <div key={`free-${i}`} className="feature-cell">
-                  <span className={f.free === "—" ? "feature-none" : ""}>
+                  <span className={f.free === "â€”" ? "feature-none" : ""}>
                     {f.free}
                   </span>
                 </div>
@@ -297,3 +297,4 @@ export default function ProPage() {
     </>
   );
 }
+

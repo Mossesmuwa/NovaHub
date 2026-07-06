@@ -1,4 +1,4 @@
-// pages/api/og.js
+﻿// pages/api/og.js
 // Dynamic Open Graph image generation using @vercel/og.
 // Install: npm install @vercel/og
 //
@@ -125,7 +125,7 @@ export default function handler(req) {
         {/* Rating */}
         {rating && (
           <div style={{ fontSize: 18, color: "#AEAEB2", fontWeight: 500 }}>
-            ★ {rating}
+            â˜… {rating}
           </div>
         )}
 
@@ -151,3 +151,4 @@ export default function handler(req) {
     },
   );
 }
+

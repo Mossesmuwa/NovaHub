@@ -1,5 +1,5 @@
-// components/ProGate.js
-// NovaHub — Pro Feature Gate
+﻿// components/ProGate.js
+// NovaHub â€” Pro Feature Gate
 // Wrap any pro-only UI element with this component.
 // Free users see an upgrade prompt instead of the feature.
 //
@@ -10,7 +10,7 @@
 //   </ProGate>
 //
 //   // Show degraded version for free users
-//   <ProGate feature="novaScore" fallback={<span>—</span>}>
+//   <ProGate feature="novaScore" fallback={<span>â€”</span>}>
 //     <NovaScore value={94} />
 //   </ProGate>
 //
@@ -26,13 +26,13 @@ export default function ProGate({ feature, children, fallback = null, soft = fal
   const { isPro, can, loading } = usePro();
   const router = useRouter();
 
-  // While checking auth/pro status — render nothing to avoid flash
+  // While checking auth/pro status â€” render nothing to avoid flash
   if (loading) return null;
 
-  // User has access — render normally
+  // User has access â€” render normally
   if (can(feature)) return children;
 
-  // Soft gate — show content but blur it with an upgrade overlay
+  // Soft gate â€” show content but blur it with an upgrade overlay
   if (soft) {
     return (
       <div className="pro-gate-soft" style={{ position: 'relative' }}>
@@ -44,37 +44,37 @@ export default function ProGate({ feature, children, fallback = null, soft = fal
     );
   }
 
-  // Hard gate — show fallback or the full upgrade card
+  // Hard gate â€” show fallback or the full upgrade card
   if (fallback !== null) return fallback;
 
   return <ProUpgradeCard feature={feature} onUpgrade={() => router.push('/pro')} />;
 }
 
-// ─── Full upgrade card (hard gate) ───────────────────────────────────────────
+// â”€â”€â”€ Full upgrade card (hard gate) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ProUpgradeCard({ feature, onUpgrade }) {
   const info = FEATURES[feature] || {};
 
   return (
     <div className="pro-gate-card">
-      <div className="pro-gate-icon">✦</div>
+      <div className="pro-gate-icon">âœ¦</div>
       <p className="pro-gate-label">Pro feature</p>
       <p className="pro-gate-desc">{info.label || 'This feature requires NovaHub Pro.'}</p>
       <button className="btn-primary" onClick={onUpgrade}>
-        Unlock with Pro — $6/mo
+        Unlock with Pro â€” $6/mo
       </button>
-      <p className="pro-gate-note">Cancel anytime · Instant access</p>
+      <p className="pro-gate-note">Cancel anytime Â· Instant access</p>
     </div>
   );
 }
 
-// ─── Overlay for soft gate ────────────────────────────────────────────────────
+// â”€â”€â”€ Overlay for soft gate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ProUpgradeOverlay({ feature, onUpgrade }) {
   const info = FEATURES[feature] || {};
 
   return (
     <div className="pro-gate-overlay">
       <div className="pro-gate-overlay-inner">
-        <span className="pro-gate-icon">✦</span>
+        <span className="pro-gate-icon">âœ¦</span>
         <p>{info.label || 'Pro feature'}</p>
         <button className="btn-primary btn-sm" onClick={onUpgrade}>
           Upgrade to Pro
@@ -84,12 +84,12 @@ function ProUpgradeOverlay({ feature, onUpgrade }) {
   );
 }
 
-// ─── Inline pro badge (use in nav or profile) ─────────────────────────────────
+// â”€â”€â”€ Inline pro badge (use in nav or profile) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function ProBadge() {
-  return <span className="pro-badge">✦ Pro</span>;
+  return <span className="pro-badge">âœ¦ Pro</span>;
 }
 
-// ─── Higher-order component version ───────────────────────────────────────────
+// â”€â”€â”€ Higher-order component version â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Usage: export default withProGate(MyComponent, 'vibeDialUnlimited');
 export function withProGate(Component, feature, options = {}) {
   return function ProGatedComponent(props) {
@@ -100,3 +100,4 @@ export function withProGate(Component, feature, options = {}) {
     );
   };
 }
+

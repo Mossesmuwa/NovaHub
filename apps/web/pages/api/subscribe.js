@@ -1,7 +1,7 @@
-// pages/api/subscribe.js
+﻿// pages/api/subscribe.js
 // Subscribes an email to the NovaHub newsletter via Beehiiv API.
 // Set BEEHIIV_API_KEY and BEEHIIV_PUBLICATION_ID in Vercel env vars.
-// Get them at: https://app.beehiiv.com → Settings → API
+// Get them at: https://app.beehiiv.com â†’ Settings â†’ API
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -15,9 +15,9 @@ export default async function handler(req, res) {
   const pubId = process.env.BEEHIIV_PUBLICATION_ID;
 
   if (!apiKey || !pubId) {
-    // Graceful fallback — log and return success so UX isn't broken during setup
+    // Graceful fallback â€” log and return success so UX isn't broken during setup
     console.warn(
-      "[subscribe] BEEHIIV_API_KEY or BEEHIIV_PUBLICATION_ID not set — logging subscription only",
+      "[subscribe] BEEHIIV_API_KEY or BEEHIIV_PUBLICATION_ID not set â€” logging subscription only",
     );
     console.log("[subscribe] Would have subscribed:", email);
     return res.status(200).json({ success: true });
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
     if (!beehiivRes.ok) {
       const err = await beehiivRes.json().catch(() => ({}));
-      // 409 = already subscribed — treat as success
+      // 409 = already subscribed â€” treat as success
       if (beehiivRes.status === 409) {
         return res
           .status(200)
@@ -62,3 +62,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Network error. Please try again." });
   }
 }
+

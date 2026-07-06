@@ -3,16 +3,22 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { useSupabase } from "shared/lib/SupabaseContext";
 import * as Favorites from "shared/lib/favorites";
 import { colors } from "shared/lib/design";
 import { useToast } from "../../components/Toast";
+=======
+import { supabase } from "../../lib/supabase";
+import { colors } from "../../lib/design";
+>>>>>>> 50591a7c90e60952c5363e2bd4a789b18f50b8fb
 
 // Import premium components
 import ScoreGauge from "../../components/ScoreGauge";
 import ScoreBreakdown from "../../components/ScoreBreakdown";
 import TrendAnalysis from "../../components/TrendAnalysis";
 import TrustBadge from "../../components/TrustBadge";
+import DataSources from "../../components/DataSources";
 import AuditTrail from "../../components/AuditTrail";
 import CompareButton from "../../components/CompareButton";
 import TrailerPlayer from "../../components/TrailerPlayer";
@@ -332,7 +338,7 @@ export default function ItemDetail({
                   color: colors.t1,
                 }}
               >
-                Intelligence Analysis
+                📊 Intelligence Analysis
               </h2>
               <p
                 style={{
