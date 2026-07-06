@@ -1,6 +1,8 @@
 ﻿// pages/api/items/search.js
 // Search items by query with ranking by Nova Score
-import { supabase } from "../../../lib/supabase";
+import { getSupabase } from "../../../../../packages/shared/lib/supabaseClient";
+
+const supabase = getSupabase();
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {

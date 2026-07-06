@@ -1,8 +1,8 @@
 ﻿// components/AuditTrail.js
 // Premium audit trail with expandable timeline and data verification history
 import { useState } from "react";
-import { colors } from "../lib/design";
-import { formatDate } from "../lib/formatters";
+import { colors } from "shared/lib/design";
+import { formatDate } from "../../../packages/shared/lib/formatters";
 
 export default function AuditTrail({
   dataSources = [

@@ -1,7 +1,7 @@
 ﻿// components/Footer.js
 // Premium responsive footer with links, social, and newsletter
 import Link from "next/link";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

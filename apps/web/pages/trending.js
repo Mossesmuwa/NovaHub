@@ -65,7 +65,8 @@ export async function getServerSideProps() {
       id: item.id,
       slug: item.slug,
       name: item.name,
-      description: item.short_desc || item.long_desc || "No description available",
+      description:
+        item.short_desc || item.long_desc || "No description available",
       category: item.category_id || item.type || "General",
       image: item.image,
       trending_score: item.trending_score ?? 0,
@@ -94,7 +95,7 @@ export default function PremiumTrending({ items = [] }) {
   if (!hero) {
     return (
       <Layout activePage="trending">
-        <SEO title="Trending — NovaHub" />
+        <SEO title="Trending ï¿½ NovaHub" />
         <div style={styles.center}>
           <motion.div
             initial={{ opacity: 0 }}
@@ -102,7 +103,9 @@ export default function PremiumTrending({ items = [] }) {
             style={{ color: "#fff", textAlign: "center" }}
           >
             <h2>No signal data yet</h2>
-            <p style={{ color: THEME.text2 }}>Waiting for live momentum to surface.</p>
+            <p style={{ color: THEME.text2 }}>
+              Waiting for live momentum to surface.
+            </p>
           </motion.div>
         </div>
       </Layout>
@@ -111,7 +114,7 @@ export default function PremiumTrending({ items = [] }) {
 
   return (
     <Layout activePage="trending">
-      <SEO title="Trending — NovaHub" />
+      <SEO title="Trending ï¿½ NovaHub" />
       <div style={styles.page}>
         <div style={styles.glow} />
 
@@ -120,10 +123,12 @@ export default function PremiumTrending({ items = [] }) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div style={styles.kicker}>LIVE SIGNAL BOARD</div>
               <h1 style={styles.title}>
-                What’s <span style={{ color: THEME.gold }}>Gaining</span> Momentum
+                Whatâ€™s <span style={{ color: THEME.gold }}>Gaining</span>{" "}
+                Momentum
               </h1>
               <p style={styles.subtitle}>
-                A curated view of fast-moving picks, creators, and cultural signals.
+                A curated view of fast-moving picks, creators, and cultural
+                signals.
               </p>
             </motion.div>
           </header>
@@ -134,7 +139,9 @@ export default function PremiumTrending({ items = [] }) {
 
               <h2 style={styles.heroTitle}>{hero.name}</h2>
 
-              <p style={styles.desc}>{hero.description || "No description available"}</p>
+              <p style={styles.desc}>
+                {hero.description || "No description available"}
+              </p>
 
               <div style={styles.metaRow}>
                 <div>
@@ -144,7 +151,9 @@ export default function PremiumTrending({ items = [] }) {
 
                 <div>
                   <div style={styles.label}>CATEGORY</div>
-                  <div style={styles.category}>{hero.category || "General"}</div>
+                  <div style={styles.category}>
+                    {hero.category || "General"}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -216,7 +225,8 @@ const styles = {
     position: "fixed",
     inset: 0,
     pointerEvents: "none",
-    background: "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 45%)",
+    background:
+      "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 45%)",
   },
   header: {
     marginBottom: 28,

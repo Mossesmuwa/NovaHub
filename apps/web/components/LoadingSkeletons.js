@@ -1,6 +1,6 @@
 ﻿// components/LoadingSkeletons.js
 // Premium loading skeletons with smooth pulsing animations
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 // Base skeleton component
 function Skeleton({ height = "1rem", width = "100%", borderRadius = "8px" }) {

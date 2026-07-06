@@ -3,7 +3,7 @@
 import Head from "next/head";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 

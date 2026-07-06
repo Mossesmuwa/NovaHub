@@ -3,15 +3,11 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { useSupabase } from "shared/lib/SupabaseContext";
 import * as Favorites from "shared/lib/favorites";
 import { colors } from "shared/lib/design";
 import { useToast } from "../../components/Toast";
-=======
-import { supabase } from "../../lib/supabase";
-import { colors } from "../../lib/design";
->>>>>>> 50591a7c90e60952c5363e2bd4a789b18f50b8fb
+import { getSupabase } from "shared/lib/supabaseClient";
 
 // Import premium components
 import ScoreGauge from "../../components/ScoreGauge";

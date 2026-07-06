@@ -3,19 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-<<<<<<< HEAD
 import { useSupabase } from "shared/lib/SupabaseContext";
 import { logout } from "shared/lib/auth";
+import { colors } from "shared/lib/design";
 
 export default function Navbar({ activePage }) {
-=======
-import { colors } from "../lib/design";
-
-export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
->>>>>>> 50591a7c90e60952c5363e2bd4a789b18f50b8fb
   const router = useRouter();
   const { user, profile, loading } = useSupabase();
   const [scrolled, setScrolled] = useState(false);
@@ -71,40 +63,9 @@ export default function Navbar() {
             background: "var(--border2)",
             animation: "pulse 1.5s ease-in-out infinite",
           }}
-<<<<<<< HEAD
         />
       );
     }
-=======
-        >
-          {/* Logo */}
-          <Link href="/">
-            <a
-              style={{
-                fontSize: 24,
-                fontWeight: 900,
-                color: colors.gold,
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                letterSpacing: "-0.02em",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.textShadow = `0 0 12px ${colors.gold}40`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.textShadow = "none";
-              }}
-            >
-              <span style={{ fontSize: 28 }}>📊</span>
-              Platform
-            </a>
-          </Link>
->>>>>>> 50591a7c90e60952c5363e2bd4a789b18f50b8fb
 
     if (user) {
       return (

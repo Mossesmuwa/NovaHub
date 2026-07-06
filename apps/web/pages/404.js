@@ -334,4 +334,3 @@ export default function UltimateAdaptive404() {
     </div>
   );
 }
-

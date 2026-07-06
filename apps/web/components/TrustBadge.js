@@ -1,8 +1,8 @@
 ﻿// components/TrustBadge.js
 // Premium data quality display with visual confidence indicators
 import { useState } from "react";
-import { colors } from "../lib/design";
-import { formatDate } from "../lib/formatters";
+import { colors } from "shared/lib/design";
+import { formatDate } from "../../../packages/shared/lib/formatters";
 
 const metricInfo = {
   freshness: {

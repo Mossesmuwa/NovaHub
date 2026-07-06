@@ -1,6 +1,8 @@
 // pages/api/items/[slug]/nova-score.js
 // Returns Nova Score breakdown for an item with all verification data
-import { supabase } from "../../../../lib/supabase";
+import { getSupabase } from "../../../../../../packages/shared/lib/supabaseClient";
+
+const supabase = getSupabase();
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {

@@ -1,7 +1,7 @@
 // components/DataSources.js
 // Premium data sources display with verification status and links
 import { useState } from "react";
-import { colors } from "../lib/design";
+import { colors } from "shared/lib/design";
 
 const sourceIcons = {
   github: "⭐",

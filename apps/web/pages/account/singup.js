@@ -4,9 +4,9 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { colors } from "@lib/design";
-import Navbar from "@components/Navbar";
-import Footer from "@components/Footer";
+import { colors } from "shared/lib/design";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 export default function SignupPage() {
   const router = useRouter();
