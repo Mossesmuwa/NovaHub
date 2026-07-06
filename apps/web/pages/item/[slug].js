@@ -390,7 +390,7 @@ export default function ItemDetail({
                 color: colors.t1,
               }}
             >
-              🚀 Why It's Trending
+              🚀 Signal Drivers
             </h2>
             <TrendAnalysis
               reasons={[
