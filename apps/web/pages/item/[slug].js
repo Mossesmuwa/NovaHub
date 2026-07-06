@@ -3,8 +3,10 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { supabase } from "shared/lib/supabase";
+import { useSupabase } from "shared/lib/SupabaseContext";
+import * as Favorites from "shared/lib/favorites";
 import { colors } from "shared/lib/design";
+import { useToast } from "../../components/Toast";
 
 // Import premium components
 import ScoreGauge from "../../components/ScoreGauge";
@@ -21,15 +23,61 @@ export default function ItemDetail({
   dataSources,
   changeHistory,
 }) {
+  const toast = useToast();
+  const { user, loading: authLoading } = useSupabase();
   const [compareOpen, setCompareOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [saveCount, setSaveCount] = useState(item.save_count || 0);
+  const [saving, setSaving] = useState(false);
 
-  // Handle save
+  useEffect(() => {
+    setSaveCount(item.save_count || 0);
+    setIsSaved(false);
+  }, [item.id]);
+
+  useEffect(() => {
+    if (!item?.id || authLoading || !user) {
+      setIsSaved(false);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const saved = await Favorites.isFavorited(item.id);
+      if (!cancelled) setIsSaved(saved);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [item?.id, user, authLoading]);
+
   const handleSave = async () => {
-    setIsSaved(!isSaved);
-    setSaveCount(isSaved ? saveCount - 1 : saveCount + 1);
-    // TODO: persist to database
+    if (authLoading) return;
+    if (!user) {
+      toast("Please log in to save items.", "warning");
+      return;
+    }
+    if (saving) return;
+
+    const wasSaved = isSaved;
+    setSaving(true);
+    setIsSaved(!wasSaved);
+    setSaveCount((current) => current + (wasSaved ? -1 : 1));
+
+    const result = wasSaved
+      ? await Favorites.removeFavorite(item.id)
+      : await Favorites.addFavorite(item.id);
+
+    if (!result.success) {
+      setIsSaved(wasSaved);
+      setSaveCount((current) => current + (wasSaved ? 1 : -1));
+      toast(result.error || "Couldn't update saved items.", "error");
+    } else {
+      toast(wasSaved ? "Removed from saved items." : "Saved to your collection.", "success");
+    }
+
+    setSaving(false);
   };
 
   return (

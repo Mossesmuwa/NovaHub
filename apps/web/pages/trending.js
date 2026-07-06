@@ -1,5 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState } from "react";
+import Layout from "../components/Layout";
+import SEO from "../components/SEO";
+import { getSupabase } from "shared/lib/supabaseClient";
 
 const THEME = {
   gold: "#D4AF37",
@@ -15,7 +18,7 @@ function getRankMedal(rank) {
     { color: "#C0C0C0", label: "2nd" },
     { color: "#CD7F32", label: "3rd" },
   ];
-  
+
   if (rank < 3) {
     const medal = medals[rank];
     return (
@@ -32,115 +35,134 @@ function getRankMedal(rank) {
   return <div style={{ fontSize: 18, fontWeight: 900, color: "#666" }}>#{rank + 1}</div>;
 }
 
+export async function getServerSideProps() {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("items")
+      .select("id, slug, name, short_desc, long_desc, image, category_id, type, trending_score")
+      .eq("approved", true)
+      .order("trending_score", { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    const items = (data || []).map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      name: item.name,
+      description: item.short_desc || item.long_desc || "No description available",
+      category: item.category_id || item.type || "General",
+      image: item.image,
+      trending_score: item.trending_score ?? 0,
+    }));
+
+    return { props: { items } };
+  } catch (err) {
+    console.error("[trending] failed to load items", err);
+    return { props: { items: [] } };
+  }
+}
+
 export default function PremiumTrending({ items = [] }) {
   const [hovered, setHovered] = useState(null);
 
   const safeItems = Array.isArray(items) ? items : [];
 
   const sorted = useMemo(() => {
-    return [...safeItems].sort(
-      (a, b) => (b.trending_score || 0) - (a.trending_score || 0),
-    );
+    return [...safeItems].sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
   }, [safeItems]);
 
   const hero = sorted[0];
   const rest = sorted.slice(1, 10);
 
-  // EMPTY STATE (critical for Vercel + SSR)
   if (!hero) {
     return (
-      <div style={styles.center}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          style={{ color: "#fff", textAlign: "center" }}
-        >
-          <h2>No trending data yet</h2>
-          <p style={{ color: THEME.text2 }}>Waiting for live signals...</p>
-        </motion.div>
-      </div>
+      <Layout activePage="trending">
+        <SEO title="Trending — NovaHub" />
+        <div style={styles.center}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: "#fff", textAlign: "center" }}>
+            <h2>No trending data yet</h2>
+            <p style={{ color: THEME.text2 }}>Waiting for live signals...</p>
+          </motion.div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div style={styles.page}>
-      {/* Glow background */}
-      <div style={styles.glow} />
+    <Layout activePage="trending">
+      <SEO title="Trending — NovaHub" />
+      <div style={styles.page}>
+        <div style={styles.glow} />
 
-      <div style={styles.container}>
-        {/* HEADER */}
-        <header style={styles.header}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div style={styles.kicker}>GLOBAL TREND ENGINE</div>
-            <h1 style={styles.title}>
-              What’s <span style={{ color: THEME.gold }}>Exploding</span> Now
-            </h1>
-          </motion.div>
-        </header>
+        <div style={styles.container}>
+          <header style={styles.header}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div style={styles.kicker}>GLOBAL TREND ENGINE</div>
+              <h1 style={styles.title}>
+                What’s <span style={{ color: THEME.gold }}>Exploding</span> Now
+              </h1>
+            </motion.div>
+          </header>
 
-        {/* MAIN GRID */}
-        <div style={styles.grid}>
-          {/* HERO CARD */}
-          <motion.div whileHover={{ scale: 1.01 }} style={styles.hero}>
-            {getRankMedal(0)}
+          <div style={styles.grid}>
+            <motion.div whileHover={{ scale: 1.01 }} style={styles.hero}>
+              {getRankMedal(0)}
 
-            <h2 style={styles.heroTitle}>{hero.name}</h2>
+              <h2 style={styles.heroTitle}>{hero.name}</h2>
 
-            <p style={styles.desc}>
-              {hero.description || "No description available"}
-            </p>
+              <p style={styles.desc}>{hero.description || "No description available"}</p>
 
-            <div style={styles.metaRow}>
-              <div>
-                <div style={styles.label}>TREND SCORE</div>
-                <div style={styles.score}>{hero.trending_score ?? 0}</div>
+              <div style={styles.metaRow}>
+                <div>
+                  <div style={styles.label}>TREND SCORE</div>
+                  <div style={styles.score}>{hero.trending_score ?? 0}</div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>CATEGORY</div>
+                  <div style={styles.category}>{hero.category || "General"}</div>
+                </div>
               </div>
+            </motion.div>
 
-              <div>
-                <div style={styles.label}>CATEGORY</div>
-                <div style={styles.category}>{hero.category || "General"}</div>
-              </div>
+            <div style={styles.list}>
+              <AnimatePresence>
+                {rest.map((item, i) => (
+                  <motion.div
+                    key={item.id || i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    whileHover={{ x: 6 }}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                    style={{
+                      ...styles.card,
+                      borderColor: hovered === i ? THEME.gold : THEME.border,
+                    }}
+                  >
+                    <div style={styles.rank}>{getRankMedal(i + 1)}</div>
+
+                    {item.image ? <img src={item.image} alt="" style={styles.img} /> : <div style={styles.imgPlaceholder} />}
+
+                    <div style={{ flex: 1 }}>
+                      <div style={styles.name}>{item.name}</div>
+                      <div style={styles.sub}>{item.category}</div>
+                    </div>
+
+                    <div style={styles.points}>{item.trending_score ?? 0}</div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
-          </motion.div>
-
-          {/* LIST */}
-          <div style={styles.list}>
-            <AnimatePresence>
-              {rest.map((item, i) => (
-                <motion.div
-                  key={item.id || i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  whileHover={{ x: 6 }}
-                  onMouseEnter={() => setHovered(i)}
-                  onMouseLeave={() => setHovered(null)}
-                  style={{
-                    ...styles.card,
-                    borderColor: hovered === i ? THEME.gold : THEME.border,
-                  }}
-                >
-                  <div style={styles.rank}>{getRankMedal(i + 1)}</div>
-
-                  <img src={item.image} alt="" style={styles.img} />
-
-                  <div style={{ flex: 1 }}>
-                    <div style={styles.name}>{item.name}</div>
-                    <div style={styles.sub}>{item.category}</div>
-                  </div>
-
-                  <div style={styles.points}>{item.trending_score ?? 0}</div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
-
-/* ---------------- STYLES ---------------- */
 
 const styles = {
   page: {
@@ -173,8 +195,7 @@ const styles = {
     transform: "translateX(-50%)",
     width: "70vw",
     height: "60vh",
-    background:
-      "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
+    background: "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
     pointerEvents: "none",
   },
 
@@ -268,6 +289,13 @@ const styles = {
     height: 42,
     borderRadius: 10,
     objectFit: "cover",
+  },
+
+  imgPlaceholder: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    background: "rgba(255,255,255,0.08)",
   },
 
   name: {
